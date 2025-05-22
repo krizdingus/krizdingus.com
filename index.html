@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<!--
+KRIZDINGUS.com Homepage
+Design: Game Boy-inspired retro aesthetic with 90s web motifs
+Palette: Light gray (#c4bebb), pixel green (#84d07d), magenta (#9a2257), charcoal (#272929)
+Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode toggle
+-->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Krizdingus - Hardware Hacks and Chaotic Code</title>
+    <meta name="description" content="Hardware hacks and chaotic code, served fresh. Web developer by trade, maker by impulse.">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "WebSite",
+                "@id": "https://krizdingus.com/#site",
+                "url": "https://krizdingus.com/",
+                "name": "Krizdingus",
+                "description": "Hardware hacks and chaotic code, served fresh",
+                "publisher": { "@id": "https://krizdingus.com/#person" }
+            },
+            {
+                "@type": "Person",
+                "@id": "https://krizdingus.com/#person",
+                "name": "Kris Williams",
+                "url": "https://krizdingus.com/",
+                "jobTitle": "Web Developer & Maker",
+                "description": "Web developer by trade, maker by impulse. Building tools, toys, and quirks in equal measure.",
+                "sameAs": [
+                    "https://github.com/krizdingus",
+                    "https://www.instagram.com/krizdingus/",
+                    "https://kwilliams.me"
+                ]
+            },
+            {
+                "@type": "ItemList",
+                "@id": "https://krizdingus.com/#projects",
+                "itemListOrder": "https://schema.org/ItemListOrderAscending",
+                "numberOfItems": 8,
+                "itemListElement": [
+                    {
+                        "@type": "CreativeWork",
+                        "position": 1,
+                        "url": "https://makerworld.com/en/models/715832-mini-magsafe-zyn-container",
+                        "name": "Mini MagSafe Zyn Container",
+                        "description": "A magnetic pouch dock so I never lose a Zyn mid-panic-coding session.",
+                        "creator": { "@id": "https://krizdingus.com/#person" }
+                    },
+                    {
+                        "@type": "CreativeWork",
+                        "position": 2,
+                        "url": "https://github.com/krizdingus/gb-rom-database-bot",
+                        "name": "GB ROM Database Bot",
+                        "description": "Because remembering 7,000 Game Boy titles is above my pay grade.",
+                        "creator": { "@id": "https://krizdingus.com/#person" }
+                    }
+                ]
+            }
+        ]
+    }
+    </script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JDBW51FKXH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-JDBW51FKXH');
+    </script>
+</head>
+<body>
+    <!-- Skip Link -->
+    <a href="#main" class="skip-link">Skip to main content</a>
+
+    <!-- Header -->
+    <header role="banner" class="site-header">
+        <div class="container">
+            <h1 class="site-title">
+                <span class="pixel-text">KRIZDINGUS</span>
+            </h1>
+            <nav role="navigation" aria-label="Main navigation">
+                <ul class="nav-list">
+                    <li><a href="#home" aria-current="page">Home</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="https://kwilliams.me" target="_blank" rel="noopener">Web</a></li>
+                </ul>
+            </nav>
+            <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light theme">
+                <span class="toggle-icon">◐</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main" role="main">
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <div class="scan-lines"></div>
+                <h1 class="hero-title pixel-text">KRIZDINGUS</h1>
+                <p class="hero-tagline">Hardware hacks and chaotic code, served fresh</p>
+                <a href="#projects" class="cta-button">View Projects</a>
+            </div>
+        </section>
+
+        <!-- Featured Project -->
+        <section id="featured" class="featured-project" itemscope itemtype="https://schema.org/CreativeWork">
+            <div class="container">
+                <h2>Featured Project</h2>
+                <article class="project-card featured">
+                    <figure class="project-image">
+                        <img src="/api/placeholder/300/200" 
+                             alt="Mini MagSafe Zyn Container - A 3D printed magnetic container" 
+                             itemprop="image"
+                             loading="lazy">
+                    </figure>
+                    <div class="project-info">
+                        <h3 itemprop="name">Mini MagSafe Zyn Container</h3>
+                        <p itemprop="description">A magnetic pouch dock so I never lose a Zyn mid-panic-coding session.</p>
+                        <ul class="tech-tags">
+                            <li>Shapr3D</li>
+                            <li>ABS FDM</li>
+                            <li>3D Print</li>
+                        </ul>
+                        <a href="https://makerworld.com/en/models/715832-mini-magsafe-zyn-container" 
+                           target="_blank" 
+                           rel="noopener"
+                           itemprop="url"
+                           class="project-link">View Project</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Projects Grid -->
+        <section id="projects" class="projects-section" itemscope itemtype="https://schema.org/ItemList">
+            <div class="container">
+                <h2>All Projects</h2>
+                <div class="projects-grid">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement">
+                        <a href="https://github.com/krizdingus/gb-rom-database-bot" target="_blank" rel="noopener" itemprop="url">
+                            <h3 itemprop="name">GB ROM Database Bot</h3>
+                            <p class="project-hook">Because remembering 7,000 Game Boy titles is above my pay grade.</p>
+                            <div class="tech-tags">
+                                <span>JavaScript</span>
+                                <span>Node.js</span>
+                            </div>
+                        </a>
+                    </article>
+
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement">
+                        <a href="https://github.com/krizdingus/gameboy-cartridge-labels" target="_blank" rel="noopener" itemprop="url">
+                            <h3 itemprop="name">Game Boy Cartridge Labels</h3>
+                            <p class="project-hook">Custom labels for homebrew and flash cartridges.</p>
+                            <div class="tech-tags">
+                                <span>Design</span>
+                                <span>Print</span>
+                            </div>
+                        </a>
+                    </article>
+
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement">
+                        <a href="https://krizdingus.com/mousebitelabs/" target="_blank" rel="noopener" itemprop="url">
+                            <h3 itemprop="name">Mouse Bite Flash Cart Labels</h3>
+                            <p class="project-hook">Professional labels for Mouse Bite Labs cartridges.</p>
+                            <div class="tech-tags">
+                                <span>Design</span>
+                                <span>Web</span>
+                            </div>
+                        </a>
+                    </article>
+
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement">
+                        <a href="https://makerworld.com/en/models/623660-game-boy-game-pak-discreet-display-stand" target="_blank" rel="noopener" itemprop="url">
+                            <h3 itemprop="name">Game Boy Display Stand</h3>
+                            <p class="project-hook">Discreet display stand for Game Boy cartridges.</p>
+                            <div class="tech-tags">
+                                <span>3D Design</span>
+                                <span>Print</span>
+                            </div>
+                        </a>
+                    </article>
+
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement">
+                        <a href="https://makerworld.com/en/models/640269-cassette-style-case-for-game-boy-games" target="_blank" rel="noopener" itemprop="url">
+                            <h3 itemprop="name">Cassette-Style Game Case</h3>
+                            <p class="project-hook">Retro storage solution for Game Boy games.</p>
+                            <div class="tech-tags">
+                                <span>3D Design</span>
+                                <span>Retro</span>
+                            </div>
+                        </a>
+                    </article>
+
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement">
+                        <a href="https://www.thingiverse.com/thing:6240141" target="_blank" rel="noopener" itemprop="url">
+                            <h3 itemprop="name">GameCube USB-C Adapter</h3>
+                            <p class="project-hook">Modern power solution for vintage gaming.</p>
+                            <div class="tech-tags">
+                                <span>Hardware</span>
+                                <span>Mod</span>
+                            </div>
+                        </a>
+                    </article>
+
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement">
+                        <a href="https://makerworld.com/en/models/1293032-printable-poopin-stool" target="_blank" rel="noopener" itemprop="url">
+                            <h3 itemprop="name">Printable Poopin' Stool</h3>
+                            <p class="project-hook">Practical solutions for everyday problems.</p>
+                            <div class="tech-tags">
+                                <span>Practical</span>
+                                <span>3D Print</span>
+                            </div>
+                        </a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="about-section" itemscope itemtype="https://schema.org/Person">
+            <div class="container">
+                <h2>About</h2>
+                <div class="about-content">
+                    <p itemprop="description">I'm Kris—web developer by trade, maker by impulse. I build tools, toys, and quirks in equal measure, then share the blueprints here for anyone foolish enough to follow along.</p>
+                    
+                    <p>I've been on the internet since 1995. I like to tinker. Sometimes I record myself doing it and share it on my <a href="https://www.instagram.com/krizdingus/" target="_blank" rel="noopener" itemprop="sameAs">Instagram</a>. My projects typically involve programming, creative design, crafting, and/or some combination of those.</p>
+                    
+                    <p>After enough messages from a handful of very kind people, I've put up this website as a repository for project files, links, and more.</p>
+                    
+                    <p>By day I'm a <a href="https://kwilliams.me" target="_blank" rel="noopener" itemprop="url">web developer</a> with too many pets. Thanks for stopping by.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer role="contentinfo" class="site-footer">
+        <div class="container">
+            <nav class="social-nav" aria-label="Social media links">
+                <a href="https://www.instagram.com/krizdingus/" target="_blank" rel="noopener" aria-label="Instagram">
+                    <span class="social-icon">📷</span>
+                </a>
+                <a href="https://github.com/krizdingus" target="_blank" rel="noopener" aria-label="GitHub">
+                    <span class="social-icon">⚡</span>
+                </a>
+                <a href="https://kwilliams.me" target="_blank" rel="noopener" aria-label="Portfolio Website">
+                    <span class="social-icon">🌐</span>
+                </a>
+            </nav>
+            <p class="footer-text">Built with code and plastic. Powered by curiosity.</p>
+            <p class="copyright">© This is all <a href="https://kwilliams.me" target="_blank" rel="noopener">K. Williams</a> fault, 2022-2025.</p>
+        </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
