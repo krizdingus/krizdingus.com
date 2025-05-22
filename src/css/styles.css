@@ -159,12 +159,10 @@ p {
 
 .site-header .container {
     display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding-top: var(--spacing-sm);
-    padding-bottom: var(--spacing-sm);
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
+    width: 100%;
 }
 
 .site-title {
@@ -175,9 +173,17 @@ p {
 /* Navigation */
 .nav-list {
     display: flex;
-    list-style: none;
+    flex-direction: row;
+    align-items: center;
     gap: var(--spacing-md);
-    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.nav-list li {
+    display: flex;
+    align-items: center;
 }
 
 .nav-list a {
@@ -217,34 +223,44 @@ p {
 
 /* Theme Toggle */
 .theme-toggle {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
     width: 40px;
     height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
     padding: 0;
+    background: var(--accent-secondary);
+    border: var(--border-width) solid transparent;
+    border-radius: var(--border-radius);
+    color: white;
+    transition: var(--transition);
+    cursor: pointer;
 }
 
-.theme-toggle:hover {
-    background: var(--bg-hover);
-    transform: scale(1.05);
+.theme-toggle:hover,
+.theme-toggle:focus {
+    background: var(--accent-tertiary);
+    color: var(--text-primary);
+    border-color: var(--accent-secondary);
+    outline: none;
+    transform: translateY(-1px);
 }
 
-.theme-toggle:active {
-    transform: scale(0.95);
+[data-theme="dark"] .theme-toggle {
+    background: var(--dark-accent-secondary);
+    color: white;
+}
+[data-theme="dark"] .theme-toggle:hover,
+[data-theme="dark"] .theme-toggle:focus {
+    background: var(--dark-accent-tertiary);
+    color: var(--dark-bg-primary);
+    border-color: var(--dark-accent-secondary);
 }
 
 .theme-toggle .sun-icon,
 .theme-toggle .moon-icon {
     width: 20px;
     height: 20px;
-    transition: opacity 0.3s ease;
 }
 
 .theme-toggle .sun-icon {
@@ -784,11 +800,28 @@ a:focus {
 @media (max-width: 768px) {
     .site-header .container {
         flex-direction: column;
+        align-items: center;
         text-align: center;
     }
-    
     .nav-list {
+        flex-direction: row;
         justify-content: center;
+        align-items: center;
+        gap: var(--spacing-md);
+        margin-top: var(--spacing-sm);
+    }
+    .nav-list li {
+        width: auto;
+        justify-content: center;
+    }
+    .theme-toggle {
+        width: 32px;
+        height: 32px;
+    }
+    .theme-toggle .sun-icon,
+    .theme-toggle .moon-icon {
+        width: 16px;
+        height: 16px;
     }
     
     .hero {

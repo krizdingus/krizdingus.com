@@ -34,20 +34,6 @@ coverage/
 
 # Cloudflare
 .cloudflare/
-.wrangler/
-.dev.vars
-
-# Strapi
-.strapi/
-.strapi-updater.json
-license.txt
-exports/
-*.cache
-.tmp/
-.temp/
-
-# Railway
-.railway/
 
 # macOS
 .AppleDouble

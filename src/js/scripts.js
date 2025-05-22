@@ -289,37 +289,6 @@ class ProjectCardManager {
     }
 }
 
-// ===== PERFORMANCE MONITORING =====
-class PerformanceMonitor {
-    constructor() {
-        this.init();
-    }
-    
-    init() {
-        // Monitor page load performance
-        window.addEventListener('load', () => {
-            if ('performance' in window) {
-                // Report Core Web Vitals if available
-                this.reportWebVitals();
-            }
-        });
-    }
-    
-    reportWebVitals() {
-        // Simple performance tracking
-        try {
-            const perfEntries = performance.getEntriesByType('navigation')[0];
-            if (perfEntries) {
-                const metrics = {
-                    domContentLoaded: Math.round(perfEntries.domContentLoadedEventEnd - perfEntries.domContentLoadedEventStart),
-                    loadComplete: Math.round(perfEntries.loadEventEnd - perfEntries.loadEventStart)
-                };
-            }
-        } catch (e) {
-        }
-    }
-}
-
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize all managers
