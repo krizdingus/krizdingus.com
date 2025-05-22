@@ -43,12 +43,7 @@ Personal website showcasing hardware hacks and chaotic code projects. Built with
    yarn install
    ```
 
-3. Set up environment variables:
-   ```bash
-   cp .env.example .env
-   ```
-
-4. Start the development server:
+3. Start the development server:
    ```bash
    npm run dev
    # or
@@ -79,10 +74,6 @@ krizdingus.com/
 ├── postcss.config.js      # PostCSS configuration
 └── README.md              # Project documentation
 ```
-
-## License
-
-[Your chosen license]
 
 ## Author
 
