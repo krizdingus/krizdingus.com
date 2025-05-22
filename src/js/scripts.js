@@ -9,7 +9,6 @@ Storage: localStorage for theme persistence across visits
 class ThemeManager {
     constructor() {
         this.themeToggle = document.querySelector('.theme-toggle');
-        this.toggleIcon = document.querySelector('.toggle-icon');
         this.currentTheme = this.getStoredTheme() || this.getPreferredTheme();
         
         this.init();
@@ -18,7 +17,6 @@ class ThemeManager {
     init() {
         // Set initial theme
         this.applyTheme(this.currentTheme);
-        this.updateToggleIcon();
         
         // Add event listener
         this.themeToggle?.addEventListener('click', () => this.toggleTheme());
@@ -55,23 +53,12 @@ class ThemeManager {
     toggleTheme() {
         const newTheme = this.currentTheme === 'light' ? 'dark' : 'light';
         this.applyTheme(newTheme);
-        this.updateToggleIcon();
         
         // Add a subtle animation feedback
         this.themeToggle.style.transform = 'scale(0.95)';
         setTimeout(() => {
             this.themeToggle.style.transform = '';
         }, 150);
-    }
-    
-    updateToggleIcon() {
-        if (this.toggleIcon) {
-            this.toggleIcon.textContent = this.currentTheme === 'light' ? '🌙' : '☀️';
-        }
-        
-        // Update aria-label for accessibility
-        const label = this.currentTheme === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
-        this.themeToggle?.setAttribute('aria-label', label);
     }
     
     watchSystemTheme() {
@@ -82,7 +69,6 @@ class ThemeManager {
             if (!this.getStoredTheme()) {
                 const newTheme = e.matches ? 'dark' : 'light';
                 this.applyTheme(newTheme);
-                this.updateToggleIcon();
             }
         });
     }
@@ -93,74 +79,70 @@ class HeroAnimationManager {
     constructor() {
         this.scanLines = document.querySelector('.scan-lines');
         this.heroTitle = document.querySelector('.hero-title');
+        this.hero = document.querySelector('.hero');
         this.init();
     }
     
     init() {
-        // Respect user's motion preferences
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            return;
-        }
-        
-        // Add entrance animations when hero comes into view
-        this.observeHero();
-        
-        // Add interactive scan line effect
-        this.addInteractiveScanLines();
+        this.setupScanLines();
+        this.setupTitleAnimation();
+        this.addInteractiveStatic();
     }
     
-    observeHero() {
-        const hero = document.querySelector('.hero');
-        if (!hero) return;
+    setupScanLines() {
+        if (!this.scanLines) return;
+    }
+    
+    setupTitleAnimation() {
+        if (!this.heroTitle) return;
         
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    this.animateHeroEntrance();
-                    observer.unobserve(entry.target);
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        this.hero.classList.add('is-visible');
+                    }
+                });
+            },
+            { threshold: 0.1 }
+        );
+        
+        observer.observe(this.hero);
+    }
+    
+    addInteractiveStatic() {
+        if (!this.hero) return;
+        // Click for static burst
+        this.hero.addEventListener('click', () => {
+            this.triggerStaticBurst();
+        });
+        // Random static spikes
+        this.addRandomStaticSpikes();
+    }
+    
+    triggerStaticBurst() {
+        this.hero.classList.add('glitch-burst');
+        setTimeout(() => {
+            this.hero.classList.remove('glitch-burst');
+        }, 300);
+    }
+    
+    addRandomStaticSpikes() {
+        const scheduleSpike = () => {
+            const delay = 4000 + Math.random() * 6000; // 4-10 seconds
+            setTimeout(() => {
+                if (Math.random() < 0.6) { // 60% chance
+                    const currentIntensity = parseFloat(getComputedStyle(this.hero).getPropertyValue('--static-intensity')) || 0.4;
+                    this.hero.style.setProperty('--static-intensity', currentIntensity + 0.3);
+                    
+                    setTimeout(() => {
+                        this.hero.style.removeProperty('--static-intensity');
+                    }, 200);
                 }
-            });
-        }, { threshold: 0.1 });
-        
-        observer.observe(hero);
-    }
-    
-    animateHeroEntrance() {
-        // Stagger the entrance of hero elements
-        const elements = [
-            document.querySelector('.hero-title'),
-            document.querySelector('.hero-tagline'),
-            document.querySelector('.cta-button')
-        ].filter(Boolean);
-        
-        elements.forEach((element, index) => {
-            element.style.opacity = '0';
-            element.style.transform = 'translateY(20px)';
-            element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            
-            setTimeout(() => {
-                element.style.opacity = '1';
-                element.style.transform = 'translateY(0)';
-            }, index * 200 + 300);
-        });
-    }
-    
-    addInteractiveScanLines() {
-        const hero = document.querySelector('.hero');
-        if (!hero || !this.scanLines) return;
-        
-        let isAnimating = false;
-        
-        hero.addEventListener('mouseenter', () => {
-            if (isAnimating) return;
-            isAnimating = true;
-            
-            this.scanLines.style.animationDuration = '0.5s';
-            setTimeout(() => {
-                this.scanLines.style.animationDuration = '2s';
-                isAnimating = false;
-            }, 500);
-        });
+                scheduleSpike();
+            }, delay);
+        };
+        scheduleSpike();
     }
 }
 
@@ -317,9 +299,6 @@ class PerformanceMonitor {
         // Monitor page load performance
         window.addEventListener('load', () => {
             if ('performance' in window) {
-                const loadTime = performance.now();
-                console.log(`🚀 Krizdingus loaded in ${Math.round(loadTime)}ms`);
-                
                 // Report Core Web Vitals if available
                 this.reportWebVitals();
             }
@@ -335,92 +314,21 @@ class PerformanceMonitor {
                     domContentLoaded: Math.round(perfEntries.domContentLoadedEventEnd - perfEntries.domContentLoadedEventStart),
                     loadComplete: Math.round(perfEntries.loadEventEnd - perfEntries.loadEventStart)
                 };
-                
-                console.log('📊 Performance metrics:', metrics);
             }
         } catch (e) {
-            console.log('Performance monitoring not available');
         }
-    }
-}
-
-// ===== EASTER EGG =====
-class EasterEgg {
-    constructor() {
-        this.sequence = [];
-        this.targetSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
-        this.init();
-    }
-    
-    init() {
-        document.addEventListener('keydown', (e) => {
-            this.sequence.push(e.code);
-            
-            // Keep only the last 10 keystrokes
-            if (this.sequence.length > this.targetSequence.length) {
-                this.sequence.shift();
-            }
-            
-            // Check if sequence matches
-            if (this.sequence.length === this.targetSequence.length &&
-                this.sequence.every((key, index) => key === this.targetSequence[index])) {
-                this.triggerEasterEgg();
-                this.sequence = []; // Reset
-            }
-        });
-    }
-    
-    triggerEasterEgg() {
-        // Add a fun Game Boy-style transformation
-        const body = document.body;
-        body.style.filter = 'sepia(1) hue-rotate(80deg) saturate(2)';
-        body.style.transform = 'scale(1.02)';
-        
-        // Show a message
-        const message = document.createElement('div');
-        message.textContent = '🎮 KONAMI CODE ACTIVATED! 30 LIVES ADDED!';
-        message.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--accent-primary);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            font-family: var(--font-pixel);
-            font-size: 1.2rem;
-            z-index: 9999;
-            animation: bounce 0.5s ease;
-        `;
-        
-        document.body.appendChild(message);
-        
-        // Clean up after 3 seconds
-        setTimeout(() => {
-            body.style.filter = '';
-            body.style.transform = '';
-            message.remove();
-        }, 3000);
-        
-        console.log('🎮 Konami Code activated! You found the easter egg!');
     }
 }
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎮 Initializing Krizdingus...');
-    
     // Initialize all managers
     new ThemeManager();
     new HeroAnimationManager();
     new LazyImageLoader();
     new SmoothScrollManager();
     new ProjectCardManager();
-    new PerformanceMonitor();
-    new EasterEgg();
-    
-    console.log('✅ Krizdingus fully loaded and ready!');
+    // new PerformanceMonitor(); // Disabled for now
 });
 
 // ===== ERROR HANDLING =====
@@ -428,13 +336,3 @@ window.addEventListener('error', (e) => {
     console.error('🚨 JavaScript error:', e.error);
     // Could send to analytics service in production
 });
-
-// ===== SERVICE WORKER REGISTRATION (Future Enhancement) =====
-if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
-    window.addEventListener('load', () => {
-        // Uncomment when you have a service worker
-        // navigator.serviceWorker.register('/sw.js')
-        //     .then(reg => console.log('SW registered:', reg))
-        //     .catch(err => console.log('SW registration failed:', err));
-    });
-}

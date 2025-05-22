@@ -1,0 +1,26 @@
+{
+  "name": "krizdingus.com",
+  "version": "1.0.0",
+  "description": "Personal website showcasing hardware hacks and chaotic code projects",
+  "scripts": {
+    "dev": "npx serve src",
+    "build": "npm run clean && npm run build:css && npm run build:js && npm run copy:assets",
+    "build:css": "npx postcss src/css/styles.css -o dist/styles.css",
+    "build:js": "npx terser src/js/scripts.js -o dist/scripts.js",
+    "copy:assets": "cp -r src/assets dist/ && cp src/index.html dist/",
+    "clean": "rm -rf dist",
+    "start": "npm run build && npx serve dist"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35",
+    "postcss-cli": "^11.0.0",
+    "serve": "^14.2.1",
+    "terser": "^5.27.0"
+  },
+  "browserslist": [
+    "> 0.5%",
+    "last 2 versions",
+    "not dead"
+  ]
+} 

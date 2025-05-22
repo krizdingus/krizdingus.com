@@ -53,6 +53,7 @@ Effects: Scan lines, beveled buttons, subtle hover animations
     --border-radius: 4px;
     --transition: all 0.2s ease;
     --scan-line-height: 2px;
+    --static-intensity: 0.5; /* Dynamic static opacity control */
 }
 
 /* Dark Theme Custom Properties */
@@ -129,11 +130,11 @@ p {
 /* ===== SKIP LINK ===== */
 .skip-link {
     position: absolute;
-    top: -40px;
-    left: 6px;
+    top: -9999px;
+    left: 0;
     background: var(--accent-primary);
     color: white;
-    padding: 8px;
+    padding: 8px 12px;
     text-decoration: none;
     border-radius: var(--border-radius);
     z-index: 1000;
@@ -141,8 +142,9 @@ p {
 }
 
 .skip-link:focus {
-    top: 6px;
+    top: 0;
     outline: 2px solid var(--accent-tertiary);
+    outline-offset: 2px;
 }
 
 /* ===== HEADER ===== */
@@ -199,6 +201,14 @@ p {
     outline: none;
 }
 
+/* Dark Theme Navigation Hover */
+[data-theme="dark"] .nav-list a:hover,
+[data-theme="dark"] .nav-list a:focus {
+    color: var(--dark-bg-primary);
+    background: var(--dark-accent-tertiary);
+    border-color: var(--dark-accent-secondary);
+}
+
 .nav-list a[aria-current="page"] {
     background: var(--accent-primary);
     color: white;
@@ -207,25 +217,51 @@ p {
 
 /* Theme Toggle */
 .theme-toggle {
-    background: var(--bg-tertiary);
-    border: var(--border-width) solid var(--border-color);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     color: var(--text-primary);
-    width: 44px;
-    height: 44px;
-    border-radius: var(--border-radius);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     cursor: pointer;
-    transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    padding: 0;
 }
 
-.theme-toggle:hover,
-.theme-toggle:focus {
-    background: var(--accent-tertiary);
+.theme-toggle:hover {
+    background: var(--bg-hover);
     transform: scale(1.05);
-    outline: 2px solid var(--accent-primary);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+.theme-toggle .sun-icon,
+.theme-toggle .moon-icon {
+    width: 20px;
+    height: 20px;
+    transition: opacity 0.3s ease;
+}
+
+.theme-toggle .sun-icon {
+    opacity: 1;
+}
+
+.theme-toggle .moon-icon {
+    opacity: 0;
+    position: absolute;
+}
+
+[data-theme="dark"] .theme-toggle .sun-icon {
+    opacity: 0;
+}
+
+[data-theme="dark"] .theme-toggle .moon-icon {
+    opacity: 1;
 }
 
 /* ===== HERO SECTION ===== */
@@ -238,6 +274,175 @@ p {
     justify-content: center;
     overflow: hidden;
     border-bottom: var(--border-width) solid var(--border-color);
+    animation: occasionalGlitch 10s infinite; /* Increased frequency */
+    will-change: transform, filter;
+    transform: translateZ(0);
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('../assets/images/dingus_and_dog.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.15;
+    z-index: 1;
+    animation: staticBars 0.2s infinite steps(3);
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3CcolorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.5; /* Slightly increased opacity */
+    mix-blend-mode: overlay;
+    animation: dramaticStatic 0.08s steps(8) infinite;
+    pointer-events: none;
+    z-index: 2;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+}
+
+@keyframes dramaticStatic {
+    0% { 
+        transform: translate(0, 0) scale(1) rotate(0deg); 
+        opacity: 0.5; /* Match base opacity */
+    }
+    12.5% { 
+        transform: translate(-3px, 2px) scale(1.02) rotate(0.5deg); 
+        opacity: 0.6; /* Slightly higher peak */
+    }
+    25% { 
+        transform: translate(2px, -3px) scale(0.98) rotate(-0.5deg); 
+        opacity: 0.4; /* Slightly lower dip */
+    }
+    37.5% { 
+        transform: translate(-2px, -2px) scale(1.03) rotate(0.3deg); 
+        opacity: 0.55;
+    }
+    50% { 
+        transform: translate(3px, 3px) scale(0.97) rotate(-0.3deg); 
+        opacity: 0.65; /* Higher peak */
+    }
+    62.5% { 
+        transform: translate(-1px, 2px) scale(1.01) rotate(0.2deg); 
+        opacity: 0.45;
+    }
+    75% { 
+        transform: translate(2px, -1px) scale(0.99) rotate(-0.2deg); 
+        opacity: 0.58;
+    }
+    87.5% { 
+        transform: translate(-3px, -1px) scale(1.02) rotate(0.4deg); 
+        opacity: 0.62;
+    }
+    100% { 
+        transform: translate(1px, -2px) scale(1) rotate(0deg); 
+        opacity: 0.5; /* Return to base opacity */
+    }
+}
+
+.hero.glitch-burst {
+    animation: glitchBurst 0.3s ease-out;
+}
+
+@keyframes glitchBurst {
+    0% { filter: none; transform: none; }
+    10% { filter: hue-rotate(360deg) saturate(5) contrast(3); transform: translate(5px, 0) skewX(5deg); }
+    20% { filter: invert(1) hue-rotate(180deg) saturate(2); transform: translate(-5px, 2px) skewX(-3deg); }
+    30% { filter: sepia(1) saturate(8) hue-rotate(120deg); transform: translate(3px, -3px) skewY(2deg); }
+    40% { filter: contrast(5) brightness(3) saturate(0); transform: translate(-2px, 1px) scale(1.02); }
+    50% { filter: hue-rotate(-360deg) saturate(3) invert(0.5); transform: translate(2px, -1px) scale(0.98); }
+    100% { filter: none; transform: none; }
+}
+
+@keyframes occasionalGlitch {
+    0%, 95%, 100% { 
+        filter: none;
+        transform: none;
+    }
+    96% { 
+        filter: hue-rotate(90deg) saturate(1.5);
+        transform: translate(1px, 0);
+    }
+    97% { 
+        filter: hue-rotate(-90deg) saturate(0.8);
+        transform: translate(-1px, 0);
+    }
+    98% { 
+        filter: none;
+        transform: translate(0, 0);
+    }
+}
+
+/* Alternative subtle static effect */
+.hero.subtle-static::after {
+    animation: subtleStatic 0.15s linear infinite;
+    opacity: 0.06;
+}
+
+@keyframes subtleStatic {
+    0% { 
+        transform: translateX(0) translateY(0);
+        background-position: 0 0;
+    }
+    25% { 
+        transform: translateX(-0.5px) translateY(0.5px);
+        background-position: -1px 1px;
+    }
+    50% { 
+        transform: translateX(0.5px) translateY(-0.5px);
+        background-position: 1px -1px;
+    }
+    75% { 
+        transform: translateX(-0.5px) translateY(-0.5px);
+        background-position: -1px -1px;
+    }
+    100% { 
+        transform: translateX(0.5px) translateY(0.5px);
+        background-position: 1px 1px;
+    }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .hero::after {
+        animation: subtleStatic 0.5s linear infinite;
+        opacity: 0.03;
+    }
+    
+    .hero::before {
+        animation: none;
+    }
+    
+    .hero {
+        animation: none;
+    }
+}
+
+/* Fallback for browsers that don't support SVG filters */
+@supports not (filter: url(#noiseFilter)) {
+    .hero::after {
+        background-image: linear-gradient(45deg, 
+            rgba(0,0,0,0.1) 25%, 
+            transparent 25%, 
+            transparent 50%, 
+            rgba(0,0,0,0.1) 50%, 
+            rgba(0,0,0,0.1) 75%, 
+            transparent 75%, 
+            transparent
+        );
+        background-size: 4px 4px;
+    }
 }
 
 .hero-content {
@@ -246,6 +451,33 @@ p {
     z-index: 2;
     max-width: var(--container-narrow);
     padding: var(--spacing-xl);
+    background: rgba(var(--bg-primary-rgb), 0.8);
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(4px);
+    width: 100%; /* Ensure it doesn't constrain children */
+}
+
+.hero-content > * {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.hero.is-visible .hero-content > * {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hero.is-visible .hero-content .hero-title {
+    transition-delay: 0.1s;
+}
+
+.hero.is-visible .hero-content .hero-tagline {
+    transition-delay: 0.2s;
+}
+
+.hero.is-visible .hero-content .cta-button {
+    transition-delay: 0.3s;
 }
 
 .hero-title {
@@ -269,16 +501,30 @@ p {
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    animation: scanlines 2s linear infinite;
+}
+
+.scan-lines::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: repeating-linear-gradient(
         0deg,
-        transparent,
-        transparent 2px,
-        var(--shadow-color) 2px,
-        var(--shadow-color) 4px
+        rgba(0, 0, 0, 0.1),
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 2px
     );
-    pointer-events: none;
-    opacity: 0.1;
-    animation: scanlines 2s linear infinite;
+    /* Ensure pseudo-element covers the full area */
+    width: 100%;
+    height: 100%;
 }
 
 /* CTA Button */
@@ -400,6 +646,14 @@ section {
     border: 1px solid var(--border-color);
 }
 
+/* Dark Theme Tech Tags */
+[data-theme="dark"] .tech-tags li,
+[data-theme="dark"] .tech-tags span {
+    background: var(--dark-bg-secondary);
+    color: var(--dark-text-primary);
+    border-color: var(--dark-border-color);
+}
+
 /* ===== PROJECTS GRID ===== */
 .projects-grid {
     display: grid;
@@ -415,6 +669,19 @@ section {
 
 .about-content p {
     max-width: 70ch;
+}
+
+.about-content a {
+    color: var(--accent-primary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: var(--transition);
+}
+
+.about-content a:hover,
+.about-content a:focus {
+    border-bottom-color: var(--accent-primary);
+    outline: none;
 }
 
 /* ===== FOOTER ===== */
@@ -443,6 +710,7 @@ section {
     border-radius: var(--border-radius);
     text-decoration: none;
     transition: var(--transition);
+    color: var(--accent-secondary); /* Set default SVG color */
 }
 
 .social-nav a:hover,
@@ -450,6 +718,15 @@ section {
     background: var(--accent-tertiary);
     transform: translateY(-2px);
     outline: 2px solid var(--accent-primary);
+    color: var(--text-primary); /* Set SVG color on hover/focus */
+}
+
+.social-nav a svg {
+    /* fill: currentColor; */
+}
+
+.social-nav a svg.filled-icon {
+    fill: currentColor;
 }
 
 .social-icon {
@@ -590,4 +867,12 @@ a:focus {
         border: 1px solid #ccc;
         box-shadow: none;
     }
+}
+
+[data-theme="dark"] .social-nav a:hover,
+[data-theme="dark"] .social-nav a:focus {
+    background: var(--dark-accent-tertiary);
+    color: var(--dark-bg-primary);
+    border-color: var(--dark-accent-secondary);
+    outline: 2px solid var(--dark-accent-primary);
 }

@@ -63,11 +63,21 @@ The site is automatically deployed to Cloudflare Pages when changes are pushed t
 
 ```
 krizdingus.com/
-├── index.html          # Main HTML template
-├── styles.css          # Global styles
-├── scripts.js          # JavaScript functionality
-├── .gitignore         # Git ignore rules
-└── README.md          # Project documentation
+├── src/                    # Source files
+│   ├── css/               # Stylesheets
+│   │   └── styles.css
+│   ├── js/                # JavaScript files
+│   │   └── scripts.js
+│   ├── assets/            # Static assets
+│   │   ├── images/        # Image files
+│   │   ├── fonts/         # Font files
+│   │   └── icons/         # Icon files
+│   └── index.html         # Main HTML template
+├── dist/                   # Build output
+├── .gitignore             # Git ignore rules
+├── package.json           # Project configuration
+├── postcss.config.js      # PostCSS configuration
+└── README.md              # Project documentation
 ```
 
 ## License
@@ -76,4 +86,29 @@ krizdingus.com/
 
 ## Author
 
-Kris Williams - [krizdingus.com](https://krizdingus.com) 
+Kris Williams - [krizdingus.com](https://krizdingus.com)
+
+---
+
+## Credits & Acknowledgements
+
+**Fonts**
+- [Silkscreen](https://fonts.google.com/specimen/Silkscreen) by Jason Kottke (Open Font License via Google Fonts)
+
+**Icons**
+- [Heroicons](https://heroicons.com/) (MIT License)
+- [Simple Icons](https://simpleicons.org/) (CC0 1.0 Universal)
+
+**Other External Resources**
+- [Google Fonts](https://fonts.google.com/)
+- [Google Analytics](https://analytics.google.com/)
+
+**Build & Tooling**
+- [PostCSS](https://postcss.org/)
+- [Autoprefixer](https://github.com/postcss/autoprefixer)
+- [Terser](https://github.com/terser/terser)
+- [Serve](https://github.com/vercel/serve)
+- [Cloudflare Pages](https://pages.cloudflare.com/)
+
+**Design**
+- Game Boy-inspired retro aesthetic and 90s web motifs. 

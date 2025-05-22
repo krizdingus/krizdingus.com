@@ -47,4 +47,20 @@ exports/
 .temp/
 
 # Railway
-.railway/ 
+.railway/
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Build output
+dist/
+build/ 
