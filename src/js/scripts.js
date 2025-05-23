@@ -327,7 +327,23 @@ document.addEventListener('DOMContentLoaded', () => {
     new LazyImageLoader();
     new SmoothScrollManager();
     new ProjectCardManager();
-    // new PerformanceMonitor(); // Disabled for now
+
+    // Smooth scroll to top for site title link
+    const siteTitleLink = document.querySelector('.site-title a');
+    if (siteTitleLink) {
+        siteTitleLink.addEventListener('click', function(e) {
+            // Only intercept if on the homepage or root
+            if (window.location.pathname === '/' || window.location.pathname === '/index.html' || window.location.hostname === 'localhost') {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Optionally, focus the main content for accessibility
+                const main = document.getElementById('main');
+                if (main) {
+                    setTimeout(() => main.focus && main.focus({ preventScroll: true }), 500);
+                }
+            }
+        });
+    }
 });
 
 // ===== ERROR HANDLING =====

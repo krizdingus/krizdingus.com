@@ -148,21 +148,26 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
 </head>
 <body>
     <!-- Skip Link -->
-    <a href="#main" class="skip-link">Skip to main content</a>
+    <a href="#main" class="skip-link" tabindex="0">Skip to main content</a>
 
     <!-- Header -->
     <header role="banner" class="site-header">
         <div class="container">
             <h1 class="site-title">
-                <span class="pixel-text">KRIZDINGUS</span>
+                <a href="/" aria-label="Krizdingus Home">
+                    <span class="pixel-text">KRIZDINGUS</span>
+                </a>
             </h1>
             <nav role="navigation" aria-label="Main navigation">
                 <ul class="nav-list">
-                    <li><a href="#projects">Projects</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="https://kwilliams.me" target="_blank" rel="noopener">Web</a></li>
+                    <li><a href="#projects" aria-label="View all projects">Projects</a></li>
+                    <li><a href="#about" aria-label="Learn more about Krizdingus">About</a></li>
+                    <li><a href="https://kwilliams.me" target="_blank" rel="noopener" aria-label="Visit Kris Williams' web development portfolio (opens in new tab)">Web</a></li>
                     <li>
-                        <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light theme">
+                        <button class="theme-toggle" 
+                                aria-label="Toggle dark mode" 
+                                aria-pressed="false"
+                                title="Toggle dark/light theme">
                             <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
                             </svg>
@@ -177,22 +182,22 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
     </header>
 
     <!-- Main Content -->
-    <main id="main" role="main">
+    <main id="main" role="main" aria-label="Main content">
         <!-- Hero Section -->
-        <section id="home" class="hero">
-            <div class="scan-lines"></div>
+        <section id="home" class="hero" aria-label="Hero section">
+            <div class="scan-lines" aria-hidden="true"></div>
             <div class="hero-content">
                 <h1 class="hero-title pixel-text">KRIZDINGUS</h1>
                 <p class="hero-tagline">Unapologetic pixel-era tinkering, powered by nicotine.</p>
-                <a href="#projects" class="cta-button">View Projects</a>
+                <a href="#projects" class="cta-button" aria-label="View all projects">View Projects</a>
             </div>
         </section>
 
         <!-- Featured Project -->
-        <section id="featured" class="featured-project" itemscope itemtype="https://schema.org/CreativeWork">
+        <section id="featured" class="featured-project" itemscope itemtype="https://schema.org/CreativeWork" aria-label="Featured project">
             <div class="container">
                 <h2>Featured Project</h2>
-                <article class="project-card featured">
+                <article class="project-card featured" aria-labelledby="featured-project-title">
                     <figure class="project-image">
                         <img src="assets/images/mini-magsafe-zyn-cover.jpg" 
                              alt="Mini MagSafe Zyn Container - A 3D printed magnetic container" 
@@ -202,9 +207,9 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
                              height="600">
                     </figure>
                     <div class="project-info">
-                        <h3 itemprop="name">Mini MagSafe Zyn Container</h3>
+                        <h3 id="featured-project-title" itemprop="name">Mini MagSafe Zyn Container</h3>
                         <p itemprop="description">A magnetic pouch dock so I never lose a Zyn mid-panic-coding session.</p>
-                        <ul class="tech-tags">
+                        <ul class="tech-tags" aria-label="Technologies used">
                             <li>Shapr3D</li>
                             <li>ABS FDM</li>
                             <li>3D Print</li>
@@ -213,88 +218,93 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
                            target="_blank" 
                            rel="noopener"
                            itemprop="url"
-                           class="project-link">View Project</a>
+                           class="project-link"
+                           aria-label="View Mini MagSafe Zyn Container project (opens in new tab)">View Project</a>
                     </div>
                 </article>
             </div>
         </section>
 
         <!-- Projects Grid -->
-        <section id="projects" class="projects-section" itemscope itemtype="https://schema.org/ItemList">
+        <section id="projects" class="projects-section" itemscope itemtype="https://schema.org/ItemList" aria-label="All projects">
             <div class="container">
                 <h2>All Projects</h2>
-                <div class="projects-grid">
-                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement">
-                        <a href="https://github.com/krizdingus/gb-rom-database-bot" target="_blank" rel="noopener" itemprop="url">
+                <div class="projects-grid" role="list" aria-label="Project list">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem">
+                        <a href="https://github.com/krizdingus/gb-rom-database-bot" 
+                           target="_blank" 
+                           rel="noopener" 
+                           itemprop="url"
+                           aria-label="View GB ROM Database Bot project (opens in new tab)">
                             <h3 itemprop="name">GB Rom Database Bot</h3>
                             <p class="project-hook">Because we absolutely needed another database of nearly 5000 Game Boy games to search through (but this one has filtering!).</p>
-                            <div class="tech-tags"> 
+                            <div class="tech-tags" aria-label="Technologies used"> 
                                 <span>JavaScript</span>
                                 <span>Node.js</span>
                             </div>
                         </a>
                     </article>
 
-                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement">
-                        <a href="https://github.com/krizdingus/gameboy-cartridge-labels" target="_blank" rel="noopener" itemprop="url">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem">
+                        <a href="https://github.com/krizdingus/gameboy-cartridge-labels" target="_blank" rel="noopener" itemprop="url" aria-label="View Game Boy Cartridge Labels project (opens in new tab)">
                             <h3 itemprop="name">Game Boy Cartridge Labels</h3>
                             <p class="project-hook">Custom labels for homebrew and flash cartridges.</p>
-                            <div class="tech-tags">
+                            <div class="tech-tags" aria-label="Technologies used">
                                 <span>Design</span>
                                 <span>Print</span>
                             </div>
                         </a>
                     </article>
 
-                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement">
-                        <a href="https://github.com/krizdingus/mouse-bite-labs-cartridge-labels" target="_blank" rel="noopener" itemprop="url">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem">
+                        <a href="https://github.com/krizdingus/mouse-bite-labs-cartridge-labels" target="_blank" rel="noopener" itemprop="url" aria-label="View Mouse Bite Labels Flash Cartridge Labels project (opens in new tab)">
                             <h3 itemprop="name">Mouse Bite Labels Flash Cartridge Labels</h3>
                             <p class="project-hook">Professional labels for Mouse Bite Labs cartridges.</p>
-                            <div class="tech-tags">
+                            <div class="tech-tags" aria-label="Technologies used">
                                 <span>Design</span>
                                 <span>Web</span>
                             </div>
                         </a>
                     </article>
 
-                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement">
-                        <a href="https://makerworld.com/en/models/623660-game-boy-game-pak-discreet-display-stand" target="_blank" rel="noopener" itemprop="url">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem">
+                        <a href="https://makerworld.com/en/models/623660-game-boy-game-pak-discreet-display-stand" target="_blank" rel="noopener" itemprop="url" aria-label="View Game Boy Game Pak Discreet Display Stand project (opens in new tab)">
                             <h3 itemprop="name">Game Boy Game Pak Discreet Display Stand</h3>
                             <p class="project-hook">Look, Ma! No stands! Show of your games, not the displays.</p>
-                            <div class="tech-tags">
+                            <div class="tech-tags" aria-label="Technologies used">
                                 <span>3D Design</span>
                                 <span>Print</span>
                             </div>
                         </a>
                     </article>
 
-                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement">
-                        <a href="https://makerworld.com/en/models/640269-cassette-style-case-for-game-boy-games" target="_blank" rel="noopener" itemprop="url">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem">
+                        <a href="https://makerworld.com/en/models/640269-cassette-style-case-for-game-boy-games" target="_blank" rel="noopener" itemprop="url" aria-label="View Cassette-Style Case for Game Boy Games project (opens in new tab)">
                             <h3 itemprop="name">Cassette-Style Case for Game Boy Games</h3>
                             <p class="project-hook">Retro storage solution for Game Boy games.</p>
-                            <div class="tech-tags">
+                            <div class="tech-tags" aria-label="Technologies used">
                                 <span>3D Design</span>
                                 <span>Retro</span>
                             </div>
                         </a>
                     </article>
 
-                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement">
-                        <a href="https://www.thingiverse.com/thing:6240141" target="_blank" rel="noopener" itemprop="url">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem">
+                        <a href="https://www.thingiverse.com/thing:6240141" target="_blank" rel="noopener" itemprop="url" aria-label="View Gamecube Power Port USB-C Adapter project (opens in new tab)">
                             <h3 itemprop="name">Gamecube Power Port USB-C Adapter</h3>
                             <p class="project-hook">Modern power solution for vintage gaming.</p>
-                            <div class="tech-tags">
+                            <div class="tech-tags" aria-label="Technologies used">
                                 <span>Hardware</span>
                                 <span>Mod</span>
                             </div>
                         </a>
                     </article>
 
-                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement">
-                        <a href="https://makerworld.com/en/models/1293032-printable-poopin-stool" target="_blank" rel="noopener" itemprop="url">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem">
+                        <a href="https://makerworld.com/en/models/1293032-printable-poopin-stool" target="_blank" rel="noopener" itemprop="url" aria-label="View Printable Poopin' Stool project (opens in new tab)">
                             <h3 itemprop="name">Printable Poopin' Stool</h3>
                             <p class="project-hook">Practical solutions for everyday problems.</p>
-                            <div class="tech-tags">
+                            <div class="tech-tags" aria-label="Technologies used">
                                 <span>Practical</span>
                                 <span>3D Print</span>
                             </div>
@@ -305,7 +315,7 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
         </section>
 
         <!-- About Section -->
-        <section id="about" class="about-section" itemscope itemtype="https://schema.org/Person">
+        <section id="about" class="about-section" itemscope itemtype="https://schema.org/Person" aria-label="About Krizdingus">
             <div class="container">
                 <h2>About</h2>
                 <div class="about-content-grid">
@@ -319,10 +329,11 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
                              height="800">
                         <figcaption class="visually-hidden">This is a digital 3D-rendered portrait of Krizdingus, shown as a stylized cartoon figure with bold black sunglasses, a bushy mustache, and a slightly exaggerated expression of focus and cool confidence. He wears a padded tan jacket over a navy shirt and stands in front of a pegboard wall filled with tools—pliers, hammer, screwdrivers—and a blue shelf with Game Boy cartridges and small electronics. A round patch with a rocket design adds a retro-futuristic vibe. The scene reflects Krizdingus's personality: hands-on, tech-savvy, and unapologetically nostalgic.</figcaption>
                     </figure>
-                    <div class="about-text">
-                        <p itemprop="description">I'm Kris, <a href="https://kwilliams.me" target="_blank" rel="noopener" itemprop="url">web developer by trade</a>, maker by impulse. I build tools, toys, and quirks in equal measure, then share the blueprints here for anyone foolish enough to follow along.</p>
+                    <div class="about-text" aria-labelledby="about-title">
+                        <h3 id="about-title" class="visually-hidden">About Krizdingus</h3>
+                        <p itemprop="description">I'm Kris, <a href="https://kwilliams.me" target="_blank" rel="noopener" itemprop="url" aria-label="Visit Kris Williams' web development portfolio (opens in new tab)">web developer by trade</a>, maker by impulse. I build tools, toys, and quirks in equal measure, then share the blueprints here for anyone foolish enough to follow along.</p>
                         
-                        <p>I've been on the internet since 1995, back when I was slapping together shitty Angelfire and GeoCities pages to proclaim how awesome Mega Man and Gohan are. These days I still tinker, sometimes I record the chaos for <a href="https://www.instagram.com/krizdingus/" target="_blank" rel="noopener" itemprop="sameAs">Instagram</a>, and call anything involving code, creative design, or crafting "a project."</p>
+                        <p>I've been on the internet since 1995, back when I was slapping together shitty Angelfire and GeoCities pages to proclaim how awesome Mega Man and Gohan are. These days I still tinker, sometimes I record the chaos for <a href="https://www.instagram.com/krizdingus/" target="_blank" rel="noopener" itemprop="sameAs" aria-label="Follow Krizdingus on Instagram (opens in new tab)">Instagram</a>, and call anything involving code, creative design, or crafting "a project."</p>
                         
                         <p>After enough nudges from a handful of very kind people, I finally turned all this into a proper repository: project files, links, and more.</p>
                         
