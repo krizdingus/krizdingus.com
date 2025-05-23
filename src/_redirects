@@ -1,8 +1,8 @@
+# Redirect old mousebitelabs page to GitHub
+/mousebitelabs* https://github.com/krizdingus/mouse-bite-labs-cartridge-labels 301
+
 # Redirect www to non-www
 https://www.krizdingus.com/* https://krizdingus.com/:splat 301!
 
 # Redirect HTTP to HTTPS (though Cloudflare handles this automatically)
 http://krizdingus.com/* https://krizdingus.com/:splat 301!
-
-# Redirect old mousebitelabs page to GitHub
-/mousebitelabs/ https://github.com/krizdingus/mouse-bite-labs-cartridge-labels 301! 
