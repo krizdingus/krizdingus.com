@@ -96,51 +96,81 @@ class HeroAnimationManager {
     setupTitleAnimation() {
         if (!this.heroTitle) return;
         
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        this.hero.classList.add('is-visible');
-                    }
-                });
-            },
-            { threshold: 0.1 }
-        );
-        
-        observer.observe(this.hero);
+        try {
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            requestAnimationFrame(() => {
+                                this.hero.classList.add('is-visible');
+                            });
+                        }
+                    });
+                },
+                { threshold: 0.1 }
+            );
+            
+            observer.observe(this.hero);
+        } catch (error) {
+            console.warn('IntersectionObserver not supported:', error);
+            // Fallback: show hero immediately
+            this.hero.classList.add('is-visible');
+        }
     }
     
     addInteractiveStatic() {
         if (!this.hero) return;
-        // Click for static burst
-        this.hero.addEventListener('click', () => {
-            this.triggerStaticBurst();
-        });
-        // Random static spikes
-        this.addRandomStaticSpikes();
+        
+        try {
+            // Click for static burst
+            this.hero.addEventListener('click', () => {
+                requestAnimationFrame(() => {
+                    this.triggerStaticBurst();
+                });
+            });
+            
+            // Random static spikes
+            this.addRandomStaticSpikes();
+        } catch (error) {
+            console.warn('Error setting up static effects:', error);
+        }
     }
     
     triggerStaticBurst() {
-        this.hero.classList.add('glitch-burst');
-        setTimeout(() => {
-            this.hero.classList.remove('glitch-burst');
-        }, 300);
+        try {
+            this.hero.classList.add('glitch-burst');
+            setTimeout(() => {
+                requestAnimationFrame(() => {
+                    this.hero.classList.remove('glitch-burst');
+                });
+            }, 300);
+        } catch (error) {
+            console.warn('Error triggering static burst:', error);
+        }
     }
     
     addRandomStaticSpikes() {
         const scheduleSpike = () => {
-            const delay = 4000 + Math.random() * 6000; // 4-10 seconds
-            setTimeout(() => {
-                if (Math.random() < 0.6) { // 60% chance
-                    const currentIntensity = parseFloat(getComputedStyle(this.hero).getPropertyValue('--static-intensity')) || 0.4;
-                    this.hero.style.setProperty('--static-intensity', currentIntensity + 0.3);
-                    
-                    setTimeout(() => {
-                        this.hero.style.removeProperty('--static-intensity');
-                    }, 200);
-                }
-                scheduleSpike();
-            }, delay);
+            try {
+                const delay = 4000 + Math.random() * 6000; // 4-10 seconds
+                setTimeout(() => {
+                    if (Math.random() < 0.6) { // 60% chance
+                        requestAnimationFrame(() => {
+                            const currentIntensity = parseFloat(getComputedStyle(this.hero).getPropertyValue('--static-intensity')) || 0.4;
+                            this.hero.style.setProperty('--static-intensity', currentIntensity + 0.3);
+                            
+                            setTimeout(() => {
+                                requestAnimationFrame(() => {
+                                    this.hero.style.removeProperty('--static-intensity');
+                                });
+                            }, 200);
+                        });
+                    }
+                    scheduleSpike();
+                }, delay);
+            } catch (error) {
+                console.warn('Error in static spike animation:', error);
+            }
         };
         scheduleSpike();
     }
