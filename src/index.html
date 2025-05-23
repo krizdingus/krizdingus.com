@@ -29,6 +29,19 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
     <meta name="robots" content="index, follow">
     <meta name="author" content="Kris Williams">
     <meta name="creator" content="Kris Williams">
+    <meta name="language" content="English">
+    <meta name="geo.region" content="US">
+    <meta name="theme-color" content="#84d07d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <!-- Performance Optimizations -->
+    <link rel="preload" href="css/styles.css" as="style">
+    <link rel="preload" href="js/scripts.js" as="script">
+    <link rel="preload" href="assets/images/dingus_opengraph.png" as="image">
+    <link rel="dns-prefetch" href="https://www.google-analytics.com">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
@@ -69,6 +82,30 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
                 ]
             },
             {
+                "@type": "Organization",
+                "@id": "https://krizdingus.com/#organization",
+                "name": "Krizdingus",
+                "url": "https://krizdingus.com/",
+                "logo": "https://krizdingus.com/assets/images/dingus_opengraph.png",
+                "sameAs": [
+                    "https://github.com/krizdingus",
+                    "https://www.instagram.com/krizdingus/",
+                    "https://kwilliams.me"
+                ]
+            },
+            {
+                "@type": "BreadcrumbList",
+                "@id": "https://krizdingus.com/#breadcrumb",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Home",
+                        "item": "https://krizdingus.com/"
+                    }
+                ]
+            },
+            {
                 "@type": "ItemList",
                 "@id": "https://krizdingus.com/#projects",
                 "itemListOrder": "https://schema.org/ItemListOrderAscending",
@@ -80,7 +117,9 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
                         "url": "https://makerworld.com/en/models/715832-mini-magsafe-zyn-container",
                         "name": "Mini MagSafe Zyn Container",
                         "description": "A magnetic pouch dock so I never lose a Zyn mid-panic-coding session.",
-                        "creator": { "@id": "https://krizdingus.com/#person" }
+                        "creator": { "@id": "https://krizdingus.com/#person" },
+                        "datePublished": "2024-03-19",
+                        "keywords": ["3D Printing", "MagSafe", "Hardware", "Design"]
                     },
                     {
                         "@type": "CreativeWork",
@@ -88,7 +127,9 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
                         "url": "https://github.com/krizdingus/gb-rom-database-bot",
                         "name": "GB ROM Database Bot",
                         "description": "Because remembering 7,000 Game Boy titles is above my pay grade.",
-                        "creator": { "@id": "https://krizdingus.com/#person" }
+                        "creator": { "@id": "https://krizdingus.com/#person" },
+                        "datePublished": "2024-03-19",
+                        "keywords": ["Game Boy", "Database", "Bot", "JavaScript"]
                     }
                 ]
             }
@@ -156,7 +197,9 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
                         <img src="assets/images/mini-magsafe-zyn-cover.jpg" 
                              alt="Mini MagSafe Zyn Container - A 3D printed magnetic container" 
                              itemprop="image"
-                             loading="lazy">
+                             loading="lazy"
+                             width="800"
+                             height="600">
                     </figure>
                     <div class="project-info">
                         <h3 itemprop="name">Mini MagSafe Zyn Container</h3>
@@ -271,7 +314,9 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
                              alt="Krizdingus in the Workshop – Stylized Portrait"
                              title="Krizdingus in the Workshop – Stylized Portrait"
                              itemprop="image"
-                             loading="lazy">
+                             loading="lazy"
+                             width="600"
+                             height="800">
                         <figcaption class="visually-hidden">This is a digital 3D-rendered portrait of Krizdingus, shown as a stylized cartoon figure with bold black sunglasses, a bushy mustache, and a slightly exaggerated expression of focus and cool confidence. He wears a padded tan jacket over a navy shirt and stands in front of a pegboard wall filled with tools—pliers, hammer, screwdrivers—and a blue shelf with Game Boy cartridges and small electronics. A round patch with a rocket design adds a retro-futuristic vibe. The scene reflects Krizdingus's personality: hands-on, tech-savvy, and unapologetically nostalgic.</figcaption>
                     </figure>
                     <div class="about-text">
