@@ -14,7 +14,7 @@ Personal website showcasing hardware hacks and chaotic code projects. Built with
 Let's get something out of the way: I didn't redesign my site because I was bored. I redesigned it because the old one was... fine.
 It did the job. It had some links. It had my name up top. It looked like someone who knows how to write CSS built it on a long lunch break. Which is more or less what happened.
 
-But after a while, "fine" stopped cutting it. I've made too many weird, semi-useful, probably-not-FDA-approved objects to let them live under a beige wall of <p> tags and a floating particle background that looked like it came free with an HTML5 boilerplate.
+But after a while, "fine" stopped cutting it. I've made too many weird, semi-useful, probably-not-FDA-approved objects to let them live under a beige wall of `p` tags and a floating particle background that looked like it came free with an HTML5 boilerplate.
 
 So I tore it down. I rebuilt it. I made it louder, leaner, and strangely emotional for a site that features a product called the "Printable Poopin' Stool."
 
@@ -23,7 +23,7 @@ This is a write-up of what I did, why I did it, and the small, dumb joys of buil
 ### From One File to... Still Kinda One File
 My last site was a single-page HTML doc. It was clean, semantic, and did the job with less than 10kb of enthusiasm. Honestly, not a bad way to live.
 
-But it was so minimal it almost felt shy. And I'm not shy. I'm a web developer who wires USB-C ports into GameCubes and builds bots to scrape ROM data from No-Intro dumps. That kind of energy deserves better than a floating <h1> and a politely centered <p> tag.
+But it was so minimal it almost felt shy. And I'm not shy. I'm a web developer who wires USB-C ports into GameCubes and builds bots to scrape ROM data from No-Intro dumps. That kind of energy deserves better than a floating `h1` and a politely centered `p` tag.
 
 So the new site is... still pretty simple. But it feels like something now. It's animated, stylized, and powered by a toolchain that sounds more impressive than it looks.
 
