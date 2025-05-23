@@ -44,7 +44,7 @@ The typography is pixel font for headers (Silkscreen) and monospace for body cop
 There are glitch effects, scanlines, subtle hover tilts, and other things no one asked for but everyone secretly enjoys. If you click the hero section, it even flickers like a CRT having a moment.
 
 ### Projects That Range from Useful to "Why?"
-The content hasn't changed much, it's still mostly a gallery of things I've built, printed, soldered, or hallucinated into existence at 2 a.m.
+The content hasn't changed much, it's still mostly a gallery of things I've built, printed, or hallucinated into existence at 2 a.m.
 
 Some of my favorites:
 - Mini MagSafe Zyn Container: For the nicotine-powered coder in all of us
