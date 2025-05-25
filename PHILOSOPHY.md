@@ -144,7 +144,7 @@ A fully 3D-printable squatty potty. Designed for home use. Compatible with most 
 
 ### MagSafe Zyn Container
 
-A puck-shaped case that magnetically attaches to your laptop. Because nothing says "I take my nicotine seriously" like affixing it to your iPhone like a military module. The Zyn pod ejects with a satisfying pop, which, let's be honest, is half the point.
+A puck-shaped case that magnetically attaches to your laptop. Because nothing says "I take my nicotine seriously" like affixing it to your iPhone like a military module. The Zyn container opens with a satisfying pop, which, let's be honest, is half the point.
 
 ### Game Boy ROM Database Bot
 
