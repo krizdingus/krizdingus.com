@@ -48,15 +48,11 @@ No React. No Vue. No Astro. Not even jQuery. This site runs on HTML, CSS, and Ja
 
 Here's what it's made of:
 
-HTML -- Clean, semantic HTML. No frills. No framework.
-
-CSS -- Untouched by preprocessors. Chaotic but well-meaning.
-
-JavaScript -- All in scripts.js. No modules. No frameworks. Just handcrafted nonsense.
-
-Serve -- For local preview. No dev server bells, just plain old HTTP.
-
-Cloudflare Pages -- Fast, free, and blissfully unaware of what a Docker container is.
+- HTML -- Clean, semantic HTML. No frills. No framework.
+- CSS -- Untouched by preprocessors. Chaotic but well-meaning.
+- JavaScript -- All in scripts.js. No modules. No frameworks. Just handcrafted nonsense.
+- Serve -- For local preview. No dev server bells, just plain old HTTP.
+- Cloudflare Pages -- Fast, free, and blissfully unaware of what a Docker container is.
 
 There's no CMS. No database. No dashboard. If I want to update a project, I open a text file and type words like it's 1998.
 
