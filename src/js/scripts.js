@@ -748,7 +748,7 @@ class FeaturedProjectRotator {
         this.featuredSection = document.querySelector('#featured');
         this.projectCard = document.querySelector('.project-card.featured');
         this.currentIndex = 0;
-        this.rotateInterval = 45000; // 45 seconds
+        this.rotateInterval = 20000; // 20 seconds
         this.autoRotateTimer = null;
         this.hoverDelayTimer = null;
         this.isHovered = false;
