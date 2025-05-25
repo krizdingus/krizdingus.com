@@ -1,10 +1,20 @@
 /*
 KRIZDINGUS.com JavaScript
-Features: Dark/light mode toggle with system preference sync, retro console boot sequence with random messages,
-         lazy image loading with fade effects, project card glitch animations, featured project rotation,
-         scan lines and static effects, smooth scrolling with motion preferences
-Design: Retro 90s aesthetic with CRT effects, intentional glitches, and nostalgic boot sequences
+Theme: Game Boy nostalgia meets 90s web aesthetic
+Features:
+  - Dark/light mode toggle with system preference sync
+  - Retro console boot sequence with random messages
+  - Lazy image loading with fade effects
+  - Project card glitch animations
+  - Featured project rotation
+  - Scan lines and static effects
+  - Smooth scrolling with motion preferences
 Storage: localStorage for theme persistence across visits
+Timing:
+  - Boot sequences: Random selection on page load
+  - Typing: 50-80ms/char
+  - Glitch effects: 300-800ms
+  - Project rotation: 45s
 
 Notes:
 - Boot sequences are randomly selected on page load

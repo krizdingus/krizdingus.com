@@ -1,6 +1,6 @@
 /*
 KRIZDINGUS.com Stylesheet
-Design Philosophy: Game Boy nostalgia meets 90s web aesthetic
+Theme: Game Boy nostalgia meets 90s web aesthetic
 Color Palette: 
   - Light: #c4bebb (bg), #272929 (text), #9a2257 (headers), #494786 (nav), #84d07d (accent)
   - Dark: Inverted with deeper contrasts for accessibility
@@ -11,8 +11,6 @@ Effects:
   - Glitch: Pixel corruption, chroma bleed, extreme transitions
   - Retro: Beveled buttons, subtle hover animations, OS window chrome
   - Accessibility: High contrast, reduced motion support, focus states
-
-lmao this file is a mess, i really need to clean this up
 */
 
 /* ===== CSS CUSTOM PROPERTIES ===== */
