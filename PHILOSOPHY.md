@@ -4,7 +4,7 @@ Let's get something out of the way: I didn't rebuild my website because I had a 
 
 It worked. It was one page. It had links. It said "Krizdingus" at the top. Technically, it was a website. You could point to it and say, "Yeah, that's a guy who probably knows how to set up FTP."
 
-But eventually, that wasn't enough. I make weird things—printable stools, cartridge displays, nicotine mag-holders disguised as Game Boy mods. My website didn't reflect that. It looked like it belonged to someone who helps their HOA set up email forwarding.
+But eventually, that wasn't enough. I make weird things—printable stools, cartridge displays, nicotine mag-holders disguised as Game Boy mods. My website didn't reflect that. It looked like it belonged to someone who runs a neighborhood email list and takes it very seriously.
 
 So I wiped it. Started fresh. What came out the other side is what you're looking at now: a retro-futurist CRT terminal pretending it's 1996 but hosted on Cloudflare in 2025.
 
