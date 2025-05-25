@@ -51,7 +51,7 @@ No React. No Vue. No Astro. Not even jQuery. This site runs on HTML, CSS, and Ja
 
 Here's what it's made of:
 
-- **HTML** — Hand-written, semantically sound, and suspiciously human.
+- **HTML** — Clean, semantic HTML. No frills. No framework.
 - **CSS** — One file. Untouched by preprocessors. Chaotic but well-meaning.
 - **JavaScript** — All in `scripts.js`. No modules. No frameworks. Just handcrafted nonsense.
 - **Serve** — For local preview. No dev server bells, just plain old HTTP.
