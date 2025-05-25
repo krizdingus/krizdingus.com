@@ -1,7 +1,5 @@
 # How I Rebuilt My Website (And Why It Had to Get Weirder)
 
-How I Rebuilt My Website (And Why It Had to Get Weirder)
-
 Let’s get something out of the way: I didn’t rebuild my website because I had a grand plan. I did it because the old one was held together with a HostGator coupon, stubbornness, and whatever energy you get from drinking White Monsters and forgetting to eat dinner.
 
 It worked. It was one page. It had links. It said “Krizdingus” at the top. Technically, it was a website. You could point to it and say, “Yeah, that’s a guy who probably knows how to set up FTP.”
