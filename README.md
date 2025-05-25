@@ -34,7 +34,7 @@ This site wasn't designed by committee. It wasn't built for conversion rates. It
 
 If you're curious about how it evolved—from a one-page .php file duct-taped to a HostGator coupon, to a glitchy, CRT-themed side project powered by spite and raw HTML—you can read the full breakdown here:
 
-[PHILOSOPHY.md](./PHILOSOPHY.md)
+[PHILOSOPHY.md](./PHILOSOPHY.md) - *How I Rebuilt My Website (And Why It Had to Get Weirder)*
 
 ## Author
 
