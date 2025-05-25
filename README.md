@@ -45,9 +45,6 @@ Kris Williams - [krizdingus.com](https://krizdingus.com)
 - [Google Analytics](https://analytics.google.com/)
 
 **Build & Tooling**
-- [PostCSS](https://postcss.org/)
-- [Autoprefixer](https://github.com/postcss/autoprefixer)
-- [Terser](https://github.com/terser/terser)
 - [Serve](https://github.com/vercel/serve)
 - [Cloudflare Pages](https://pages.cloudflare.com/)
 
