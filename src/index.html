@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <!--
-KRIZDINGUS.com Homepage
-Design: Game Boy-inspired retro aesthetic with 90s web motifs
-Palette: Light gray (#c4bebb), pixel green (#84d07d), magenta (#9a2257), charcoal (#272929)
-Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode toggle
+KRIZDINGUS.com - A retro-styled portfolio site
+Theme: Game Boy nostalgia meets 90s web aesthetic
+Features:
+  - Retro OS-style boot sequence with ASCII art
+  - Dark/light theme with system preference sync
+  - Project showcase with glitch effects
+  - CRT-style animations and transitions
+  - Responsive design with mobile-first approach
+  - Accessibility features and reduced motion support
+  - SEO optimized with structured data
 -->
 <html lang="en">
 <head>
@@ -16,13 +22,13 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
     <meta property="og:description" content="Hardware hacks and chaotic code, served fresh. Web developer by trade, maker by impulse.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://krizdingus.com/">
-    <meta property="og:image" content="assets/images/dingus_opengraph.png">
+    <meta property="og:image" content="assets/images/krizdingus-opengraph.png">
     <meta property="og:image:alt" content="Krizdingus logo and retro pixel art aesthetic">
     <meta property="og:site_name" content="Krizdingus">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Krizdingus - Hardware Hacks and Chaotic Code">
     <meta name="twitter:description" content="Hardware hacks and chaotic code, served fresh. Web developer by trade, maker by impulse.">
-    <meta name="twitter:image" content="assets/images/dingus_opengraph.png">
+    <meta name="twitter:image" content="assets/images/krizdingus-opengraph.png">
     <meta name="twitter:image:alt" content="Krizdingus logo and retro pixel art aesthetic">
     <!-- Additional Meta Tags -->
     <link rel="canonical" href="https://krizdingus.com/">
@@ -39,7 +45,9 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
     <!-- Performance Optimizations -->
     <link rel="preload" href="css/styles.css" as="style">
     <link rel="preload" href="js/scripts.js" as="script">
-    <link rel="preload" href="assets/images/dingus_opengraph.png" as="image">
+    <link rel="preload" href="assets/images/magsafe-zyn-container-3d-print.jpg" as="image">
+    <link rel="preload" href="assets/images/krizdingus-portrait.jpg" as="image">
+    <link rel="preload" href="assets/images/krizdingus-opengraph.png" as="image">
     <link rel="dns-prefetch" href="https://www.google-analytics.com">
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <!-- Favicons -->
@@ -147,10 +155,10 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
     </script>
 </head>
 <body>
-    <!-- Skip Link -->
+    <!-- Skip to main content link for keyboard users -->
     <a href="#main" class="skip-link" tabindex="0">Skip to main content</a>
 
-    <!-- Header -->
+    <!-- Site header with logo and navigation -->
     <header role="banner" class="site-header">
         <div class="container">
             <h1 class="site-title">
@@ -181,56 +189,96 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
         </div>
     </header>
 
-    <!-- Main Content -->
+    <!-- Main content area -->
     <main id="main" role="main" aria-label="Main content">
-        <!-- Hero Section -->
+        <!-- Retro console-style hero section -->
         <section id="home" class="hero" aria-label="Hero section">
-            <div class="scan-lines" aria-hidden="true"></div>
-            <div class="hero-content">
-                <h1 class="hero-title pixel-text">KRIZDINGUS</h1>
-                <p class="hero-tagline">Unapologetic pixel-era tinkering, powered by nicotine.</p>
-                <a href="#projects" class="cta-button" aria-label="View all projects">View Projects</a>
+            <div class="console-hero" id="consoleHero">
+                <div class="console-content">
+                    <!-- Boot sequence content will be injected here -->
+                    <div class="boot-sequence" id="bootSequence"></div>
+                    <!-- Ready state -->
+                    <div class="ready-state os-window" id="readyState">
+                        <div class="console-title-bg"></div>
+                        <div class="window-chrome">
+                            <div class="title-bar">
+                                <div class="window-controls">
+                                    <button class="window-btn close-btn" aria-label="Close"></button>
+                                    <button class="window-btn minimize-btn" aria-label="Minimize"></button>
+                                    <button class="window-btn maximize-btn" aria-label="Maximize"></button>
+                                </div>
+                                <div class="window-title">KRIZDINGUS.EXE</div>
+                            </div>
+                            <div class="menu-bar">
+                                <span class="menu-item">File</span>
+                                <span class="menu-item">Edit</span>
+                                <span class="menu-item">View</span>
+                                <span class="menu-item">Help</span>
+                            </div>
+                            <div class="window-content">
+                                <div class="ready-content">
+                                    <h1 class="console-title">KRIZDINGUS</h1>
+                                    <p class="console-tagline">Unapologetic pixel-era tinkering, powered by nicotine.</p>
+                                    <a href="#projects" class="console-button">View Projects</a>
+                                </div>
+                            </div>
+                            <div class="status-bar">
+                                <span class="status-text">Ready</span>
+                                <span class="status-info">System Ready • MacroHard v2.1</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ASCII Art display -->
+                    <div class="ascii-display" id="asciiDisplay">
+                        <div>
+                            <div class="ascii-art" id="asciiArt"></div>
+                            <div class="ascii-label" id="asciiLabel"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- Featured Project -->
-        <section id="featured" class="featured-project" itemscope itemtype="https://schema.org/CreativeWork" aria-label="Featured project">
+        <!-- Featured project showcase -->
+        <section id="featured" class="featured-project" aria-label="Featured project">
             <div class="container">
                 <h2>Featured Project</h2>
                 <article class="project-card featured" aria-labelledby="featured-project-title">
                     <figure class="project-image">
-                        <img src="assets/images/mini-magsafe-zyn-cover.jpg" 
-                             alt="Mini MagSafe Zyn Container - A 3D printed magnetic container" 
-                             itemprop="image"
-                             loading="lazy"
-                             width="800"
-                             height="600">
+                        <img src="assets/images/magsafe-zyn-container-3d-print.jpg" alt="Featured project image" itemprop="image" loading="lazy" width="800" height="600">
                     </figure>
                     <div class="project-info">
-                        <h3 id="featured-project-title" itemprop="name">Mini MagSafe Zyn Container</h3>
-                        <p itemprop="description">A magnetic pouch dock so I never lose a Zyn mid-panic-coding session.</p>
-                        <ul class="tech-tags" aria-label="Technologies used">
-                            <li>Shapr3D</li>
-                            <li>ABS FDM</li>
-                            <li>3D Print</li>
-                        </ul>
-                        <a href="https://makerworld.com/en/models/715832-mini-magsafe-zyn-container" 
-                           target="_blank" 
-                           rel="noopener"
-                           itemprop="url"
-                           class="project-link"
-                           aria-label="View Mini MagSafe Zyn Container project (opens in new tab)">View Project</a>
+                        <h3 id="featured-project-title" itemprop="name">Loading featured project...</h3>
+                        <p class="project-hook" itemprop="description">Please wait while we load the featured project...</p>
+                        <div class="tech-tags" aria-label="Technologies used"></div>
+                        <a href="#" target="_blank" rel="noopener" itemprop="url" class="project-link" aria-label="View featured project (opens in new tab)">View Project</a>
                     </div>
                 </article>
             </div>
         </section>
 
-        <!-- Projects Grid -->
+        <!-- Grid of all projects -->
         <section id="projects" class="projects-section" itemscope itemtype="https://schema.org/ItemList" aria-label="All projects">
             <div class="container">
                 <h2>All Projects</h2>
                 <div class="projects-grid" role="list" aria-label="Project list">
-                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem" data-featured="true" data-image="assets/images/magsafe-zyn-container-3d-print.jpg" data-image-alt="Mini MagSafe Zyn Container">
+                        <a href="https://makerworld.com/en/models/715832-mini-magsafe-zyn-container" 
+                           target="_blank" 
+                           rel="noopener" 
+                           itemprop="url"
+                           aria-label="View Mini MagSafe Zyn Container project (opens in new tab)">
+                            <h3 itemprop="name">Mini MagSafe Zyn Container</h3>
+                            <p class="project-hook">A magnetic pouch dock so I never lose a Zyn mid-panic-coding session.</p>
+                            <div class="tech-tags" aria-label="Technologies used">
+                                <span>Shapr3D</span>
+                                <span>ABS FDM</span>
+                                <span>3D Print</span>
+                            </div>
+                        </a>
+                    </article>
+
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem" data-featured="false" data-image="assets/images/gb-rom-database-bot.jpg" data-image-alt="GB ROM Database Bot">
                         <a href="https://github.com/krizdingus/gb-rom-database-bot" 
                            target="_blank" 
                            rel="noopener" 
@@ -245,7 +293,7 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
                         </a>
                     </article>
 
-                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem" data-featured="false" data-image="assets/images/gameboy-cartridge-labels.jpg" data-image-alt="Game Boy Cartridge Labels">
                         <a href="https://github.com/krizdingus/gameboy-cartridge-labels" target="_blank" rel="noopener" itemprop="url" aria-label="View Game Boy Cartridge Labels project (opens in new tab)">
                             <h3 itemprop="name">Game Boy Cartridge Labels</h3>
                             <p class="project-hook">Custom labels for homebrew and flash cartridges.</p>
@@ -256,7 +304,7 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
                         </a>
                     </article>
 
-                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem" data-featured="false" data-image="assets/images/mouse-bite-labels.jpg" data-image-alt="Mouse Bite Labels Flash Cartridge Labels">
                         <a href="https://github.com/krizdingus/mouse-bite-labs-cartridge-labels" target="_blank" rel="noopener" itemprop="url" aria-label="View Mouse Bite Labels Flash Cartridge Labels project (opens in new tab)">
                             <h3 itemprop="name">Mouse Bite Labels Flash Cartridge Labels</h3>
                             <p class="project-hook">Professional labels for Mouse Bite Labs cartridges.</p>
@@ -267,7 +315,7 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
                         </a>
                     </article>
 
-                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem" data-featured="true" data-image="assets/images/3d-printed-display-stand.jpg" data-image-alt="Game Boy Game Pak Discreet Display Stand">
                         <a href="https://makerworld.com/en/models/623660-game-boy-game-pak-discreet-display-stand" target="_blank" rel="noopener" itemprop="url" aria-label="View Game Boy Game Pak Discreet Display Stand project (opens in new tab)">
                             <h3 itemprop="name">Game Boy Game Pak Discreet Display Stand</h3>
                             <p class="project-hook">Look, Ma! No stands! Show of your games, not the displays.</p>
@@ -278,7 +326,7 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
                         </a>
                     </article>
 
-                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem" data-featured="true" data-image="assets/images/3d-printed-cassette-case.jpg" data-image-alt="Cassette-Style Case for Game Boy Games">
                         <a href="https://makerworld.com/en/models/640269-cassette-style-case-for-game-boy-games" target="_blank" rel="noopener" itemprop="url" aria-label="View Cassette-Style Case for Game Boy Games project (opens in new tab)">
                             <h3 itemprop="name">Cassette-Style Case for Game Boy Games</h3>
                             <p class="project-hook">Retro storage solution for Game Boy games.</p>
@@ -289,7 +337,7 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
                         </a>
                     </article>
 
-                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem" data-featured="false" data-image="assets/images/gamecube-power-port.jpg" data-image-alt="Gamecube Power Port USB-C Adapter">
                         <a href="https://www.thingiverse.com/thing:6240141" target="_blank" rel="noopener" itemprop="url" aria-label="View Gamecube Power Port USB-C Adapter project (opens in new tab)">
                             <h3 itemprop="name">Gamecube Power Port USB-C Adapter</h3>
                             <p class="project-hook">Modern power solution for vintage gaming.</p>
@@ -300,7 +348,7 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
                         </a>
                     </article>
 
-                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem">
+                    <article class="project-card" itemscope itemtype="https://schema.org/CreativeWork" itemprop="itemListElement" role="listitem" data-featured="true" data-image="assets/images/3d-printed-stool-design.jpg" data-image-alt="Printable Poopin' Stool">
                         <a href="https://makerworld.com/en/models/1293032-printable-poopin-stool" target="_blank" rel="noopener" itemprop="url" aria-label="View Printable Poopin' Stool project (opens in new tab)">
                             <h3 itemprop="name">Printable Poopin' Stool</h3>
                             <p class="project-hook">Practical solutions for everyday problems.</p>
@@ -314,13 +362,13 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
             </div>
         </section>
 
-        <!-- About Section -->
-        <section id="about" class="about-section" itemscope itemtype="https://schema.org/Person" aria-label="About Krizdingus">
+        <!-- About section with portrait and bio -->
+        <section id="about" class="about-section retro-bg" itemscope itemtype="https://schema.org/Person" aria-label="About Krizdingus">
             <div class="container">
                 <h2>About</h2>
                 <div class="about-content-grid">
                     <figure class="about-portrait">
-                        <img src="assets/images/dingus_portrait.jpg" 
+                        <img src="assets/images/krizdingus-portrait.jpg" 
                              alt="Krizdingus in the Workshop – Stylized Portrait"
                              title="Krizdingus in the Workshop – Stylized Portrait"
                              itemprop="image"
@@ -344,7 +392,7 @@ Features: Semantic HTML5, WCAG AA accessibility, Schema.org JSON-LD, dark mode t
         </section>
     </main>
 
-    <!-- Footer -->
+    <!-- Site footer with social links -->
     <footer role="contentinfo" class="site-footer">
         <div class="container">
             <nav class="social-nav" aria-label="Social media links">
