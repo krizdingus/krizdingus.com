@@ -2,7 +2,12 @@
   Cache-Control: no-cache, must-revalidate, max-age=0 
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://www.google-analytics.com;
+  Content-Security-Policy:
+    default-src 'self';
+    script-src 'self' https://www.googletagmanager.com;
+    connect-src 'self' https://www.google-analytics.com;
+    img-src 'self' data:;
+    style-src 'self' 'unsafe-inline';
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
