@@ -894,11 +894,6 @@ class OSMenuSystem {
                         label: 'MakerWorld',
                         action: 'openExternal',
                         params: 'https://makerworld.com/en/@krizdingus'
-                    },
-                    {
-                        label: 'Portfolio',
-                        action: 'openExternal',
-                        params: 'https://kwilliams.me'
                     }
                 ]
             },
@@ -912,7 +907,7 @@ class OSMenuSystem {
                     {
                         label: 'README',
                         action: 'openExternal',
-                        params: 'https://github.com/krizdingus/krizdingus.github.io/blob/main/README.md'
+                        params: 'https://github.com/krizdingus/krizdingus.com/blob/main/README.md'
                     }
                 ]
             }
