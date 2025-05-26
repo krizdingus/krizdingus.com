@@ -1,6 +1,6 @@
 # Krizdingus.com
 
-Personal website showcasing hardware hacks and chaotic code projects. Built with a Game Boy-inspired retro aesthetic and modern web development practices.
+Web developer. Tinkerer. Occasional menace. Projects include Discord bots, bootleg cartridge labels, and things that probably shouldn't exist.
 
 ## Table of Contents
 - [Features](#features)

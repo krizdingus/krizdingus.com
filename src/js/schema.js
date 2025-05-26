@@ -7,7 +7,7 @@ const ldJson = {
             "@id": "https://krizdingus.com/#site",
             "url": "https://krizdingus.com/",
             "name": "Krizdingus",
-            "description": "Hardware hacks and chaotic code, served fresh",
+            "description": "Web developer. Tinkerer. Occasional menace. Projects include Discord bots, bootleg cartridge labels, and things that probably shouldn't exist.",
             "publisher": { "@id": "https://krizdingus.com/#person" }
         },
         {
@@ -16,7 +16,7 @@ const ldJson = {
             "name": "Kris Williams",
             "url": "https://krizdingus.com/",
             "jobTitle": "Web Developer & Maker",
-            "description": "Web developer by trade, maker by impulse. Building tools, toys, and quirks in equal measure.",
+            "description": "Web developer. Tinkerer. Occasional menace. Projects include Discord bots, bootleg cartridge labels, and things that probably shouldn't exist.",
             "sameAs": [
                 "https://github.com/krizdingus",
                 "https://www.instagram.com/krizdingus/",
