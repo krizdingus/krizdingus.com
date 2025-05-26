@@ -28,7 +28,7 @@ const ldJson = {
             "@id": "https://krizdingus.com/#organization",
             "name": "Krizdingus",
             "url": "https://krizdingus.com/",
-            "logo": "https://krizdingus.com/assets/images/krizdingus-opengraph.png",
+            "logo": "https://krizdingus.com/assets/images/krizdingus-ogimage.png",
             "sameAs": [
                 "https://github.com/krizdingus",
                 "https://www.instagram.com/krizdingus/",
