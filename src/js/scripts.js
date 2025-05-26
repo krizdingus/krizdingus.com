@@ -9,17 +9,13 @@ Features:
   - Featured project rotation
   - Scan lines and static effects
   - Smooth scrolling with motion preferences
+  - OS window controls (minimize/maximize/close)
+  - Menu system with dropdowns
 Storage: localStorage for theme persistence across visits
-Timing:
-  - Boot sequences: Random selection on page load
-  - Typing: 50-80ms/char
-  - Glitch effects: 300-800ms
-  - Project rotation: 45s
 
 Notes:
 - Boot sequences are randomly selected on page load
-- Animation timings: typing (50-80ms/char), glitch effects (300-800ms), project rotation (45s)
-- Window controls: close (minimizes), maximize (scales 1.1x), minimize (not implemented)
+- Window state persists until page refresh
 - Error handling is intentionally minimal to maintain the retro feel
 */
 
@@ -186,7 +182,7 @@ class ConsoleHero {
               {
                 name: "Enhanced Terminal Crimewave",
                 lines: [
-                  { text: "K-SHELL v666", type: "system", delay: 400 },
+                  { text: "K-SHELL v39", type: "system", delay: 400 },
                   { text: "Loading: Dev stack + miscellaneous regret", type: "system", delay: 300 },
                   { text: "make coffee: BUILD SUCCESSFUL", type: "success", delay: 200 },
                   { text: "npm install: questionable plugin accepted", type: "loading", delay: 700, progress: true },
@@ -299,15 +295,15 @@ class ConsoleHero {
             // Add title card loading sequence before showing ready state
             const titleCardElement = document.createElement('div');
             titleCardElement.className = 'boot-line loading';
-            titleCardElement.textContent = 'Loading title card';
+            titleCardElement.textContent = 'Loading Krizdingus.exe';
             this.elements.bootSequence.appendChild(titleCardElement);
             this.elements.bootSequence.scrollTop = this.elements.bootSequence.scrollHeight;
 
             // Animate dots for title card loading
-            animateDots(titleCardElement, 'Loading title card', 1200, () => {
+            animateDots(titleCardElement, 'Loading Krizdingus.exe', 1200, () => {
                 setTimeout(() => {
                     titleCardElement.className = 'boot-line success';
-                    titleCardElement.textContent = 'Title card loaded successfully';
+                    titleCardElement.textContent = 'Krizdingus.exe loaded successfully';
                     this.elements.bootSequence.scrollTop = this.elements.bootSequence.scrollHeight;
                     
                     // Add a small delay before showing ready state
@@ -426,8 +422,8 @@ class ConsoleHero {
     startIdleTimer() {
         this.clearTimers();
         this.idleTimer = setTimeout(() => {
-            // Removed: this.showAsciiArt();
-        }, 8000); // 8 seconds of idle before ASCII art (now does nothing)
+            // Idle state handling
+        }, 8000); // 8 seconds of idle before state change
     }
     
     resetToReady() {
@@ -443,11 +439,15 @@ class ConsoleHero {
     setupEventListeners() {
         // Reset to ready state on any interaction, but only if already in ready state
         ['click', 'mousemove', 'keydown', 'touchstart'].forEach(event => {
-            this.elements.hero.addEventListener(event, () => {
-                if (this.state === 'ready') {
-                    this.resetToReady();
-                }
-            });
+            this.elements.hero.addEventListener(
+                event,
+                () => {
+                    if (this.state === 'ready') {
+                        this.resetToReady();
+                    }
+                },
+                event === 'touchstart' ? { passive: true } : false
+            );
         });
         
         // Prevent event bubbling on the console button
@@ -484,113 +484,9 @@ class ConsoleHero {
     }
 }
 
-// ===== HERO ANIMATION =====
-/**
- * Adds scan lines and static effects to the hero section
- * Makes the screen glitch when you click it
- */
-class HeroAnimationManager {
-    constructor() {
-        this.scanLines = document.querySelector('.scan-lines');
-        this.heroTitle = document.querySelector('.hero-title');
-        this.hero = document.querySelector('.hero');
-        this.init();
-    }
-    
-    init() {
-        this.setupScanLines();
-        this.setupTitleAnimation();
-        this.addInteractiveStatic();
-    }
-    
-    setupScanLines() {
-        if (!this.scanLines) return;
-    }
-    
-    setupTitleAnimation() {
-        if (!this.heroTitle) return;
-        
-        try {
-            const observer = new IntersectionObserver(
-                (entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            // Removed: this.hero.classList.add('is-visible');
-                        }
-                    });
-                },
-                { threshold: 0.1 }
-            );
-            
-            observer.observe(this.hero);
-        } catch (error) {
-            console.warn('IntersectionObserver not supported:', error);
-            // Fallback: removed automatic addition of 'is-visible'
-        }
-    }
-    
-    addInteractiveStatic() {
-        if (!this.hero) return;
-        
-        try {
-            // Click for static burst
-            this.hero.addEventListener('click', () => {
-                requestAnimationFrame(() => {
-                    this.triggerStaticBurst();
-                });
-            });
-            
-            // Random static spikes
-            this.addRandomStaticSpikes();
-        } catch (error) {
-            console.warn('Error setting up static effects:', error);
-        }
-    }
-    
-    triggerStaticBurst() {
-        try {
-            this.hero.classList.add('glitch-burst');
-            setTimeout(() => {
-                requestAnimationFrame(() => {
-                    this.hero.classList.remove('glitch-burst');
-                });
-            }, 300);
-        } catch (error) {
-            console.warn('Error triggering static burst:', error);
-        }
-    }
-    
-    addRandomStaticSpikes() {
-        const scheduleSpike = () => {
-            try {
-                const delay = 4000 + Math.random() * 6000; // 4-10 seconds
-                setTimeout(() => {
-                    if (Math.random() < 0.6) { // 60% chance
-                        requestAnimationFrame(() => {
-                            const currentIntensity = parseFloat(getComputedStyle(this.hero).getPropertyValue('--static-intensity')) || 0.4;
-                            this.hero.style.setProperty('--static-intensity', currentIntensity + 0.3);
-                            
-                            setTimeout(() => {
-                                requestAnimationFrame(() => {
-                                    this.hero.style.removeProperty('--static-intensity');
-                                });
-                            }, 200);
-                        });
-                    }
-                    scheduleSpike();
-                }, delay);
-            } catch (error) {
-                console.warn('Error in static spike animation:', error);
-            }
-        };
-        scheduleSpike();
-    }
-}
-
 // ===== IMAGE LOADING =====
 /**
- * Loads images only when they're about to be visible
- * Shows a nice fade-in effect when images load
+ * Handles image fade-in effects and error fallbacks
  */
 class LazyImageLoader {
     constructor() {
@@ -599,37 +495,10 @@ class LazyImageLoader {
     }
     
     init() {
-        // Use native lazy loading if supported, otherwise implement observer
-        if ('loading' in HTMLImageElement.prototype) {
-            this.images.forEach(img => {
-                img.addEventListener('load', () => this.handleImageLoad(img));
-                img.addEventListener('error', () => this.handleImageError(img));
-            });
-        } else {
-            this.implementObserver();
-        }
-    }
-    
-    implementObserver() {
-        const imageObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    this.loadImage(img);
-                    imageObserver.unobserve(img);
-                }
-            });
-        }, {
-            rootMargin: '50px 0px'
+        this.images.forEach(img => {
+            img.addEventListener('load', () => this.handleImageLoad(img));
+            img.addEventListener('error', () => this.handleImageError(img));
         });
-        
-        this.images.forEach(img => imageObserver.observe(img));
-    }
-    
-    loadImage(img) {
-        img.addEventListener('load', () => this.handleImageLoad(img));
-        img.addEventListener('error', () => this.handleImageError(img));
-        img.src = img.dataset.src || img.src;
     }
     
     handleImageLoad(img) {
@@ -644,7 +513,6 @@ class LazyImageLoader {
     }
     
     handleImageError(img) {
-        // Provide fallback for broken images
         img.style.background = 'var(--bg-tertiary)';
         img.style.color = 'var(--text-secondary)';
         img.alt = 'Image not available';
@@ -652,45 +520,9 @@ class LazyImageLoader {
     }
 }
 
-// ===== SCROLL BEHAVIOR =====
-/**
- * Makes page scrolling smooth
- * Respects user's motion preferences
- */
-class SmoothScrollManager {
-    constructor() {
-        this.supportsReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        this.init();
-    }
-
-    init() {
-        if (this.supportsReducedMotion) {
-            return; // Don't initialize smooth scrolling if reduced motion is preferred
-        }
-
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', this.handleClick.bind(this));
-        });
-    }
-
-    handleClick(e) {
-        e.preventDefault();
-        const targetId = e.currentTarget.getAttribute('href');
-        const targetElement = document.querySelector(targetId);
-        
-        if (targetElement) {
-            targetElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    }
-}
-
 // ===== PROJECT CARDS =====
 /**
- * Makes project cards tilt on hover
- * Adds keyboard navigation for accessibility
+ * Handles keyboard navigation for project cards
  */
 class ProjectCardManager {
     constructor() {
@@ -699,24 +531,7 @@ class ProjectCardManager {
     }
     
     init() {
-        this.addHoverEffects();
         this.addKeyboardNavigation();
-    }
-    
-    addHoverEffects() {
-        this.cards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                // Add subtle tilt effect
-                if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                    const randomTilt = (Math.random() - 0.5) * 2; // -1 to 1 degree
-                    card.style.transform = `translateY(-4px) rotate(${randomTilt}deg)`;
-                }
-            });
-            
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = '';
-            });
-        });
     }
     
     addKeyboardNavigation() {
@@ -930,7 +745,7 @@ class FeaturedProjectRotator {
             projectLink.textContent = 'View Project';
             projectLink.setAttribute('aria-label', `View ${project.title} project (opens in new tab)`);
         } catch (error) {
-            // Removed console error
+            // Error handling
         }
     }
     buildProjectsFromHTML() {
@@ -984,6 +799,594 @@ class FeaturedProjectRotator {
     }
 }
 
+// ===== OS WINDOW MENU SYSTEM =====
+class OSMenuSystem {
+    constructor() {
+        this.menuBar = document.querySelector('.menu-bar');
+        this.windowChrome = document.querySelector('.window-chrome');
+        this.consoleHero = document.getElementById('consoleHero');
+        this.readyState = document.querySelector('.ready-state');
+        this.activeMenu = null;
+        this.currentWallpaper = null;
+        this.isMinimized = false;
+        this.isMaximized = false;
+        this.menuData = this.buildMenuData();
+        
+        this.init();
+    }
+    
+    init() {
+        if (!this.menuBar) return;
+        
+        this.renderMenus();
+        this.setupEventListeners();
+        this.setupWindowControls();
+        this.detectCurrentWallpaper();
+    }
+    
+    buildMenuData() {
+        return {
+            'File': {
+                items: [
+                    {
+                        label: 'Open',
+                        hasSubmenu: true,
+                        getSubmenu: () => this.getBootSequenceMenu()
+                    },
+                    { label: 'separator' },
+                    {
+                        label: 'Print',
+                        action: 'print',
+                        disabled: true
+                    },
+                    { label: 'separator' },
+                    {
+                        label: 'Close',
+                        action: 'rebootRandom'
+                    }
+                ]
+            },
+            'Edit': {
+                items: [
+                    {
+                        label: 'Theme',
+                        hasSubmenu: true,
+                        submenu: [
+                            {
+                                label: 'Light Mode',
+                                action: 'setTheme',
+                                params: 'light'
+                            },
+                            {
+                                label: 'Dark Mode',
+                                action: 'setTheme',
+                                params: 'dark'
+                            }
+                        ]
+                    },
+                    { label: 'separator' },
+                    {
+                        label: 'Desktop',
+                        hasSubmenu: true,
+                        getSubmenu: () => this.getDesktopBackgroundMenu()
+                    }
+                ]
+            },
+            'View': {
+                items: [
+                    {
+                        label: 'Projects',
+                        hasSubmenu: true,
+                        getSubmenu: () => this.getProjectsMenu()
+                    },
+                    { label: 'separator' },
+                    {
+                        label: 'Instagram',
+                        action: 'openExternal',
+                        params: 'https://www.instagram.com/krizdingus/'
+                    },
+                    {
+                        label: 'GitHub',
+                        action: 'openExternal',
+                        params: 'https://github.com/krizdingus'
+                    },
+                    {
+                        label: 'MakerWorld',
+                        action: 'openExternal',
+                        params: 'https://makerworld.com/en/@krizdingus'
+                    },
+                    {
+                        label: 'Portfolio',
+                        action: 'openExternal',
+                        params: 'https://kwilliams.me'
+                    }
+                ]
+            },
+            'Help': {
+                items: [
+                    {
+                        label: 'About',
+                        action: 'scrollTo',
+                        params: '#about'
+                    },
+                    {
+                        label: 'README',
+                        action: 'openExternal',
+                        params: 'https://github.com/krizdingus/krizdingus.github.io/blob/main/README.md'
+                    }
+                ]
+            }
+        };
+    }
+    
+    setupWindowControls() {
+        const minimizeBtn = document.querySelector('.minimize-btn');
+        const closeBtn = document.querySelector('.close-btn');
+        const maximizeBtn = document.querySelector('.maximize-btn');
+        
+        if (minimizeBtn) {
+            minimizeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.minimizeWindow();
+            });
+        }
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.rebootConsole();
+            });
+        }
+        
+        if (maximizeBtn) {
+            maximizeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleMaximize();
+            });
+        }
+    }
+    
+    minimizeWindow() {
+        if (!this.windowChrome || !this.readyState) return;
+        
+        this.isMinimized = true;
+        
+        // Remove any existing classes
+        this.readyState.classList.remove('restoring');
+        this.windowChrome.classList.remove('restoring', 'maximized');
+        this.isMaximized = false;
+        
+        // Add minimized class
+        this.windowChrome.classList.add('minimized');
+        
+        // Setup click handler on title bar for restore
+        const titleBar = this.windowChrome.querySelector('.title-bar');
+        if (titleBar) {
+            // Remove any existing restore handler
+            titleBar.removeEventListener('click', this.titleBarRestoreHandler);
+            
+            // Create new handler
+            this.titleBarRestoreHandler = (e) => {
+                // Don't restore if clicking on window controls
+                if (e.target.closest('.window-controls')) {
+                    return;
+                }
+                e.stopPropagation();
+                this.restoreWindow();
+            };
+            
+            titleBar.addEventListener('click', this.titleBarRestoreHandler);
+            titleBar.style.cursor = 'pointer';
+        }
+    }
+    
+    restoreWindow() {
+        if (!this.windowChrome || !this.readyState || !this.isMinimized) return;
+        
+        this.isMinimized = false;
+        
+        // Remove minimized class
+        this.windowChrome.classList.remove('minimized');
+        
+        // Add restoring animation to the window chrome
+        this.windowChrome.classList.add('restoring');
+        
+        // Remove title bar click handler
+        const titleBar = this.windowChrome.querySelector('.title-bar');
+        if (titleBar && this.titleBarRestoreHandler) {
+            titleBar.removeEventListener('click', this.titleBarRestoreHandler);
+            titleBar.style.cursor = '';
+            this.titleBarRestoreHandler = null;
+        }
+        
+        // Clean up animation class after completion
+        setTimeout(() => {
+            this.windowChrome.classList.remove('restoring');
+        }, 100); // Match animation duration (0.1s)
+    }
+    
+    toggleMaximize() {
+        if (!this.windowChrome) return;
+        
+        // If minimized, restore first
+        if (this.isMinimized) {
+            this.restoreWindow();
+            return;
+        }
+        
+        // Toggle maximized state
+        this.isMaximized = !this.isMaximized;
+        
+        if (this.isMaximized) {
+            this.windowChrome.classList.add('maximized');
+        } else {
+            this.windowChrome.classList.remove('maximized');
+        }
+    }
+    
+    rebootConsole() {
+        const consoleHero = window.consoleHeroInstance;
+        if (!consoleHero) return;
+        
+        // Always restore window to normal size before reboot
+        if (this.isMinimized) {
+            this.restoreWindow();
+        }
+        
+        // Remove maximized state
+        if (this.isMaximized) {
+            this.windowChrome.classList.remove('maximized');
+            this.isMaximized = false;
+        }
+        
+        // Close all menus
+        this.closeAllMenus();
+        
+        // Add CRT power-off animation
+        consoleHero.elements.hero.classList.add('crt-poweroff');
+        
+        // Wait for power-off animation to complete
+        setTimeout(() => {
+            // Reset console state
+            consoleHero.state = 'booting';
+            consoleHero.currentBootIndex = 0;
+            consoleHero.currentLineIndex = 0;
+            
+            // Hide ready state
+            consoleHero.elements.readyState.style.display = 'none';
+            consoleHero.elements.bootSequence.style.display = 'block';
+            consoleHero.elements.bootSequence.style.opacity = '1';
+            consoleHero.elements.bootSequence.innerHTML = '';
+            
+            // Remove power-off class
+            consoleHero.elements.hero.classList.remove('crt-poweroff');
+            
+            // Start random boot sequence after a longer delay
+            setTimeout(() => {
+                consoleHero.startBootSequence();
+            }, 1500); // Increased from 200ms to 1500ms (1.5 seconds)
+        }, 600); // Match the power-off animation duration
+    }
+    
+    rebootConsoleSpecific(sequenceIndex) {
+        const consoleHero = window.consoleHeroInstance;
+        if (!consoleHero) return;
+        
+        // Always restore window to normal size before reboot
+        if (this.isMinimized) {
+            this.restoreWindow();
+        }
+        
+        // Remove maximized state
+        if (this.isMaximized) {
+            this.windowChrome.classList.remove('maximized');
+            this.isMaximized = false;
+        }
+        
+        // Close all menus
+        this.closeAllMenus();
+        
+        // Add CRT power-off animation
+        consoleHero.elements.hero.classList.add('crt-poweroff');
+        
+        // Wait for power-off animation to complete
+        setTimeout(() => {
+            // Reset console state
+            consoleHero.state = 'booting';
+            consoleHero.currentBootIndex = 0;
+            consoleHero.currentLineIndex = 0;
+            
+            // Hide ready state
+            consoleHero.elements.readyState.style.display = 'none';
+            consoleHero.elements.bootSequence.style.display = 'block';
+            consoleHero.elements.bootSequence.style.opacity = '1';
+            consoleHero.elements.bootSequence.innerHTML = '';
+            
+            // Remove power-off class
+            consoleHero.elements.hero.classList.remove('crt-poweroff');
+            
+            // Start specific boot sequence after a longer delay
+            setTimeout(() => {
+                const sequences = consoleHero.getBootSequences();
+                const selectedSequence = sequences[sequenceIndex];
+                if (selectedSequence) {
+                    consoleHero.typeBootSequence(selectedSequence.lines, 0);
+                }
+            }, 1500); // Increased from 200ms to 1500ms (1.5 seconds)
+        }, 600); // Match the power-off animation duration
+    }
+    
+    detectCurrentWallpaper() {
+        const consoleHero = window.consoleHeroInstance;
+        if (!consoleHero || !consoleHero.elements.titleBg) return;
+        
+        const bgStyle = consoleHero.elements.titleBg.style.backgroundImage;
+        if (bgStyle) {
+            const match = bgStyle.match(/url\(['"]?([^'")]+)['"]?\)/);
+            if (match) {
+                this.currentWallpaper = match[1];
+            }
+        }
+    }
+    
+    // Menu action handlers
+    executeAction(action, params) {
+        switch (action) {
+            case 'rebootRandom':
+                this.rebootConsole();
+                break;
+            case 'rebootSpecific':
+                this.rebootConsoleSpecific(params);
+                break;
+            case 'print':
+                window.print();
+                break;
+            case 'setTheme':
+                this.setTheme(params);
+                break;
+            case 'setBackground':
+                this.setBackground(params);
+                break;
+            case 'scrollTo':
+                this.smoothScrollTo(params);
+                break;
+            case 'openExternal':
+                window.open(params, '_blank', 'noopener');
+                break;
+            case 'openProject':
+                window.open(params, '_blank', 'noopener');
+                break;
+        }
+        
+        this.closeAllMenus();
+    }
+    
+    renderMenus() {
+        this.menuBar.innerHTML = '';
+        
+        Object.keys(this.menuData).forEach(menuName => {
+            const menuItem = document.createElement('span');
+            menuItem.className = 'menu-item';
+            menuItem.textContent = menuName;
+            menuItem.dataset.menu = menuName;
+            
+            this.menuBar.appendChild(menuItem);
+        });
+    }
+    
+    setupEventListeners() {
+        this.menuBar.addEventListener('click', (e) => {
+            const menuItem = e.target.closest('.menu-item');
+            if (!menuItem) return;
+            
+            e.stopPropagation();
+            this.toggleMenu(menuItem);
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!this.menuBar.contains(e.target)) {
+                this.closeAllMenus();
+            }
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeAllMenus();
+            }
+        });
+    }
+    
+    toggleMenu(menuItem) {
+        const menuName = menuItem.dataset.menu;
+        
+        if (this.activeMenu === menuName) {
+            this.closeAllMenus();
+        } else {
+            this.closeAllMenus();
+            this.openMenu(menuItem, menuName);
+        }
+    }
+    
+    openMenu(menuItem, menuName) {
+        menuItem.classList.add('active');
+        this.activeMenu = menuName;
+        
+        const dropdown = this.createDropdown(this.menuData[menuName].items);
+        dropdown.classList.add('show');
+        menuItem.appendChild(dropdown);
+    }
+    
+    closeAllMenus() {
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.classList.remove('active');
+            const dropdown = item.querySelector('.dropdown-menu');
+            if (dropdown) dropdown.remove();
+        });
+        this.activeMenu = null;
+    }
+    
+    createDropdown(items) {
+        const dropdown = document.createElement('div');
+        dropdown.className = 'dropdown-menu';
+        
+        items.forEach(item => {
+            if (item.label === 'separator') {
+                const separator = document.createElement('div');
+                separator.className = 'dropdown-separator';
+                dropdown.appendChild(separator);
+            } else {
+                const dropdownItem = this.createDropdownItem(item);
+                dropdown.appendChild(dropdownItem);
+            }
+        });
+        
+        return dropdown;
+    }
+    
+    createDropdownItem(item) {
+        const dropdownItem = document.createElement('div');
+        dropdownItem.className = 'dropdown-item';
+        
+        if (item.disabled) {
+            dropdownItem.classList.add('disabled');
+        }
+        
+        if (item.hasSubmenu) {
+            dropdownItem.classList.add('has-submenu');
+        }
+        
+        if (item.action === 'setBackground' && item.params === this.currentWallpaper) {
+            dropdownItem.classList.add('disabled', 'current-wallpaper');
+        }
+        
+        dropdownItem.textContent = item.label;
+        
+        if (!item.disabled && !(item.action === 'setBackground' && item.params === this.currentWallpaper)) {
+            dropdownItem.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (item.action) {
+                    this.executeAction(item.action, item.params);
+                }
+            });
+        }
+        
+        if (item.hasSubmenu) {
+            dropdownItem.addEventListener('mouseenter', () => {
+                const submenuItems = item.getSubmenu ? item.getSubmenu() : item.submenu;
+                const submenu = this.createSubmenu(submenuItems);
+                dropdownItem.appendChild(submenu);
+            });
+            
+            dropdownItem.addEventListener('mouseleave', () => {
+                const submenu = dropdownItem.querySelector('.dropdown-submenu');
+                if (submenu) submenu.remove();
+            });
+        }
+        
+        return dropdownItem;
+    }
+    
+    createSubmenu(items) {
+        const submenu = document.createElement('div');
+        submenu.className = 'dropdown-submenu';
+        
+        items.forEach(item => {
+            const dropdownItem = this.createDropdownItem(item);
+            submenu.appendChild(dropdownItem);
+        });
+        
+        return submenu;
+    }
+    
+    getBootSequenceMenu() {
+        const consoleHero = window.consoleHeroInstance;
+        if (!consoleHero) return [];
+        
+        const sequences = consoleHero.getBootSequences();
+        return sequences.map((seq, index) => ({
+            label: seq.name,
+            action: 'rebootSpecific',
+            params: index
+        }));
+    }
+    
+    getDesktopBackgroundMenu() {
+        const consoleHero = window.consoleHeroInstance;
+        if (!consoleHero) return [];
+        
+        this.detectCurrentWallpaper();
+        
+        return consoleHero.bgImages.map(img => ({
+            label: this.formatBackgroundName(img),
+            action: 'setBackground',
+            params: img
+        }));
+    }
+    
+    getProjectsMenu() {
+        const projects = document.querySelectorAll('.projects-grid .project-card');
+        const menuItems = [];
+        
+        projects.forEach(card => {
+            const link = card.querySelector('a[href]');
+            const title = card.querySelector('h3');
+            
+            if (link && title) {
+                menuItems.push({
+                    label: title.textContent.trim(),
+                    action: 'openProject',
+                    params: link.href
+                });
+            }
+        });
+        
+        return menuItems;
+    }
+    
+    formatBackgroundName(imagePath) {
+        const filename = imagePath.split('/').pop();
+        const name = filename.replace('console-title-bg_', '').replace('.png', '');
+        return name.charAt(0).toUpperCase() + name.slice(1);
+    }
+    
+    setTheme(theme) {
+        const themeManager = window.themeManagerInstance;
+        if (themeManager) {
+            themeManager.applyTheme(theme);
+        }
+    }
+    
+    setBackground(imagePath) {
+        const consoleHero = window.consoleHeroInstance;
+        if (!consoleHero) return;
+        
+        const titleBg = consoleHero.elements.titleBg;
+        if (titleBg) {
+            // Add extreme glitch class
+            titleBg.classList.add('extreme-change');
+            
+            // Change image at the midpoint of the animation
+            setTimeout(() => {
+                titleBg.style.backgroundImage = `url('${imagePath}')`;
+                consoleHero.elements.hero.classList.add('ready-bg-visible');
+                this.currentWallpaper = imagePath;
+            }, 600); // Midpoint of 1.2s animation
+            
+            // Remove animation class after completion
+            setTimeout(() => {
+                titleBg.classList.remove('extreme-change');
+            }, 1200); // Match animation duration
+        }
+    }
+    
+    smoothScrollTo(selector) {
+        const element = document.querySelector(selector);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+}
+
 // ===== RANDOM EFFECTS =====
 /**
  * Adds random glitch effects to project cards
@@ -996,7 +1399,7 @@ class RandomProjectEffects {
         this.effectQueue = [];
         this.lastEffectTime = 0;
         this.minEffectInterval = 3000;
-        this.maxEffectInterval = 8000;
+        this.maxEffectInterval = 5000;
         this.respectsReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         this.init();
     }
@@ -1424,13 +1827,12 @@ function animateDots(element, baseText, duration, onComplete) {
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize all managers
-    new ThemeManager();
-    new HeroAnimationManager();
-    new ConsoleHero();
+    window.themeManagerInstance = new ThemeManager();
+    window.consoleHeroInstance = new ConsoleHero();
     new LazyImageLoader();
-    new SmoothScrollManager();
     new ProjectCardManager();
     new FeaturedProjectRotator();
+    new OSMenuSystem();
     new RandomProjectEffects();
 
     // Smooth scroll to top for site title link
@@ -1452,44 +1854,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.retro-bg').forEach(element => {
         new SimpleRetroBackground(element);
     });
-
-    // Window Control Functionality
-    const windowControls = {
-        closeBtn: document.querySelector('.close-btn'),
-        minimizeBtn: document.querySelector('.minimize-btn'),
-        maximizeBtn: document.querySelector('.maximize-btn'),
-        windowChrome: document.querySelector('.window-chrome'),
-        consoleHero: document.getElementById('consoleHero'),
-        
-        init() {
-            this.closeBtn?.addEventListener('click', () => this.handleClose());
-            this.maximizeBtn?.addEventListener('click', () => this.handleMaximize());
-            this.minimizeBtn?.addEventListener('click', () => this.handleMinimize());
-        },
-        
-        handleClose() {
-            if (!this.consoleHero) return;
-            this.consoleHero.style.transform = 'scale(0.8)';
-            this.consoleHero.style.opacity = '0.7';
-            setTimeout(() => {
-                this.consoleHero.style.transform = '';
-                this.consoleHero.style.opacity = '';
-            }, 300);
-        },
-        
-        handleMaximize() {
-            if (!this.windowChrome) return;
-            this.windowChrome.style.transform = 
-                this.windowChrome.style.transform === 'scale(1.1)' ? '' : 'scale(1.1)';
-        },
-        
-        handleMinimize() {
-            // Not implemented - could add minimize animation here
-            console.log('Minimize not implemented');
-        }
-    };
-    
-    windowControls.init();
 });
 
 // ===== ERROR HANDLING =====
