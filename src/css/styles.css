@@ -350,7 +350,7 @@ p {
 /* ===== HERO SECTION ===== */
 .hero {
     position: relative;
-    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+    background: linear-gradient(135deg, #242727 0%, #2e3131 100%);
     min-height: 60vh;
     display: flex;
     align-items: center;
