@@ -905,9 +905,14 @@ class OSMenuSystem {
                         params: '#about'
                     },
                     {
-                        label: 'README',
+                        label: 'README.md',
                         action: 'openExternal',
                         params: 'https://github.com/krizdingus/krizdingus.com/blob/main/README.md'
+                    },
+                    {
+                        label: 'PHILOSOPHY.md',
+                        action: 'openExternal',
+                        params: 'https://github.com/krizdingus/krizdingus.com/blob/main/PHILOSOPHY.md'
                     }
                 ]
             }
