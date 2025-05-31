@@ -69,7 +69,9 @@ This file is the entire personality engine for the site. And it works.
 The boot sequence is handled by a class called ConsoleHero. It starts with one of several fake operating systems like "MultimediOS '98" or "Terminal Crimewave." Each one is packed with nonsense lines like:
 
 Mount /mnt/zyn... OK
+
 Ego containment... STABLE
+
 Save battery: LEAKING HISTORY
 
 Each line animates with either typing effects, animated dots, or a simulated ASCII progress bar. None of it is necessary. All of it is beautiful.
@@ -117,7 +119,9 @@ There's a single featured project card that changes every 20 seconds. When it sw
 You get animated warnings like:
 
 ◊ SRAM DETECTS CHAOS ENERGY ◊
+
 ◊ CARTRIDGE READ FAILURE ◊
+
 ◊ DINGUS MODULE OUT OF RANGE ◊
 
 Then the card updates with new content. A little drama. A little chaos. Maximum toy energy.
