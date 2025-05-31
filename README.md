@@ -32,7 +32,9 @@ Web developer. Tinkerer. Occasional menace. Projects include Discord bots, bootl
 
 This site wasn't designed by committee. It wasn't built for conversion rates. It was built because I didn't like the old one.
 
-A comprehensive writeup about the site's evolution—from a one-page .php file duct-taped to a HostGator coupon, to a glitchy, CRT-themed side project powered by spite and raw HTML—is currently in progress. Stay tuned for the full breakdown of how this site came to be.
+If you're curious about how it evolved—from a one-page .php file duct-taped to a HostGator coupon, to a glitchy, CRT-themed side project powered by spite and raw HTML—you can read the full breakdown here:
+
+- [PHILOSOPHY.md](./PHILOSOPHY.md) - *How I Rebuilt My Website (And Why It Had to Get Weirder)*
 
 ## Author
 
