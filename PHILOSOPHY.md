@@ -20,7 +20,7 @@ The old site was one .php file I threw on a HostGator plan I got during a Black 
 
 It didn't do much. A list of links. Some green highlights. A paragraph about me that read like it was written by someone being asked to describe themselves at gunpoint. But it loaded fast. It never broke. It never asked for anything.
 
-The problem wasn't performance. It was personality. The same kind of chaos you see in nic-pouch holders and cartridge stands deserved a site with more style. More glitch. More "what the hell is this?"
+The problem wasn't performance. It was personality. If I'm going to make magnetic nicotine holders and printable poop stools, the portfolio showing them better have some personality too. More glitch. More "what the hell is this?"
 
 So I rebuilt it. Sort of.
 
