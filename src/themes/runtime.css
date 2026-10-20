@@ -1,0 +1,40 @@
+/* =============================================================
+   runtime.css — the theme framework's own (tiny) styles. Loaded in
+   normal mode with the base CSS; holds no theme's look.
+   ============================================================= */
+
+/* A theme is pending (head kicker): keep the normal layout from
+   flashing before the theme mounts. Failsafe: show the page anyway
+   after 4s if the theme never arrives. The selector out-ranks normal
+   mode's blanket `animation: none` rule in pro.css. */
+:root[data-skin-pending]:not([data-skin]) body:not([data-motion-ok]) {
+  visibility: hidden;
+  animation: skin-failsafe 0s linear 4s forwards !important;
+}
+@keyframes skin-failsafe { to { visibility: visible; } }
+
+/* The swap. With no `transition` in the theme's manifest the browser's
+   own View Transition crossfade plays (data-skin-swap="fade"). A theme
+   that brings keyframes (data-skin-swap="custom") gets the stock
+   animation switched off here; the runtime then drives both snapshots
+   with the manifest's keyframes (Web Animations). No theme's look lives
+   in this file. The runtime never starts a View Transition under
+   prefers-reduced-motion. The snapshots shrink and grow over a dark
+   backdrop, so a collapsing page reads as a screen switching off rather
+   than a layout slipping on whatever colour the canvas happens to be. */
+:root[data-skin-swap="custom"]::view-transition {
+  background: #000;
+}
+:root[data-skin-swap="custom"]::view-transition-old(root),
+:root[data-skin-swap="custom"]::view-transition-new(root) {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none !important; }
+}
+
+/* #main takes focus when the runtime has to move it during a swap
+   (tabindex="-1", never in the tab order). No ring on a whole page. */
+#main[tabindex="-1"]:focus { outline: none; }

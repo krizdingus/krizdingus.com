@@ -1,0 +1,265 @@
+[
+ {
+  "out": "home.jpg",
+  "kind": "title",
+  "mood": "paper",
+  "hue": "berry",
+  "crumb": "> krizdingus",
+  "title": "Web developer. Tinkerer. Occasional menace.",
+  "sub": "Kris Williams",
+  "url": "krizdingus.com/"
+ },
+ {
+  "out": "projects.jpg",
+  "kind": "title",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> krizdingus / projects",
+  "title": "Projects",
+  "sub": "Things I 3D-printed, flashed, or wrote.",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "blog.jpg",
+  "kind": "title",
+  "mood": "plum",
+  "hue": "grape",
+  "crumb": "> krizdingus / blog",
+  "title": "Blog",
+  "sub": "How this site is built, and the stories behind a few of the projects.",
+  "url": "krizdingus.com/blog/"
+ },
+ {
+  "out": "web.jpg",
+  "kind": "title",
+  "mood": "paper",
+  "hue": "kiwi",
+  "crumb": "> krizdingus / web",
+  "title": "Web work",
+  "sub": "The kind of web work I do, and who I've done it for.",
+  "url": "krizdingus.com/web/"
+ },
+ {
+  "out": "about.jpg",
+  "kind": "title",
+  "mood": "paper",
+  "hue": "dandy",
+  "crumb": "> krizdingus / about",
+  "title": "About",
+  "sub": "More than you asked for, and how to reach me.",
+  "url": "krizdingus.com/about/"
+ },
+ {
+  "out": "colophon.jpg",
+  "kind": "title",
+  "mood": "plum",
+  "hue": "berry",
+  "crumb": "> krizdingus / colophon",
+  "title": "Colophon",
+  "sub": "What this site is made of.",
+  "url": "krizdingus.com/colophon/"
+ },
+ {
+  "out": "blog/a-theme-is-a-folder.jpg",
+  "mood": "plum",
+  "hue": "grape",
+  "crumb": "> blog / a-theme-is-a-folder",
+  "title": "A theme is a folder",
+  "url": "krizdingus.com/blog/",
+  "kind": "photo",
+  "src": "/images/blog/a-theme-is-a-folder.jpg",
+  "position": "centre"
+ },
+ {
+  "out": "blog/robots-saw-right-through-that.jpg",
+  "mood": "plum",
+  "hue": "grape",
+  "crumb": "> blog / robots-saw-right-through-that",
+  "title": "Robots saw right through that shit",
+  "url": "krizdingus.com/blog/",
+  "kind": "photo",
+  "src": "/images/blog/robots-saw-right-through-that.jpg",
+  "position": "centre"
+ },
+ {
+  "out": "blog/the-texture-lives-in-the-profile.jpg",
+  "mood": "plum",
+  "hue": "grape",
+  "crumb": "> blog / the-texture-lives-in-the-profile",
+  "title": "The texture lives in the profile",
+  "url": "krizdingus.com/blog/",
+  "kind": "photo",
+  "src": "/images/blog/the-texture-lives-in-the-profile.jpg",
+  "position": "centre"
+ },
+ {
+  "out": "blog/time-for-a-bigger-site.jpg",
+  "mood": "plum",
+  "hue": "grape",
+  "crumb": "> blog / time-for-a-bigger-site",
+  "title": "Time for a bigger site",
+  "url": "krizdingus.com/blog/",
+  "kind": "photo",
+  "src": "/images/blog/time-for-a-bigger-site.jpg",
+  "position": "centre"
+ },
+ {
+  "out": "blog/turns-out-its-not-100000-games.jpg",
+  "mood": "plum",
+  "hue": "grape",
+  "crumb": "> blog / turns-out-its-not-100000-games",
+  "title": "Turns out it’s not 100,000 games",
+  "url": "krizdingus.com/blog/",
+  "kind": "photo",
+  "src": "/images/blog/turns-out-its-not-100000-games.jpg",
+  "position": "centre"
+ },
+ {
+  "out": "projects/cassette-case-gameboy-games.jpg",
+  "kind": "framed",
+  "src": "/images/projects/cassette-case-gameboy-games/open-and-closed.webp",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / cassette-case-gameboy-games",
+  "title": "Cassette-Style Case for Game Boy Games",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "projects/claudometer.jpg",
+  "kind": "title",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / claudometer",
+  "title": "Claudometer: a Claude Code Usage Monitor on a $15 ESP32 Display",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "projects/dingus-game-kart.jpg",
+  "kind": "framed",
+  "src": "/images/projects/dingus-game-kart/turntable-frame.webp",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / dingus-game-kart",
+  "title": "Dingus Game Kart: a 3D-Printable Game Boy Cartridge Shell",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "projects/fdm-friendly-gameboy-cartridge.jpg",
+  "kind": "framed",
+  "src": "/images/projects/fdm-friendly-gameboy-cartridge/tetris-shell.webp",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / fdm-friendly-gameboy-cartridge",
+  "title": "FDM-Friendly Game Boy Cartridge",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "projects/gameboy-bootleg-cartridge-labels.jpg",
+  "kind": "framed",
+  "src": "/images/projects/gameboy-bootleg-cartridge-labels/game-boy-wars.webp",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / gameboy-bootleg-cartridge-labels",
+  "title": "Game Boy Cartridge Labels for Romhacks and Translations",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "projects/gamepak-discreet-display-stand.jpg",
+  "kind": "framed",
+  "src": "/images/projects/gamepak-discreet-display-stand/crystal-front.webp",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / gamepak-discreet-display-stand",
+  "title": "Game Boy Game Pak Discreet Display Stand",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "projects/gb-rom-database-bot.jpg",
+  "kind": "title",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / gb-rom-database-bot",
+  "title": "GB ROM Database Bot",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "projects/gbc-palette-editor.jpg",
+  "kind": "framed",
+  "src": "/images/projects/gbc-palette-editor/palette-edit-light.webp",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / gbc-palette-editor",
+  "title": "GBC Palette Editor for macOS",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "projects/leaksmith.jpg",
+  "kind": "title",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / leaksmith",
+  "title": "leaksmith: Fake Leaked-Document PDFs That Fool AI and Nobody Else",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "projects/linkbruh.jpg",
+  "kind": "title",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / linkbruh",
+  "title": "linkbruh: a Discord Bot That Fixes X and Instagram Embeds",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "projects/magsafe-zyn-container.jpg",
+  "kind": "photo",
+  "src": "/images/projects/magsafe-zyn-container/open-with-pouches.webp",
+  "position": "centre",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / magsafe-zyn-container",
+  "title": "Mini MagSafe Zyn Container",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "projects/mouse-bite-labs-cartridge-labels.jpg",
+  "kind": "framed",
+  "src": "/images/projects/mouse-bite-labs-cartridge-labels/mbc3-cartridge.webp",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / mouse-bite-labs-cartridge-labels",
+  "title": "Mouse Bite Labs Flash Cartridge Labels",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "projects/peekabu.jpg",
+  "kind": "framed",
+  "src": "/images/projects/peekabu/dashboard.webp",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / peekabu",
+  "title": "Peekabu: a Mac Menu Bar Monitor for Bambu Lab Printers",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "projects/printable-poopin-stool.jpg",
+  "kind": "framed",
+  "src": "/images/projects/printable-poopin-stool/in-place.webp",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / printable-poopin-stool",
+  "title": "Printable Poopin’ Stool",
+  "url": "krizdingus.com/projects/"
+ },
+ {
+  "out": "projects/zyn-container-easy-open-threaded.jpg",
+  "kind": "photo",
+  "src": "/images/projects/zyn-container-easy-open-threaded/open-with-pouches.webp",
+  "position": "centre",
+  "mood": "paper",
+  "hue": "teal",
+  "crumb": "> projects / zyn-container-easy-open-threaded",
+  "title": "Zyn Container (Easy-open, Threaded)",
+  "url": "krizdingus.com/projects/"
+ }
+]

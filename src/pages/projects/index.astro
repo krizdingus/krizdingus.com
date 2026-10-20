@@ -1,0 +1,111 @@
+---
+import fs from 'node:fs';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import { getCollection } from 'astro:content';
+import { tagCounts, sortProjects, slugFromId, hostLabel, crtGlyph } from '../../lib/projects-helpers';
+import { pageCard } from '../../lib/seo';
+import '../../styles/projects.css';
+
+const projects = sortProjects(await getCollection('projects', (e) => !e.data.draft));
+const tags = tagCounts(projects);
+const total = projects.length;
+const pad2 = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+// Rows with no photo get a phosphor tile in the thumb's slot, the same size as
+// a thumbnail, showing the project's crt_glyph in the next phosphor of the cycle.
+const PHOSPHORS = ['green', 'amber', 'white', 'cyan'] as const;
+let noPhoto = 0;
+
+// 400×300 WebP thumbnails (public/images/projects/<slug>/thumb.webp), cut from
+// the picture each project page leads with.
+function thumbFor(slug: string): string | null {
+  const rel = `/images/projects/${slug}/thumb.webp`;
+  return fs.existsSync(`public${rel}`) ? rel : null;
+}
+---
+
+<BaseLayout
+  title="Projects — Krizdingus"
+  ogImage={pageCard('projects')}
+  breadcrumbs={[{ name: 'Projects', path: '/projects/' }]}
+  description="3D prints, Game Boy labels and shells, Discord bots and Mac apps by Kris Williams, with the files on MakerWorld and GitHub."
+  shellTitle="KRIZSCAPE — Projects"
+  statusSegment={`${total} projects`}
+  bodyClass="no-card-glitch"
+>
+  <section class="content-section proj-index">
+    <PageHero
+      crumb="> krizdingus / projects"
+      title="Projects"
+      sub="Things I 3D-printed, flashed, or wrote."
+      heroStyle="border-top-color:var(--accent-primary);background:var(--bg-primary);padding-left:0;padding-right:0"
+    />
+
+    <div class="proj-filter" role="search" aria-label="Filter projects" data-filter-ui hidden>
+      <div class="proj-filter__field proj-filter__field--grow">
+        <label class="proj-filter__label" for="proj-search">Search</label>
+        <input id="proj-search" class="os-input" type="search" autocomplete="off" placeholder="stool, Game Boy, ESP32…" data-filter-search />
+      </div>
+      <div class="proj-filter__field">
+        <label class="proj-filter__label" for="proj-tag">Tag</label>
+        <select id="proj-tag" class="os-input" data-filter-tag>
+          <option value="">All tags</option>
+          {tags.map(([t, n]) => <option value={t.toUpperCase()}>{t} ({n})</option>)}
+        </select>
+      </div>
+      <p class="proj-filter__count">
+        <span class="proj-filter__label" aria-hidden="true">Showing</span>
+        <output data-filter-count aria-hidden="true">{total}/{total}</output>
+      </p>
+      <p class="proj-sr" role="status" data-filter-status></p>
+    </div>
+
+    <p class="proj-empty" data-filter-empty hidden>
+      <span data-filter-empty-text>Nothing in here matches that.</span>
+      <button type="button" class="proj-empty__clear" data-filter-clear>Clear the filters</button>
+    </p>
+
+    <div class="proj-list__head" aria-hidden="true" data-filter-head>
+      <span>#</span><span></span><span>Name</span><span>Year · Files on</span>
+    </div>
+    <ol class="proj-list" data-filter-grid aria-label="Projects, newest first">
+      {projects.map((entry, i) => {
+        const slug = slugFromId(entry.id);
+        const d = entry.data;
+        // UTC year so a YYYY-01-01 date doesn't roll back in US timezones.
+        const year = d.date_published.getUTCFullYear();
+        const thumb = d.hero_image ? thumbFor(slug) : null;
+        const glyph = crtGlyph(d.title, d.crt_glyph);
+        return (
+          <li
+            class={thumb ? 'proj-row' : 'proj-row proj-row--text'}
+            data-filter-item
+            data-title={d.title}
+            data-hook={d.summary}
+            data-tags={d.tags.join('|').toUpperCase()}
+            data-exe={d.exe_name}
+          >
+            <span class="proj-row__num" aria-hidden="true">{pad2(i + 1)}</span>
+            {thumb && (
+              <span class="proj-row__media">
+                <img src={thumb} alt="" width="400" height="300" loading={i < 3 ? 'eager' : 'lazy'} decoding="async" />
+              </span>
+            )}
+            {!thumb && <span class={`proj-row__kind proj-crt--${PHOSPHORS[noPhoto++ % PHOSPHORS.length]}`} aria-hidden="true">{glyph}</span>}
+            <div class="proj-row__text">
+              <h2 class="proj-row__title">
+                <a href={`/projects/${slug}/`}>{d.title}</a>
+              </h2>
+              <p class="proj-row__sum">{d.summary}</p>
+              <p class="proj-row__tags">{d.tags.join(' / ')}</p>
+            </div>
+            <p class="proj-row__where">
+              <span class="proj-row__year">{year}</span>
+              <span class="proj-row__host">{hostLabel(d.external_url)}</span>
+            </p>
+          </li>
+        );
+      })}
+    </ol>
+  </section>
+</BaseLayout>

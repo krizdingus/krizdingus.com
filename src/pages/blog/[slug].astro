@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import Pnav from '../../components/Pnav.astro';
+import BlogPicture from '../../components/BlogPicture.astro';
+import { getCollection, render } from 'astro:content';
+import { postDateLabel, readingMinutes, postSlug, needsReview } from '../../lib/blog-helpers';
+import { SITE, postCard, blogPostingNode } from '../../lib/seo';
+import { blogPicture } from '../../lib/blog-images';
+import { splitAlt } from '../../lib/alt-text';
+import '../../styles/blog.css';
+
+export async function getStaticPaths() {
+  const all = await getCollection('blog', (e) => !e.data.draft);
+  all.sort((a, b) => b.data.date_published.getTime() - a.data.date_published.getTime());
+  return all.map((entry, i) => ({
+    params: { slug: postSlug(entry.id) },
+    props: {
+      entry,
+      prev: all[i + 1] ? { slug: postSlug(all[i + 1].id), title: all[i + 1].data.title } : null,
+      next: all[i - 1] ? { slug: postSlug(all[i - 1].id), title: all[i - 1].data.title } : null,
+    },
+  }));
+}
+
+const { entry, prev, next } = Astro.props;
+const { Content } = await render(entry);
+const slug = postSlug(entry.id);
+const minutes = readingMinutes(entry.body ?? '');
+const pubDate = postDateLabel(entry.data);
+const canonicalPath = `/blog/${slug}`;
+// A draft still marked for review stays out of search (noindex, and so out
+// of the sitemap) and claims no publish date. Signing it off lifts both.
+const draft = needsReview(entry.data);
+const card = postCard(slug, entry.data);
+const pic = blogPicture(entry.data.hero_image);
+// Long alt text keeps a short alt and moves the rest to a hidden description.
+const heroAlt = splitAlt(entry.data.hero_alt ?? '');
+const HERO_DESC_ID = 'post-img-desc';
+// The picture runs a little wider than the text column: the page less its
+// padding, up to 760px.
+const POST_HERO_SIZES = '(max-width: 640px) calc(100vw - 32px), (max-width: 840px) calc(100vw - 80px), 760px';
+
+// Mockup second segment: "{slug} · {N} words" — derived from body length.
+// (Reading time goes in the systemStatus segment instead.)
+const bodyText = entry.body ?? '';
+const wordCount = bodyText.trim() ? bodyText.trim().split(/\s+/).length : 0;
+function formatWords(n: number): string {
+  if (n >= 1000) {
+    const rounded = Math.round(n / 100) / 10;
+    const display = rounded % 1 === 0 ? String(Math.round(rounded)) : rounded.toFixed(1);
+    return display + 'k words';
+  }
+  return n + (n === 1 ? ' word' : ' words');
+}
+const wordLabel = formatWords(wordCount);
+---
+
+<BaseLayout
+  title={`${entry.data.title} — Krizdingus blog`}
+  description={entry.data.description ?? entry.data.summary}
+  shellTitle={`KRIZSCAPE — ${entry.data.title}`}
+  systemStatus={`Reading · ${minutes} min`}
+  statusSegment={`${slug} · ${wordLabel}`}
+  noindex={draft}
+  ogType="article"
+  ogImage={card}
+  article={draft ? { tags: entry.data.tags } : { published: entry.data.date_published, modified: entry.data.date_updated, tags: entry.data.tags }}
+  schema={[blogPostingNode(`${SITE}/blog/${slug}/`, entry.data, card, draft)]}
+  breadcrumbs={[{ name: 'Blog', path: '/blog/' }, { name: entry.data.title, path: `/blog/${slug}/` }]}
+>
+  <PageHero
+    crumb={`> blog / ${slug}`}
+    title={entry.data.title}
+    variant="blog"
+  >
+    <div class="hero-meta" slot="meta">
+      <span>{pubDate}</span>
+      <span class="hero-meta__grp"><span class="dot" aria-hidden="true">·</span>{minutes} min read</span>
+      {entry.data.tags.length > 0 && (
+        <span class="hero-meta__grp">
+          <span class="dot" aria-hidden="true">·</span>
+          <span class="hero-tags">
+            {entry.data.tags.slice(0, 3).map((t, i) => (
+              <>
+                {i > 0 && ' '}
+                <a class="tag-chip" href={`/blog/tags/${t}/`} style="font-size:9px">{t.toUpperCase()}</a>
+              </>
+            ))}
+          </span>
+        </span>
+      )}
+    </div>
+  </PageHero>
+
+  <div class="share-strip" data-share-strip hidden>
+    <span class="label">SHARE</span>
+    <button type="button" class="os-button" data-share-copy>Copy link</button>
+    <span class="visually-hidden-blog" role="status" data-share-status></span>
+    <span class="path">{canonicalPath}/</span>
+  </div>
+  {/* The strip is only a copy button, which needs scripts, so with JS off it
+      stays hidden. This runs as the parser reaches it, before first paint,
+      so showing it doesn't shift the page. */}
+  <script is:inline>document.currentScript.previousElementSibling.hidden = false;</script>
+
+  <section class="content-section">
+    {pic && (
+      <figure class="post-figure">
+        <BlogPicture pic={pic} alt={heroAlt.alt} describedby={heroAlt.desc ? HERO_DESC_ID : undefined} sizes={POST_HERO_SIZES} loading="eager" fetchpriority="high" />
+        {heroAlt.desc && <span class="sr-only" id={HERO_DESC_ID}>{heroAlt.desc}</span>}
+        {entry.data.hero_caption && <figcaption>{entry.data.hero_caption}</figcaption>}
+      </figure>
+    )}
+    <article class="prose" style="margin:0 auto">
+      <Content />
+    </article>
+  </section>
+
+  {(prev || next) && (
+    <Pnav
+      prev={prev
+        ? { href: `/blog/${prev.slug}/`, label: prev.title, kicker: 'PREV POST' }
+        : { href: '/blog/', label: '/blog/', kicker: 'ALL POSTS' }}
+      next={next
+        ? { href: `/blog/${next.slug}/`, label: next.title, kicker: 'NEXT POST' }
+        : { href: '/blog/', label: '/blog/', kicker: 'ALL POSTS' }}
+    />
+  )}
+</BaseLayout>
+
+<style>
+  /* Each separator travels with the item after it, so a "·" never ends a
+     line when the meta wraps on a phone. */
+  .hero-meta__grp { display: inline-flex; align-items: center; flex-wrap: wrap; }
+  .hero-meta__grp .dot { margin-right: 10px; }
+  /* .share-strip sets display, which would otherwise beat the hidden attribute. */
+  [data-share-strip][hidden] { display: none !important; }
+</style>

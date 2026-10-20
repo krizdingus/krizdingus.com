@@ -1,0 +1,211 @@
+---
+import { pageCard } from '../../lib/seo';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import { getCollection } from 'astro:content';
+import { groupLedger, stateLabel, waybackMonth } from '../../lib/web-ledger';
+import './_web.css';
+
+// /web/: what the web work covers, a few results from one employer, then
+// the ledger of brands and clients the work was for.
+//
+// The ledger is grouped by how the work happened. It never says what the
+// work was for a given name: not all of it was whole websites. A record
+// shows its name, what's known about the site now (only where it's known),
+// a live link where one was asked for and the Wayback capture where one
+// exists. No years, roles, tech, summaries or notes.
+//
+// The prose in the template stands on its own: it never counts, names or
+// describes entries or groups, so editing the data never means editing the
+// copy. The results are the one place that names an organization and
+// carries figures, so they live here as data; their wording is fixed and
+// tested (tests/web-ledger.test.ts).
+const all = await getCollection('web', (e) => !e.data.draft);
+const groups = groupLedger(all, (e) => e.data);
+const total = all.length;
+
+const RESULTS_WHERE = 'At St. Thomas University';
+const RESULTS: { lead: string; mark: string; tail: string }[] = [
+  { lead: "The payment systems I've built have processed ", mark: 'over $5 million and still counting', tail: '.' },
+  { lead: "An emergency fallback platform I built kept the university's payments running ", mark: 'during a service outage', tail: '.' },
+  { lead: "Redeveloping the university's website made pages load ", mark: 'more than 50% faster', tail: ' and improved accessibility scores.' },
+  { lead: 'Reusable content systems I built cut content publishing time by ', mark: 'about 40%', tail: '.' },
+];
+---
+
+<BaseLayout
+  title="Websites, web apps and integrations — Krizdingus"
+  ogImage={pageCard('web')}
+  breadcrumbs={[{ name: 'Web work', path: '/web/' }]}
+  description="Websites, web applications, payment systems and integrations Kris Williams builds, and the brands and clients he's done web work for."
+  shellTitle="KRIZSCAPE — Web ledger"
+  statusSegment={`${total} records`}
+>
+  <section class="content-section">
+    <PageHero
+      crumb="> krizdingus / web"
+      title="Web work"
+      sub="The kind of web work I do, and who I've done it for."
+      heroStyle="background:var(--bg-primary);padding-left:0;padding-right:0"
+    />
+
+    <div class="web-layout">
+      <div class="intro-block web-intro">
+        <p>
+          I build websites and web applications, and the integrations that connect them to
+          everything else: new sites built from scratch, redevelopments of sites that already
+          exist, and custom functionality on top of larger platforms.
+        </p>
+      </div>
+
+      <section class="web-results" aria-labelledby="results-title">
+        <header class="section-header">
+          <h2 class="section-title" id="results-title">A few results</h2>
+          <div class="section-meta">{RESULTS_WHERE}</div>
+        </header>
+        <ul class="web-results__list intro-block">
+          {RESULTS.map((r) => (
+            <li><span>{r.lead}<strong>{r.mark}</strong>{r.tail}</span></li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="web-do" aria-labelledby="do-title">
+        <header class="section-header">
+          <h2 class="section-title" id="do-title">What I do</h2>
+        </header>
+        <dl class="web-do__list">
+          <div class="web-do__row">
+            <dt>Web applications and payments</dt>
+            <dd>Custom payment processing, donations and event registration, built on Stripe and other payment integrations.</dd>
+          </div>
+          <div class="web-do__row">
+            <dt>Front end</dt>
+            <dd>JavaScript, React and PHP: custom interfaces, reusable components and sites driven by APIs.</dd>
+          </div>
+          <div class="web-do__row">
+            <dt>APIs and integrations</dt>
+            <dd>Connecting sites to payment processors, marketing automation, analytics and other third-party systems, and building what the existing tools don't do.</dd>
+          </div>
+          <div class="web-do__row">
+            <dt>Responsive HTML email</dt>
+            <dd>Custom responsive templates for companies and organizations, plus branded HTML email signatures.</dd>
+          </div>
+          <div class="web-do__row">
+            <dt>Performance, accessibility and SEO</dt>
+            <dd>Page speed and caching, accessibility, and search engine optimization.</dd>
+          </div>
+          <div class="web-do__row">
+            <dt>Content and publishing systems</dt>
+            <dd>Reusable content systems and the publishing workflows around them.</dd>
+          </div>
+          <div class="web-do__row">
+            <dt>E-commerce and business features</dt>
+            <dd>E-commerce features, restricted content, paywalls and other custom functionality a business needs.</dd>
+          </div>
+          <div class="web-do__row">
+            <dt>Custom WordPress</dt>
+            <dd>
+              Custom themes, custom plugins for specific needs, and integrations. A few of the plugins I've built:
+              <ul class="web-do__sub">
+                <li>Personnel management</li>
+                <li>Academic program catalogs</li>
+                <li>Academic paper indexing and paywalling</li>
+                <li>Automated media clipping for PR agencies</li>
+              </ul>
+            </dd>
+          </div>
+          <div class="web-do__row">
+            <dt>Testing, maintenance and troubleshooting</dt>
+            <dd>Automated testing, security maintenance, browser compatibility, performance audits, and tracking down why an integration isn't behaving.</dd>
+          </div>
+          <div class="web-do__row">
+            <dt>Planning and leadership</dt>
+            <dd>Leading redevelopment projects, evaluating platforms and vendors, choosing technical approaches and coordinating across departments. I also mentor developers and work directly with clients and stakeholders.</dd>
+          </div>
+          <div class="web-do__row">
+            <dt>Design</dt>
+            <dd>A background in graphic design. I've worked on the design side and the development side.</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="web-ledger" aria-labelledby="ledger-title">
+        <div class="web-ledger__side">
+          <header class="section-header">
+            <h2 class="section-title" id="ledger-title">Who it was for</h2>
+            <div class="section-meta">By how the work happened</div>
+          </header>
+          <div class="intro-block">
+            <p>
+              Some of the work for these brands and clients was building sites from the ground
+              up. Some was maintaining sites that were already running, and some was emails and
+              smaller jobs. The list doesn't say which was which.
+            </p>
+            <p>
+              Sites get redone and taken down, and I don't always hear about it. Where I know what
+              happened to one, the list says so. An archive date links to a copy saved by the
+              Wayback Machine.
+            </p>
+          </div>
+        </div>
+
+        <div class="wl">
+          <div class="wl__bar">
+            <span class="wl__file">LEDGER.DAT</span>
+            <span class="wl__count">{total} records</span>
+          </div>
+
+          <div class="wl__cols" aria-hidden="true">
+            <span>Name</span><span>Now</span><span>Archived</span>
+          </div>
+
+          {groups.map((g) => (
+            <section class="wl__group" aria-labelledby={`wl-${g.key}`}>
+              <h3 class="wl__ghead" id={`wl-${g.key}`}>
+                <span class="wl__gname">{g.label}</span>
+                {g.until && (
+                  <span class="wl__gnote"><span aria-hidden="true">· </span><span class="wl-sr">, </span>until <time datetime={g.until.iso}>{g.until.short}</time></span>
+                )}
+                <span class="wl__gcount" aria-hidden="true">{g.items.length}</span>
+              </h3>
+              <ul class="wl__list">
+                {g.items.map((entry) => {
+                  const d = entry.data;
+                  const state = stateLabel(d.site_state);
+                  const wb = waybackMonth(d.wayback_url);
+                  const live = d.live_url;
+                  const now = Boolean(state || live);
+                  const hasFacts = Boolean(now || wb);
+                  return (
+                    <li class={`wl__row${hasFacts ? ' has-facts' : ''}`}>
+                      <span class={wb && !now ? 'wl__namecell is-wide' : 'wl__namecell'}>
+                        <span class="wl__name">{d.client}</span>
+                        {hasFacts && <span class="wl__lead" aria-hidden="true"></span>}
+                      </span>
+                      {state && <span class={`wl__state is-${d.site_state}`}>{state}</span>}
+                      {live && (
+                        <span class="wl__state is-live">
+                          <a href={live} target="_blank" rel="noopener"><span class="wl-sr">{d.client}, </span>live site<span class="wl-sr"> (opens in a new tab)</span></a>
+                        </span>
+                      )}
+                      {wb && (
+                        <span class={now ? 'wl__arch' : 'wl__arch is-solo'}>
+                          <a href={d.wayback_url} target="_blank" rel="noopener"><span class="wl-sr">{d.client}, </span><span class="wl__archword">archived </span><time datetime={wb.iso}>{wb.short}</time><span class="wl-sr"> copy (opens in a new tab)</span></a>
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))}
+        </div>
+
+        <p class="wl__after">
+          There are probably more names than this. They go on the list when I find them.
+        </p>
+      </section>
+    </div>
+  </section>
+</BaseLayout>

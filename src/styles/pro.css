@@ -1,0 +1,439 @@
+/* =============================================================
+   pro.css — normal mode chrome for krizdingus.com
+   (The file keeps its old name; "pro/plain mode" is now normal mode,
+   the default for every visitor.)
+
+   Normal mode = no theme mounted = no `data-skin` attribute on <html>.
+   This file is also the base every theme draws on, unless the theme's
+   manifest says `base: 'none'` (XP does): then the runtime sets
+   <html data-skin-base="none"> and every rule scoped with
+   `:root:not([data-skin-base=none])` switches off. The header and footer
+   rules need no scope: a theme that replaces them detaches them.
+
+   Same content. No fake OS.
+   ============================================================= */
+
+/* ---------- page shape ---------- */
+.site {
+  max-width: var(--container-width, 1100px);
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+}
+.site-main { flex: 1 0 auto; }
+
+/* ---------- theme-only bits stay out of normal mode ----------
+   Markup that belongs to a theme (data-skin-only="<id>", or a selector
+   in that theme's manifest `owns` list) is hidden by a rule generated
+   from the manifests and inlined in <head> (skinOnlyCss() in
+   src/themes/manifests.ts). Nothing theme-specific lives here. */
+
+/* ---------- no ambient animation in normal mode ----------
+   Glitch, CRT and marquee motion belong to the OS theme. A component
+   that wants motion in normal mode opts in with [data-motion-ok]
+   (and still honours prefers-reduced-motion itself). */
+:root:not([data-skin-base=none]) *:not([data-motion-ok]),
+:root:not([data-skin-base=none]) *:not([data-motion-ok])::before,
+:root:not([data-skin-base=none]) *:not([data-motion-ok])::after { animation: none !important; }
+
+/* ============================================================
+   SECTION HUE — one per section; the tokens are in colors_and_type.css
+   ============================================================ */
+:root:not([data-skin-base=none]) .site {
+  --hue: var(--berry); --hue-tint: var(--berry-tint); --hue-fill: var(--berry-fill);
+  --px-hue: var(--px-berry);
+  /* read by the background pixels (src/scripts/bg-field.ts): five inks,
+     then the section's own (picked 40% of the time) */
+  --bg-px: var(--px-berry) var(--px-teal) var(--px-grape) var(--px-kiwi) var(--px-dandy) var(--px-hue);
+}
+:root:not([data-skin-base=none]) .site:has(.pro-nav a[href="/projects/"][aria-current]) { --hue: var(--teal);  --hue-tint: var(--teal-tint);  --hue-fill: var(--teal-fill);  --px-hue: var(--px-teal); }
+:root:not([data-skin-base=none]) .site:has(.pro-nav a[href="/blog/"][aria-current])     { --hue: var(--grape); --hue-tint: var(--grape-tint); --hue-fill: var(--grape-fill); --px-hue: var(--px-grape); }
+:root:not([data-skin-base=none]) .site:has(.pro-nav a[href="/web/"][aria-current])      { --hue: var(--kiwi);  --hue-tint: var(--kiwi-tint);  --hue-fill: var(--kiwi-fill);  --px-hue: var(--px-kiwi); }
+:root:not([data-skin-base=none]) .site:has(.pro-nav a[href="/about/"][aria-current])    { --hue: var(--dandy); --hue-tint: var(--dandy-tint); --hue-fill: var(--dandy-fill); --px-hue: var(--px-dandy); }
+
+/* Every element re-derives its accent, rules and print offsets from the
+   nearest --hue, so a card that sets its own hue (home, pagers) recolours
+   everything inside it. */
+:root:not([data-skin-base=none]) .site,
+:root:not([data-skin-base=none]) .site * {
+  --accent-primary: var(--hue);
+  --hue-line: color-mix(in srgb, var(--hue-fill) 70%, var(--bg-primary));
+  --hue-edge: color-mix(in srgb, var(--hue) var(--edge-amt), var(--edge-mix));
+  /* day: a flat diagonal offset in the bright ink */
+  --print: 5px 5px 0 0 var(--hue-fill);
+  --print-sm: 3px 3px 0 0 var(--hue-fill);
+}
+:root:not([data-skin-base=none])[data-theme="dark"] .site,
+:root:not([data-skin-base=none])[data-theme="dark"] .site * {
+  --hue-line: color-mix(in srgb, var(--hue) 58%, var(--bg-primary));
+  /* night: the moulded case edge under the shell */
+  --print: 0 5px 0 0 var(--hue-line);
+  --print-sm: 0 3px 0 0 var(--hue-line);
+}
+
+/* ---------- base ---------- */
+:root:not([data-skin-base=none]) body {
+  font-size: 17px;
+  background: var(--page-bg);
+}
+:root:not([data-skin-base=none]) ::selection { background: var(--marker); color: var(--marker-ink); }
+/* The skip link wears the nav's yellow marker: the section hue glows in the
+   dark mood and white text on it falls short of 4.5:1. */
+:root:not([data-skin-base=none]) .skip-link {
+  font-size: 14px;
+  color: var(--marker-ink);
+  background: var(--marker);
+  box-shadow: 2px 2px 0 var(--border-strong);
+}
+:root:not([data-skin-base=none]) :focus-visible { outline-color: var(--hue); }
+
+/* ============================================================
+   BACKGROUND PIXELS — two gutter-sized canvases drawn by
+   src/scripts/bg-field.ts on wide windows. They sit under everything
+   (z-index -1, beside the opaque .site column) and never behind text.
+   The faint 24px dot grid is their CSS background, so the script never
+   redraws it. Normal mode only: the script stops under any theme, and
+   this hides them there too.
+   ============================================================ */
+.kz-bg {
+  position: fixed; top: 0; left: 0;
+  z-index: -1;
+  pointer-events: none;
+  image-rendering: pixelated;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' shape-rendering='crispEdges'%3E%3Crect x='6' y='6' width='1' height='1' fill='%2322202c' fill-opacity='.11'/%3E%3C/svg%3E") 0 0 / 24px 24px;
+  transition: opacity 2s ease;
+}
+@starting-style { .kz-bg { opacity: 0; } }
+:root[data-theme="dark"] .kz-bg { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' shape-rendering='crispEdges'%3E%3Crect x='6' y='6' width='1' height='1' fill='%23f0eaf7' fill-opacity='.11'/%3E%3C/svg%3E") 0 0 / 24px 24px; }
+:root[data-skin] .kz-bg { display: none; }
+
+/* ============================================================
+   HEADER — the five-ink stripe, the cartridge wordmark, a quiet nav
+   ============================================================ */
+.pro-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: calc(var(--space-md) + 4px) var(--space-lg) var(--space-md);
+  background:
+    linear-gradient(to right,
+      var(--berry-fill) 0 20%, var(--grape-fill) 20% 40%, var(--teal-fill) 40% 60%,
+      var(--kiwi-fill) 60% 80%, var(--dandy-fill) 80% 100%) top / 100% 6px no-repeat,
+    var(--bg-primary);
+  border-bottom: 2px solid var(--border-strong);
+  position: sticky; top: 0; z-index: 50;
+  flex: none;
+}
+[data-theme="dark"] .pro-header { border-bottom-color: var(--hairline); }
+/* The sticky header must never cover what has focus (WCAG 2.4.11) or an
+   anchor target: keep the scroll stop clear of it. Header height plus
+   12px air; the narrow header wraps to two rows, and short viewports
+   unstick it (both under RESPONSIVE). */
+:root:not([data-skin-base=none]) { scroll-padding-top: calc(84px + 12px); }
+.pro-wordmark {
+  color: var(--text-primary);
+  text-decoration: none;
+  flex: none;
+  display: inline-flex; align-items: center;
+  line-height: 0;
+}
+/* The cartridge wordmark (src/components/Wordmark.astro), drawn at its own
+   size so the pixel parts land on whole pixels. */
+.pro-wordmark__art { display: block; width: 144px; height: 26px; }
+.pro-wordmark:hover { color: var(--hue); }
+
+/* Plain words. Hover previews the destination's ink; the current page
+   wears the yellow marker. */
+.pro-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: var(--space-lg);
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+}
+.pro-nav a {
+  font-family: var(--font-display);
+  font-size: 16.5px;
+  font-weight: 600;
+  font-stretch: 104%;
+  line-height: 1.25;
+  color: var(--text-primary);
+  text-decoration: none;
+  padding: 3px 8px;
+}
+.pro-nav a[href="/projects/"] { --hue-fill: var(--teal-fill);  --hue-tint: var(--teal-tint); }
+.pro-nav a[href="/blog/"]     { --hue-fill: var(--grape-fill); --hue-tint: var(--grape-tint); }
+.pro-nav a[href="/web/"]      { --hue-fill: var(--kiwi-fill);  --hue-tint: var(--kiwi-tint); }
+.pro-nav a[href="/about/"]    { --hue-fill: var(--dandy-fill); --hue-tint: var(--dandy-tint); }
+.pro-nav a:hover {
+  background: var(--hue-tint);
+  box-shadow: inset 0 -3px 0 var(--hue-fill);
+}
+.pro-nav a[aria-current] {
+  color: var(--marker-ink);
+  background: var(--marker);
+  box-shadow: 2px 2px 0 var(--border-strong);
+}
+/* About is yellow too, so its marker gets an ink rim there. */
+.pro-nav a[href="/about/"][aria-current] {
+  box-shadow: inset 0 0 0 1.5px var(--marker-ink), 2px 2px 0 var(--border-strong);
+}
+/* Forced colors drop the fill and shadow; keep a visible current mark. */
+@media (forced-colors: active) {
+  .pro-nav a[aria-current] { outline: 2px solid CanvasText; outline-offset: 2px; }
+}
+
+.pro-tools {
+  display: flex; align-items: center; gap: 10px;
+  flex: none;
+  margin-left: auto;
+}
+/* The light/dark key needs the script, so it is hidden with scripting off.
+   The second rule covers browsers without the scripting media feature:
+   only script sets data-theme on <html> (the head kicker, then theme.ts),
+   so without it the key never shows as a dead control. */
+@media (scripting: none) { .pro-theme { display: none !important; } }
+:root:not([data-theme]) .pro-theme { display: none !important; }
+.pro-theme {
+  width: 32px; height: 32px;
+  padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border-strong);
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+[data-theme="dark"] .pro-theme { border-color: var(--border-color); }
+.pro-theme:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+  background: var(--bg-secondary);
+}
+.pro-theme svg { width: 16px; height: 16px; }
+.pro-theme .pro-moon { display: none; }
+[data-theme="dark"] .pro-theme .pro-sun { display: none; }
+[data-theme="dark"] .pro-theme .pro-moon { display: block; }
+/* ---------- Display menu ----------
+   A small arrow joined to the light/dark key opens a menu: Colors (Auto,
+   which follows the device, Light, Dark) and Theme (Normal plus one
+   entry per theme manifest). A theme's entry is hidden in the markup; the
+   theme runtime reveals it where the theme's availability query matches,
+   and greys it out on a desktop window that is too narrow. With no theme
+   on offer (phones), the Theme group goes away. */
+.pro-display { position: relative; display: inline-flex; }
+.pro-display__more { width: 24px; margin-left: -2px; }
+.pro-display__more svg { width: 10px; height: 10px; }
+.pro-display__more[aria-expanded="true"] { background: var(--bg-secondary); }
+.display-menu {
+  position: absolute; right: 0; top: calc(100% + 8px);
+  z-index: 60;
+  display: grid; gap: 10px;
+  min-width: 228px;
+  padding: 10px;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 2px solid var(--border-strong);
+  box-shadow: 4px 4px 0 var(--hue-fill);
+}
+[data-theme="dark"] .display-menu { border-color: var(--border-color); }
+.display-menu[hidden] { display: none; }
+.display-menu__group { display: grid; gap: 2px; }
+.display-menu__group + .display-menu__group { padding-top: 10px; border-top: 1px solid var(--hairline); }
+.display-menu__group--themes:not(:has([data-theme-switch]:not([hidden]))) { display: none; }
+.display-menu__h {
+  margin: 0 0 4px;
+  font-family: var(--font-mono);
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-muted);
+}
+.display-menu__opt {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  font-family: var(--font-body);
+  font-size: 15px; font-weight: 600; line-height: 1.25;
+  text-align: left;
+  color: var(--text-primary);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.display-menu__opt[hidden] { display: none; }
+/* The pick wears a filled square; the rest an empty one. */
+.display-menu__opt::before {
+  content: '';
+  flex: none;
+  width: 10px; height: 10px;
+  box-sizing: border-box;
+  border: 2px solid currentColor;
+}
+.display-menu__opt[aria-pressed="true"]::before { background: currentColor; }
+.display-menu__opt:hover { background: var(--hue-tint); }
+.display-menu__opt[aria-disabled="true"] { color: var(--text-muted); cursor: not-allowed; }
+.display-menu__opt[aria-disabled="true"]:hover { background: transparent; }
+.display-menu__note { font-size: 13px; font-weight: 400; color: var(--text-muted); }
+/* The glyph is drawn for a grey bevel panel, so it keeps one in both moods. */
+.display-menu__glyph { display: inline-flex; flex: none; margin-left: auto; padding: 2px; background: #d4d0c8; }
+.display-menu__glyph svg { display: block; width: 16px; height: 16px; }
+.display-menu :focus-visible { outline: 2px solid var(--accent-primary); outline-offset: -2px; }
+
+/* ---------- Theme switch key ----------
+   The bevel key an XP-only page offers ("Open in XP mode"): label plus
+   the theme's own glyph, synced by the theme runtime like the menu
+   entries. */
+.skin-switch {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 32px;
+  padding: 0 10px 0 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #1a1c1c;
+  background: var(--bg-panel);
+  border: 2px solid;
+  border-color: var(--bg-panel-light) var(--border-strong) var(--border-strong) var(--bg-panel-light);
+  box-shadow: inset -1px -1px 0 var(--bg-panel-dark);
+  cursor: pointer;
+}
+.skin-switch[hidden] { display: none; }
+.skin-switch:hover { background: var(--bg-panel-light); }
+/* Unavailable on this window (too narrow or zoomed in): greyed out, the
+   reason in its title, no press. */
+.skin-switch[aria-disabled="true"] {
+  color: #4f5252;
+  background: var(--bg-panel);
+  cursor: not-allowed;
+}
+.skin-switch[aria-disabled="true"] .skin-switch__glyph { opacity: 0.55; }
+.skin-switch:not([aria-disabled="true"]):active {
+  border-color: var(--border-strong) var(--bg-panel-light) var(--bg-panel-light) var(--border-strong);
+  box-shadow: inset 1px 1px 0 var(--bg-panel-dark);
+}
+/* The icon is the theme's own (manifest `glyph`, inline SVG). */
+.skin-switch__glyph {
+  display: inline-flex;
+  flex: none;
+  width: 16px; height: 16px;
+}
+.skin-switch__glyph svg { display: block; width: 16px; height: 16px; }
+:root:not([data-skin-base=none]) .skin-switch__label { font-size: 12.5px; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.pro-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-top: 2px solid var(--border-strong);
+  background: var(--bg-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: var(--space-xl);
+  flex: none;
+}
+[data-theme="dark"] .pro-footer { border-top-color: var(--hairline); }
+/* Home ends on a ruled section; the footer sits right under it. */
+.site-main:has(> .kz-home) ~ .pro-footer { margin-top: 0; }
+.pro-footer__lines {
+  display: flex; flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 240px;
+}
+.pro-footer__lines a {
+  color: var(--hue);
+  text-decoration: underline;
+  text-decoration-color: var(--hue-fill);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.pro-footer__social {
+  list-style: none;
+  display: flex; gap: 12px;
+  padding: 0; margin: 0;
+}
+.pro-footer__social a {
+  width: 28px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+}
+.pro-footer__social a:hover {
+  color: var(--marker-ink);
+  background: var(--marker);
+  border-color: var(--accent-primary);
+}
+.pro-footer__social svg { width: 14px; height: 14px; fill: currentColor; }
+.pro-footer__back {
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--accent-secondary);
+  background: none; border: 0; padding: 0;
+  cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.pro-footer__back[hidden] { display: none; }
+.pro-footer__back:hover { color: var(--accent-primary); }
+
+.pro-header :focus-visible,
+.pro-footer :focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 720px) {
+  .pro-header {
+    padding: calc(var(--space-md) + 4px) var(--space-md) var(--space-sm);
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+  :root:not([data-skin-base=none]) { scroll-padding-top: calc(112px + 12px); }
+  .pro-nav {
+    margin-left: 0;
+    order: 3;
+    width: 100%;
+    padding-bottom: 2px;
+  }
+  .pro-footer {
+    padding: var(--space-md);
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+@media (max-width: 640px) {
+  :root:not([data-skin-base=none]) body { font-size: 16.5px; }
+  .pro-nav { gap: 8px; }
+  .pro-nav a { font-size: 15px; }
+}
+
+/* Short viewports (landscape phones, 200% zoom): a sticky header eats too
+   much of the screen, so it scrolls away with the page. Kept after the
+   width rules so its scroll-padding wins. */
+@media (max-height: 560px) {
+  .pro-header { position: static; }
+  :root:not([data-skin-base=none]) { scroll-padding-top: 12px; }
+}
+
+/* Reduced motion, site-wide. This guard used to ride in motion.css, which is
+   now XP-only; normal mode keeps it here so the visitor's setting always wins. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

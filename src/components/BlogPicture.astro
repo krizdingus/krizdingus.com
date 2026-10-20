@@ -1,0 +1,24 @@
+---
+// src/components/BlogPicture.astro
+// A post's hero_image as a <picture>: AVIF, then WebP, then the original
+// JPEG (src/lib/blog-images.ts). `sizes` is the slot's real CSS width.
+import type { BlogPicture } from '../lib/blog-images';
+
+export interface Props {
+  pic: BlogPicture;
+  alt: string;
+  sizes: string;
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'auto';
+  /** id of a hidden description that finishes a shortened alt. */
+  describedby?: string;
+}
+
+const { pic, alt, sizes, loading = 'lazy', fetchpriority, describedby } = Astro.props as Props;
+---
+
+<picture>
+  {pic.avif && <source type="image/avif" srcset={pic.avif} sizes={sizes} />}
+  {pic.webp && <source type="image/webp" srcset={pic.webp} sizes={sizes} />}
+  <img src={pic.src} alt={alt} aria-describedby={describedby} width={pic.width} height={pic.height} loading={loading} fetchpriority={fetchpriority} decoding="async" />
+</picture>

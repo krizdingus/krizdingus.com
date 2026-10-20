@@ -1,0 +1,87 @@
+---
+// The real 404. Cloudflare Pages (and `astro preview`) serve this
+// file with status 404 for any path that doesn't exist. It's a normal page:
+// the site header and nav, the footer, and in XP mode the usual window.
+// The requested path is only known in the browser, so a tiny inline script
+// fills it in; with JS off the sentence reads fine without it.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/errors.css';
+import ExternalLink from '../components/ExternalLink.astro';
+
+const waysOut = [
+  { href: '/', name: '/', desc: 'Start over' },
+  { href: '/projects/', name: 'projects/', desc: 'Things I’ve made' },
+  { href: '/blog/', name: 'blog/', desc: 'Stuff I wrote down' },
+  { href: '/about/', name: 'about/', desc: 'Who I am' },
+];
+---
+
+<BaseLayout
+  title="404 Not Found — Krizdingus"
+  description="There’s no page at this address."
+  noindex
+  shellTitle="KRIZSCAPE — 404 Not Found"
+>
+  <section class="nf" aria-labelledby="nf-h">
+    <div class="nf-grid">
+      <div class="nf-apache">
+        <h1 id="nf-h" class="nf-apache__h">Not Found</h1>
+        <p class="nf-apache__p">The requested URL was not found on this server.</p>
+        <hr class="nf-apache__rule" />
+        <address class="nf-apache__sig">HTTP 404 · static files at krizdingus.com, port 443</address>
+      </div>
+
+      <p class="nf-req" data-requested-wrap hidden>
+        <span class="nf-req__label">Requested</span>
+        <code class="nf-req__path" data-requested-path></code>
+      </p>
+
+      <p class="nf-note nf-why">
+        The link is wrong or the page is gone. From here I can’t tell which.
+      </p>
+
+      <div class="nf-out">
+        <h2 class="nf-h2" id="nf-ways">Ways out</h2>
+        <ul class="nf-ways" aria-labelledby="nf-ways">
+          {waysOut.map((w) => (
+            <li>
+              <a href={w.href}>
+                <span class="nf-ways__dir" aria-hidden="true">[DIR]</span>
+                <span class="nf-ways__name">{w.name}</span>
+                <span class="nf-ways__desc">{w.desc}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <p class="nf-note nf-mail">
+        If a link on this site sent you here, that’s my fault. Tell me which one:
+        <ExternalLink href="https://github.com/krizdingus/krizdingus.com/issues">open an issue on GitHub</ExternalLink>
+        or email <a href="mailto:me@krizdingus.com">me@krizdingus.com</a>.
+      </p>
+    </div>
+  </section>
+
+  <script is:inline>
+    (function () {
+      var el = document.querySelector('[data-requested-path]');
+      if (!el) return;
+      var p = location.pathname + location.search;
+      try { p = decodeURI(p); } catch (e) {}
+      // Text nodes only (never HTML), with a soft break after each slash
+      // so a long path wraps at a folder boundary on a phone.
+      var parts = p.split('/');
+      el.textContent = '';
+      for (var i = 0; i < parts.length; i++) {
+        if (parts[i]) el.appendChild(document.createTextNode(parts[i]));
+        if (i < parts.length - 1) {
+          el.appendChild(document.createTextNode('/'));
+          el.appendChild(document.createElement('wbr'));
+        }
+      }
+      var wrap = el.closest('[data-requested-wrap]');
+      if (wrap) wrap.hidden = false;
+    })();
+  </script>
+</BaseLayout>

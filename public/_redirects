@@ -1,0 +1,64 @@
+# Cloudflare Pages redirects. https://developers.cloudflare.com/pages/configuration/redirects/
+# The first rule that matches wins, so exact paths sit above the splats.
+# Pages applies a matching rule even where a file exists at that path, so
+# no rule here may match a file the site still serves. Pages can only
+# redirect (301/302/303/307/308): an old URL with no new home is left alone
+# and gets the real 404 page. Query strings play no part in matching.
+#
+# www -> apex is NOT handled here: Pages _redirects only matches paths, not
+# hostnames. Set it up as a Cloudflare Redirect Rule on the zone instead:
+#   when hostname eq "www.krizdingus.com"
+#   -> 301 to concat("https://krizdingus.com", http.request.uri.path), preserve query string
+# HTTP -> HTTPS is Cloudflare's "Always Use HTTPS" setting (HSTS is in _headers).
+
+# Old sitemap location (Astro's sitemap integration writes sitemap-index.xml).
+/sitemap.xml /sitemap-index.xml 301
+
+# Old /mousebitelabs/ label page (2024-25). The label images go to the same
+# labels on the project page, the print-ready zip to the repo that holds the
+# files, and everything else under it to the project page.
+/mousebitelabs/assets/img/MBC1_Cartridge_* /images/projects/mouse-bite-labs-cartridge-labels/mbc1-cartridge.webp 301
+/mousebitelabs/assets/img/MBC3_Cartridge_* /images/projects/mouse-bite-labs-cartridge-labels/mbc3-cartridge.webp 301
+/mousebitelabs/assets/img/MBC5_Cartridge_* /images/projects/mouse-bite-labs-cartridge-labels/mbc5-cartridge.webp 301
+/mousebitelabs/assets/img/MBC3_Multicart_* /images/projects/mouse-bite-labs-cartridge-labels/mbc3-multicart.webp 301
+/mousebitelabs/assets/img/MBC5_Multicart_* /images/projects/mouse-bite-labs-cartridge-labels/mbc5-multicart.webp 301
+/mousebitelabs/assets/print-ready.zip https://github.com/krizdingus/mouse-bite-labs-cartridge-labels 301
+/mousebitelabs* /projects/mouse-bite-labs-cartridge-labels/ 301
+
+# Old /flash-cart-assistant/ (2024): a search page over Catskull's GB ROM
+# Database. The Discord bot built on the same database replaced it. Only
+# the page itself moves; its old scripts and styles 404.
+/flash-cart-assistant /projects/gb-rom-database-bot/ 301
+/flash-cart-assistant/ /projects/gb-rom-database-bot/ 301
+/flash-cart-assistant/index.html /projects/gb-rom-database-bot/ 301
+
+# Old one-page site's share images (og:image over 2025). Old shares keep a
+# picture: the new home card.
+/assets/images/krizdingus-ogimage.png /images/og/home.jpg 301
+/assets/images/krizdingus-opengraph.png /images/og/home.jpg 301
+/assets/images/dingus_opengraph.png /images/og/home.jpg 301
+
+# Old one-page site's images that were renamed or replaced.
+/assets/images/dingus_portrait.jpg /images/krizdingus-portrait.jpg 301
+/assets/images/mini-magsafe-zyn-cover.jpg /images/magsafe-zyn-container-3d-print.jpg 301
+
+# Old console title backgrounds: moved to /images/wallpapers/ and ship as
+# .webp only. The dedust one isn't on the new site and has no rule: the
+# splat below sends it to /images/console-title-bg_dedust.png, which
+# doesn't exist, so it 404s after that one hop (Pages rules can't return
+# a 404 themselves). The same goes for the two dog photos no page used.
+/assets/images/console-title-bg_xp.png /images/wallpapers/console-title-bg_xp.webp 301
+/assets/images/console-title-bg_canyons.png /images/wallpapers/console-title-bg_canyons.webp 301
+/assets/images/console-title-bg_tulips.png /images/wallpapers/console-title-bg_tulips.webp 301
+/assets/images/console-title-bg_generic.png /images/wallpapers/console-title-bg_generic.webp 301
+
+# Old favicons with no file of the same name under /icons/.
+/assets/icons/favicon.ico /favicon.ico 301
+/assets/icons/favicon-48.png /icons/favicon-96.png 301
+/assets/icons/favicon-512.png /icons/favicon-192.png 301
+
+# Everything else under the old asset folders: same file name, new folder
+# (portrait, MagSafe photo, the three captioned 2025 project photos,
+# favicon-32/96/180/192).
+/assets/images/* /images/:splat 301
+/assets/icons/* /icons/:splat 301

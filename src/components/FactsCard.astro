@@ -1,0 +1,74 @@
+---
+// src/components/FactsCard.astro — a sidebar fact sheet on project pages.
+// Plain HTML in normal mode: a heading, then a <dl> of rows and/or a list of
+// links. `xpTitle` is a data attribute only; the XP theme's projects dressing
+// turns it into a window title bar at mount.
+import ExternalLink from './ExternalLink.astro';
+export interface FactsRow {
+  label: string;
+  value: string;
+  /** Render value as a list of chips instead of text. */
+  chips?: string[];
+  /** Optional extra class appended to the value. */
+  valueClass?: string;
+}
+
+export interface FactsLink {
+  href: string;
+  label: string;
+  /** Points off-site: adds an arrow that screen readers skip. */
+  external?: boolean;
+  /** Muted "back" style link. */
+  muted?: boolean;
+}
+
+export interface Props {
+  title: string;
+  /** Small line under the heading (e.g. where and when numbers were read). */
+  note?: string;
+  rows?: FactsRow[];
+  links?: FactsLink[];
+  /** Filename-style title the XP theme shows in a title bar. */
+  xpTitle?: string;
+}
+
+const { title, note, rows, links, xpTitle } = Astro.props as Props;
+---
+
+<section class="facts" data-xp-title={xpTitle}>
+  <h2 class="facts__h">{title}</h2>
+  {note && <p class="facts__note">{note}</p>}
+  {rows && rows.length > 0 && (
+    <dl class="facts__rows">
+      {rows.map((row) => (
+        <div class="facts__row">
+          <dt>{row.label}</dt>
+          {row.chips
+            ? (
+              <dd class="facts__chips">
+                {row.chips.map((c) => <span class="tag-chip">{c}</span>)}
+              </dd>
+            )
+            : <dd class={row.valueClass}>{row.value}</dd>}
+        </div>
+      ))}
+    </dl>
+  )}
+  {links && links.length > 0 && (
+    <ul class="facts__links">
+      {links.map((link) => (
+        <li>
+          {link.external ? (
+            <ExternalLink href={link.href} class={link.muted ? 'is-muted' : undefined}>
+              {link.label}<span aria-hidden="true"> ↗</span>
+            </ExternalLink>
+          ) : (
+            <a href={link.href} class={link.muted ? 'is-muted' : undefined}>
+              {link.label}
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  )}
+</section>

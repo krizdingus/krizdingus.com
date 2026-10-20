@@ -1,0 +1,1050 @@
+/* =============================================================
+   home.css — Krizdingus home page
+   AOL/Yahoo portal layout, sitting inside the existing OS-shell
+   chrome. All scoped to .kz-home so styles don't leak.
+
+   Base rules are the XP/OS look; pro.css and the
+   :root:not([data-skin-base=none]) blocks below are normal mode.
+   XP-only dressing (title bars, LEDs, marquee, foot strip) is built
+   at mount by src/themes/xp/dressing/home.dressing.ts, so those
+   selectors only ever match inside the XP theme.
+
+   Sections:
+     .kz-intro      — h1 + lede
+     .kz-feat       — top "Now Featuring" 1+3 row
+     .kz-marquee    — KRIZ-WIRE scrolling ticker (XP dressing)
+     .kz-dir-row    — 2-col Yahoo directory + workshop panel
+     .kz-blog       — more from the blog strip
+     .kz-foot-strip — hit counter + webring + pings (XP dressing)
+   ============================================================= */
+
+/* ---------- Section separation (inherits .window-content padding=0) ---------- */
+.kz-home > section { border-bottom: 1px solid var(--hairline); }
+.kz-home > section:last-of-type { border-bottom: 0; }
+.kz-home [data-xp-slot]:empty { display: none; }
+.kz-home > * { min-width: 0; }
+
+/* =============================================================
+   INTRO — the page's h1
+   ============================================================= */
+.kz-intro {
+  padding: var(--space-md) var(--space-lg) 0;
+  border-bottom: 0 !important;
+}
+.kz-intro__who {
+  font-family: var(--font-mono); font-size: 12px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 6px;
+}
+.kz-intro__title {
+  font-family: var(--font-pixel);
+  font-size: clamp(1.4rem, 2.4vw, 1.75rem);
+  letter-spacing: var(--tracking-pixel);
+  line-height: 1.12;
+  color: var(--accent-primary);
+  margin: 0 0 12px;
+  max-width: 24ch;
+  text-wrap: balance;
+}
+.kz-intro__lede {
+  font-family: var(--font-mono); font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 68ch;
+}
+/* Wide screens: headline left, lede right, so the intro is one short band. */
+@media (min-width: 901px) {
+  .kz-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    column-gap: var(--space-lg);
+    align-items: end;
+  }
+  .kz-intro__title { margin-bottom: 0; max-width: none; }
+}
+
+/* =============================================================
+   Section-head bar — used by Featuring, Directory, Eggs, Blog
+   ============================================================= */
+.kz-sec-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: var(--space-md) var(--space-lg) var(--space-sm);
+}
+.kz-sec-head--lead {
+  padding-top: var(--space-md);
+}
+.kz-sec-head__bracket {
+  font-family: var(--font-mono); font-size: 14px;
+  color: var(--accent-pixel);
+  background: var(--accent-secondary);
+  padding: 2px 6px;
+  border: 1px solid var(--border-strong);
+}
+.kz-sec-head__title {
+  font-family: var(--font-pixel);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  letter-spacing: var(--tracking-pixel);
+  color: var(--accent-primary);
+  margin: 0;
+  white-space: nowrap;
+}
+.kz-sec-head__rule {
+  flex: 1 1 auto; height: 0;
+  border-top: 1px dashed var(--border-color);
+  align-self: center;
+}
+.kz-sec-head__meta {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  min-width: 0;
+}
+.kz-sec-head__more {
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--accent-primary);
+  text-decoration: underline; text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+/* =============================================================
+   NOW FEATURING — 1 (big project) + 3 (blog / web / about)
+   ============================================================= */
+.kz-feat {
+  padding: 0 var(--space-lg) var(--space-lg);
+}
+.kz-feat .kz-sec-head { padding-left: 0; padding-right: 0; }
+.kz-feat__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr);
+  gap: var(--space-md);
+  align-items: stretch;
+}
+
+/* Shared title bars on each feature card (mini OS-window) */
+.kz-feat__bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--border-strong);
+  font-family: var(--font-pixel); font-size: 10px;
+  letter-spacing: var(--tracking-pixel);
+  color: #fff;
+}
+.kz-feat__bar-l { display: inline-flex; align-items: center; gap: 7px; }
+.kz-feat__bar-r {
+  color: rgba(255,255,255,0.7);
+  font-family: var(--font-mono);
+  letter-spacing: 4px;
+}
+.kz-feat__bar-icon {
+  width: 12px; height: 12px;
+  background: var(--accent-pixel);
+  border: 1px solid #1a1c1c;
+  color: #1a1c1c;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 10px;
+  line-height: 1;
+}
+.kz-feat__bar--mag { background: var(--accent-primary); }
+.kz-feat__bar--pur { background: var(--accent-secondary); }
+.kz-feat__bar--grn {
+  background: var(--accent-pixel);
+  color: #1a1c1c;
+}
+.kz-feat__bar--grn .kz-feat__bar-r { color: rgba(0,0,0,0.55); }
+.kz-feat__bar--grn .kz-feat__bar-icon { background: var(--accent-secondary); color: #fff; }
+
+/* Big project card: the title link stretches over the whole card; the
+   "All projects" link sits above that overlay. */
+.kz-feat__big {
+  position: relative;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-strong);
+  box-shadow: 4px 4px 0 var(--border-strong);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.kz-feat__big-link { color: inherit; text-decoration: none; }
+.kz-feat__big-link::after {
+  content: ""; position: absolute; inset: 0; z-index: 1;
+}
+.kz-feat__big-link:focus-visible { outline: none; }
+.kz-feat__big-more { position: relative; z-index: 2; }
+.kz-feat__big-thumb {
+  margin: 0;
+  border-bottom: 1px solid var(--border-strong);
+  background: var(--bg-secondary);
+  aspect-ratio: 16 / 8;
+  overflow: hidden;
+}
+.kz-feat__big-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  /* Hero photos often carry a baked-in title at the bottom; crop from the
+     top so a wordmark is either whole or gone, never sliced. */
+  object-position: 50% 0;
+  display: block;
+}
+/* A post's picture is an illustration: crop it from the centre. The
+   <picture> wrapper passes the box down to its <img>. */
+.kz-feat__big-thumb picture { display: block; width: 100%; height: 100%; }
+.kz-feat__big-thumb--art img { object-position: 50% 50%; }
+.kz-feat__big-body {
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  display: flex; flex-direction: column;
+  flex: 1 1 auto;
+}
+.kz-feat__kicker {
+  font-family: var(--font-pixel); font-size: 10px;
+  letter-spacing: var(--tracking-pixel);
+  color: var(--accent-primary);
+  margin: 0 0 6px;
+}
+.kz-feat__big-title {
+  font-family: var(--font-pixel);
+  font-size: clamp(1.1rem, 1.9vw, 1.35rem);
+  letter-spacing: var(--tracking-pixel);
+  color: var(--accent-secondary);
+  margin: 0 0 8px;
+  line-height: 1.15;
+}
+.kz-feat__big-hook {
+  font-family: var(--font-mono); font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-sm);
+  max-width: 60ch;
+}
+.kz-feat__big-facts {
+  font-family: var(--font-mono); font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0 0 var(--space-sm);
+}
+.kz-feat__big-cta {
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
+  margin-top: auto;
+  padding-top: var(--space-xs);
+}
+/* Looks like a button; the card's title link is the real control. */
+.kz-feat__go {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+  padding: 7px 16px;
+  background: var(--accent-primary); color: #fff;
+  border: 2px solid;
+  border-color: #c46b8d var(--border-strong) var(--border-strong) #c46b8d;
+}
+[data-theme="dark"] .kz-feat__go { color: #1a1c1c; border-color: #ff9dc0 #5a1a3c #5a1a3c #ff9dc0; }
+.kz-feat__big:hover .kz-feat__go { filter: brightness(1.08); }
+.kz-feat__big:hover .kz-feat__go-arrow { transform: translateX(2px); }
+.kz-feat__go-arrow { display: inline-block; transition: transform 120ms steps(2); }
+.kz-feat__big-more {
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--accent-primary);
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.kz-feat__chips { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.kz-feat__state { margin-left: auto; color: var(--text-secondary); white-space: nowrap; }
+.kz-feat__big-status {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 10px;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--bg-panel-dark);
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+.kz-feat__big:hover { box-shadow: 5px 5px 0 var(--border-strong); }
+.kz-feat__big:focus-within { outline: 2px solid var(--accent-primary); outline-offset: 3px; }
+
+/* CRT glyph: stands in for a project with no photo (never an empty <img>) */
+.kz-glyph {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-console);
+  color: var(--accent-terminal);
+  font-family: var(--font-crt);
+  text-shadow: 0 0 6px var(--accent-terminal);
+  font-size: 22px; line-height: 1;
+  overflow: hidden;
+}
+.kz-glyph--big { width: 100%; height: 100%; font-size: clamp(64px, 10vw, 140px); }
+
+/* Small stack of 3 pillar cards */
+.kz-feat__stack {
+  display: flex; flex-direction: column;
+  gap: var(--space-md);
+  min-width: 0;
+}
+.kz-feat__stack > .kz-feat__sm { flex: 1 1 auto; }
+.kz-feat__sm {
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-strong);
+  box-shadow: 3px 3px 0 var(--border-strong);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+.kz-feat__sm-link {
+  display: flex; flex-direction: column;
+  flex: 1 1 auto;
+  color: inherit; text-decoration: none;
+}
+.kz-feat__sm-body {
+  padding: 10px 12px 12px;
+  display: flex; flex-direction: column;
+  flex: 1 1 auto;
+}
+.kz-feat__sm-body--media {
+  flex-direction: row;
+  gap: 12px;
+  align-items: stretch;
+}
+.kz-feat__sm-body--media > div { display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; }
+.kz-feat__avatar {
+  width: 64px; height: 64px;
+  object-fit: cover;
+  border: 1px solid var(--border-strong);
+  flex: 0 0 64px;
+  align-self: flex-start;
+}
+.kz-feat__sm-title {
+  font-family: var(--font-pixel); font-size: 14px;
+  letter-spacing: var(--tracking-pixel);
+  color: var(--accent-secondary);
+  margin: 0 0 6px;
+  line-height: 1.2;
+}
+.kz-feat__sm-hook {
+  font-family: var(--font-mono); font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0 0 8px;
+  flex: 1 1 auto;
+}
+.kz-feat__sm-title { overflow-wrap: anywhere; }
+.kz-feat__sm-meta {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-muted);
+  margin: 0;
+  display: flex; align-items: baseline; gap: 6px;
+  flex-wrap: wrap;
+}
+.kz-feat__sm-more {
+  margin-left: auto;
+  color: var(--accent-primary);
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.kz-feat__sm:hover { box-shadow: 4px 4px 0 var(--border-strong); }
+.kz-feat__sm:focus-within { outline: 2px solid var(--accent-primary); outline-offset: 3px; }
+
+/* =============================================================
+   KRIZ-WIRE MARQUEE — atmospheric scrolling ticker
+   ============================================================= */
+.kz-marquee {
+  display: flex; align-items: stretch;
+  background: var(--bg-console);
+  color: var(--text-on-console);
+  border-top: 2px solid var(--border-strong);
+  border-bottom: 2px solid var(--border-strong);
+  overflow: hidden;
+}
+.kz-marquee__chip {
+  flex: 0 0 auto;
+  display: flex; align-items: center;
+  padding: 0 14px;
+  background: var(--accent-primary);
+  color: #fff;
+  font-family: var(--font-pixel); font-size: 11px;
+  letter-spacing: var(--tracking-pixel);
+  border-right: 2px solid var(--border-strong);
+  white-space: nowrap;
+}
+.kz-marquee__viewport { flex: 1 1 auto; overflow: hidden; position: relative; }
+.kz-marquee__track {
+  display: inline-flex; align-items: center; gap: 18px;
+  padding: 8px 0;
+  white-space: nowrap;
+  animation: kzMarquee 45s linear infinite;
+  font-family: var(--font-crt);
+  font-size: 18px; line-height: 1;
+}
+.kz-marquee:hover .kz-marquee__track,
+.kz-marquee.is-paused .kz-marquee__track { animation-play-state: paused; }
+/* Keyboard focus stops the track at its start instead of wherever it was,
+   so the browser can scroll the focused link into the viewport (2.4.11). */
+.kz-marquee:focus-within .kz-marquee__track { animation: none; }
+.kz-marquee__toggle {
+  flex: 0 0 auto;
+  align-self: center;
+  margin: 0 8px;
+  padding: 3px 8px;
+  font-family: var(--font-mono); font-size: 11px; line-height: 1.2;
+  color: var(--text-on-console);
+  background: transparent;
+  border: 1px solid currentColor;
+  cursor: pointer;
+}
+.kz-marquee__toggle:hover { background: rgba(255,255,255,0.12); }
+.kz-marquee__toggle:focus-visible { outline: 2px solid var(--accent-terminal); outline-offset: 2px; }
+.kz-marquee__item {
+  display: inline-flex; align-items: baseline; gap: 8px;
+  padding-left: 18px;
+}
+.kz-marquee__item a {
+  color: var(--accent-terminal);
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.kz-marquee__item code {
+  background: rgba(255,255,255,0.08);
+  padding: 1px 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.kz-marquee__tag {
+  font-family: var(--font-pixel); font-size: 9px;
+  background: var(--accent-pixel); color: #1a1c1c;
+  padding: 2px 5px;
+  letter-spacing: var(--tracking-pixel);
+  border: 1px solid #1a1c1c;
+  display: inline-block;
+  vertical-align: 1px;
+}
+.kz-marquee__tag--new { background: var(--accent-primary); color: #fff; border-color: #fff; }
+.kz-marquee__tag--hot { background: #ffaa00; color: #1a1c1c; }
+.kz-marquee__sep { opacity: 0.4; color: var(--accent-terminal); }
+
+@keyframes kzMarquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kz-marquee__toggle { display: none; }
+  /* Nothing loops, so the loop's second copy would just print it all twice. */
+  .kz-marquee .is-dup,
+  .kz-marquee__sep:has(+ .is-dup) { display: none; }
+  .kz-marquee__track {
+    animation: none;
+    flex-wrap: wrap;
+    white-space: normal;
+    padding: 8px 14px;
+    gap: 6px 14px;
+  }
+}
+
+/* =============================================================
+   DIRECTORY + NOW PLAYING SIDEBAR
+   ============================================================= */
+.kz-dir-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--space-lg) var(--space-lg);
+  align-items: start;
+}
+.kz-dir-row > * { min-width: 0; }
+.kz-dir-row .kz-sec-head { padding: 0 0 var(--space-sm); }
+
+.kz-dir__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-md) var(--space-lg);
+}
+.kz-dir__col + .kz-dir__col { border-left: 1px dashed var(--border-color); padding-left: var(--space-lg); }
+
+.kz-dir__h {
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  letter-spacing: var(--tracking-pixel);
+  color: var(--accent-secondary);
+  margin: var(--space-sm) 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex; align-items: baseline; gap: 6px;
+}
+.kz-dir__h:first-child { margin-top: 0; }
+.kz-dir__h a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.kz-dir__h a:hover { color: var(--accent-primary); }
+.kz-dir__bullet { font-family: var(--font-mono); font-size: 11px; color: var(--accent-primary); }
+
+.kz-dir__list {
+  list-style: none;
+  font-family: var(--font-mono); font-size: 13px;
+  line-height: 1.7;
+}
+.kz-dir__list li::before {
+  content: "·";
+  margin-right: 6px;
+  color: var(--accent-secondary);
+}
+.kz-dir__list a,
+.kz-pick__ol a,
+.kz-status__v a {
+  display: inline-block;
+  line-height: 24px;
+}
+.kz-dir__list a {
+  color: var(--accent-primary);
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.kz-dir__list a:hover { background: var(--accent-pixel); color: #1a1c1c; text-decoration: none; }
+.kz-dir__c { color: var(--text-muted); font-size: 11px; margin-left: 4px; font-family: var(--font-mono); letter-spacing: 0; }
+.kz-dir__h .kz-dir__c { margin-left: 0; }
+
+.kz-flag {
+  display: inline-block;
+  font-family: var(--font-pixel); font-size: 9px;
+  letter-spacing: var(--tracking-pixel);
+  padding: 1px 5px;
+  margin-left: 4px;
+  border: 1px solid var(--border-strong);
+  vertical-align: 1px;
+}
+.kz-flag--new { background: var(--accent-primary); color: #fff; }
+[data-theme="dark"] .kz-flag--new { color: #1a1c1c; }
+
+/* ---------- Now Playing sidebar (workshop status window) ---------- */
+.kz-pick {
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-strong);
+  box-shadow: 4px 4px 0 var(--border-strong);
+  position: sticky;
+  top: var(--space-md);
+}
+/* XP: the panel heading is the window's title bar. */
+.kz-pick__h {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0;
+  background: var(--accent-secondary); color: #fff;
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--border-strong);
+  font-family: var(--font-pixel); font-size: 11px; font-weight: 400;
+  letter-spacing: var(--tracking-pixel);
+  text-transform: uppercase;
+}
+.kz-pick__h::before { content: "◆"; font-family: var(--font-mono); color: var(--accent-pixel); }
+
+.kz-status {
+  margin: 0;
+  padding: var(--space-sm);
+  display: flex; flex-direction: column; gap: 10px;
+  border-bottom: 2px dashed var(--border-color);
+}
+.kz-status__row {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--text-secondary);
+}
+.kz-status__k {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-pixel); font-size: 10px;
+  letter-spacing: var(--tracking-pixel);
+  color: var(--accent-primary);
+  text-transform: uppercase;
+}
+.kz-status__v { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.kz-status__v a { color: var(--accent-primary); text-decoration: underline; text-underline-offset: 2px; }
+.kz-status__v code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-primary);
+  border-left: 2px solid var(--accent-pixel);
+  padding-left: 6px;
+  display: block;
+}
+.kz-status__note {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+/* LEDs (XP dressing) */
+.kz-status__icon {
+  width: 9px; height: 9px; flex: 0 0 9px;
+  border: 1px solid #1a1c1c;
+  display: inline-block;
+}
+.kz-status__icon--ok   { background: var(--success); box-shadow: 0 0 4px var(--success); }
+.kz-status__icon--warn { background: var(--warning); }
+
+.kz-pick__hot {
+  padding: var(--space-sm);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+.kz-pick__hot-h {
+  font-family: var(--font-pixel); font-size: 11px;
+  letter-spacing: var(--tracking-pixel);
+  color: var(--accent-primary);
+  margin: 0 0 6px;
+}
+.kz-pick__ol {
+  list-style: none;
+  font-family: var(--font-mono); font-size: 12px;
+  line-height: 1.7;
+  counter-reset: kzpick;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.kz-pick__ol li {
+  counter-increment: kzpick;
+  display: flex; gap: 6px;
+  align-items: center;
+  min-width: 0;
+}
+.kz-pick__ol a { min-width: 0; overflow-wrap: anywhere; }
+.kz-pick__n {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.kz-pick__src {
+  margin: 8px 0 0;
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-muted);
+}
+.kz-pick__ol li::before {
+  content: counter(kzpick, decimal-leading-zero);
+  font-family: var(--font-pixel); font-size: 10px;
+  color: var(--accent-pixel);
+  background: var(--accent-secondary);
+  padding: 1px 5px;
+  border: 1px solid var(--border-strong);
+}
+.kz-pick__ol a {
+  color: var(--accent-primary);
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.kz-pick__ol a:hover { background: var(--accent-pixel); color: #1a1c1c; text-decoration: none; }
+
+.kz-pick__status-r { margin-left: auto; }
+.kz-pick__status {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 10px;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--bg-panel-dark);
+  color: var(--text-secondary);
+  font-family: var(--font-mono); font-size: 10px;
+}
+.kz-pick__led {
+  width: 8px; height: 8px;
+  background: var(--success);
+  border: 1px solid #1a1c1c;
+  display: inline-block;
+  border-radius: 50%;
+  box-shadow: 0 0 4px var(--success);
+}
+
+
+/* =============================================================
+   MORE FROM THE BLOG — post strip
+   ============================================================= */
+.kz-blog { padding-bottom: var(--space-lg); }
+.kz-blog__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  padding: 0 var(--space-lg);
+}
+/* Two cards (a small blog): two equal columns, no empty third. */
+.kz-blog__grid--two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.kz-post {
+  background: var(--bg-primary);
+  border: 2px solid var(--border-strong);
+  box-shadow: 3px 3px 0 var(--border-strong);
+  display: flex; flex-direction: column;
+}
+.kz-post__bar {
+  background: var(--accent-secondary); color: #fff;
+  padding: 4px 10px;
+  font-family: var(--font-pixel); font-size: 10px;
+  letter-spacing: var(--tracking-pixel);
+  border-bottom: 1px solid var(--border-strong);
+  display: flex; align-items: center; gap: 6px;
+}
+.kz-post__bar::before { content: '▤'; color: var(--accent-pixel); font-family: var(--font-mono); }
+.kz-post__body { padding: 12px 14px 14px; display: flex; flex-direction: column; flex: 1 1 auto; }
+.kz-post__tags { margin-top: auto; }
+.kz-post .kz-post__meta {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-muted);
+  margin: 0 0 6px;
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.kz-post__meta .dot { color: var(--accent-secondary); }
+.kz-post h3 {
+  font-family: var(--font-pixel); font-size: 14px;
+  letter-spacing: var(--tracking-pixel);
+  color: var(--accent-primary);
+  line-height: 1.3;
+  margin: 0 0 8px;
+}
+.kz-post h3 a { color: inherit; text-decoration: none; border-bottom: 2px solid transparent; }
+.kz-post h3 a:hover { border-bottom-color: var(--accent-primary); }
+.kz-post p {
+  font-family: var(--font-mono); font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0 0 10px;
+}
+.kz-post__tags { display: flex; gap: 4px; flex-wrap: wrap; }
+
+/* =============================================================
+   HIT COUNTER + WEBRING
+   ============================================================= */
+.kz-foot-strip {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+}
+
+.kz-counter {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-pixel);
+}
+.kz-counter__label {
+  font-size: 9px;
+  letter-spacing: var(--tracking-pixel);
+  color: var(--text-muted);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-orientation: mixed;
+}
+.kz-counter__digits {
+  display: inline-flex;
+  background: #050505;
+  border: 2px solid var(--border-strong);
+  padding: 6px 6px;
+  gap: 2px;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.7);
+}
+.kz-counter__digits span {
+  font-family: var(--font-crt);
+  font-size: 26px;
+  line-height: 1;
+  width: 18px; text-align: center;
+  color: var(--accent-terminal);
+  background: #0a1a0a;
+  border: 1px solid #1a3a1a;
+  padding: 2px 0 0;
+  text-shadow: 0 0 6px var(--accent-terminal);
+}
+.kz-counter__sub {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-muted);
+}
+
+.kz-webring {
+  display: flex; align-items: center; gap: 12px;
+  flex-wrap: wrap;
+  font-family: var(--font-mono); font-size: 12px;
+  justify-content: center;
+}
+.kz-webring__label {
+  font-family: var(--font-pixel); font-size: 10px;
+  letter-spacing: var(--tracking-pixel);
+  color: var(--accent-secondary);
+  background: var(--accent-pixel);
+  border: 1px solid var(--border-strong);
+  padding: 3px 6px;
+}
+.kz-webring a {
+  color: var(--accent-primary);
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.kz-webring a:hover { background: var(--accent-pixel); color: #1a1c1c; text-decoration: none; }
+.kz-webring__count {
+  color: var(--text-muted);
+  font-size: 11px;
+  border-left: 1px dashed var(--border-color);
+  padding-left: 12px;
+}
+
+.kz-pings {
+  list-style: none;
+  display: flex; flex-direction: column; gap: 2px;
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-secondary);
+}
+.kz-pings li { display: flex; align-items: center; gap: 6px; }
+.kz-ping {
+  width: 8px; height: 8px;
+  border: 1px solid #1a1c1c;
+  display: inline-block;
+}
+.kz-ping--ok   { background: var(--success); }
+.kz-ping--warn { background: var(--warning); }
+
+/* =============================================================
+   RESPONSIVE
+   ============================================================= */
+@media (max-width: 900px) {
+  .kz-feat__grid { grid-template-columns: minmax(0, 1fr); }
+  .kz-feat__stack { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .kz-dir-row { grid-template-columns: minmax(0, 1fr); }
+  .kz-pick { position: static; }
+  .kz-blog__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .kz-intro { padding: var(--space-md) var(--space-md) var(--space-sm); }
+  .kz-feat { padding: 0 var(--space-md) var(--space-md); }
+  .kz-feat__stack { grid-template-columns: minmax(0, 1fr); }
+  .kz-sec-head { padding-left: var(--space-md); padding-right: var(--space-md); flex-wrap: wrap; row-gap: 4px; }
+  .kz-sec-head__title { white-space: normal; }
+  .kz-dir-row { padding: var(--space-md) var(--space-md); }
+  .kz-dir-row .kz-sec-head { padding-left: 0; padding-right: 0; }
+  .kz-dir__grid { grid-template-columns: minmax(0, 1fr); }
+  .kz-dir__col + .kz-dir__col {
+    border-left: 0; padding-left: 0;
+    border-top: 1px dashed var(--border-color);
+    padding-top: var(--space-sm);
+  }
+  .kz-blog__grid {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0 var(--space-md);
+  }
+  .kz-foot-strip {
+    grid-template-columns: minmax(0, 1fr);
+    text-align: center;
+  }
+  .kz-counter { justify-content: center; }
+  .kz-counter__label { writing-mode: horizontal-tb; transform: none; }
+  .kz-pings { align-items: center; }
+  .kz-feat__avatar { width: 56px; height: 56px; flex-basis: 56px; }
+}
+@media (max-width: 480px) {
+  /* The rule and meta give way before the heading does. */
+  .kz-sec-head__rule { display: none; }
+  .kz-sec-head__meta { flex: 1 1 100%; white-space: normal; }
+  .kz-status__row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+
+/* =============================================================
+   XP / OS MODE — the window scrolls inside itself, so at 1440x900 the
+   intro and the whole Now Featuring row (hero CTA, status strip, all
+   three rail cards) have to fit above the window's bottom edge.
+   ============================================================= */
+@media (min-width: 1024px) {
+  /* Same tracks as .kz-feat__grid, so the lede starts on the rail column;
+     the h1 sits one step above the 1.25rem section h2s. */
+  :root[data-skin=xp] .kz-intro {
+    padding-top: var(--space-md);
+    padding-bottom: var(--space-sm);
+    grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr);
+    column-gap: var(--space-md);
+    align-items: start;
+  }
+  :root[data-skin=xp] .kz-intro__title { font-size: 1.5rem; line-height: 1.25; }
+  :root[data-skin=xp] .kz-intro__lede { line-height: 1.55; }
+  :root[data-skin=xp] .kz-feat .kz-sec-head { padding-top: var(--space-md); padding-bottom: 4px; }
+  :root[data-skin=xp] .kz-feat__stack { gap: 10px; }
+  :root[data-skin=xp] .kz-feat__sm-body { padding: 7px 12px 8px; }
+  :root[data-skin=xp] .kz-feat__sm .kz-feat__kicker { margin-bottom: 4px; }
+  :root[data-skin=xp] .kz-feat__sm-hook { margin-bottom: 6px; }
+  /* Once the photo hits its cap (narrow windows) the leftover space sits
+     above the status strip, which stays on the card's bottom edge like a
+     window's status bar; the CTA stays right under the dek. */
+  :root[data-skin=xp] .kz-feat__big-body { flex: 0 0 auto; }
+  :root[data-skin=xp] .kz-feat__big-status { margin-top: auto; }
+  :root[data-skin=xp] .kz-feat__avatar { width: 48px; height: 48px; flex-basis: 48px; }
+  /* The photo takes whatever height the rail leaves, so there is no dead
+     band under the dek. Capped at 0.43 x width and positioned 41% down: a
+     4:3 hero with copy baked into its top sixth and bottom quarter (the
+     MagSafe one) then shows only the object, never half a wordmark. */
+  :root[data-skin=xp] .kz-feat__big { container-type: inline-size; }
+  :root[data-skin=xp] .kz-feat__big-thumb {
+    aspect-ratio: auto;
+    flex: 1 1 0;
+    min-height: 180px;
+    max-height: calc(100cqw * 0.43);
+  }
+  :root[data-skin=xp] .kz-feat__big-thumb img { object-position: 50% 41%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kz-feat__go-arrow { transition: none; }
+}
+
+[data-theme="dark"] .kz-pick__ol li::before { color: #1a1c1c; }
+
+/* =============================================================
+   NORMAL MODE — "Two moods" on the home page. The card skin, chips and
+   buttons are shared (site.css); this is the home page's own part.
+   Each card takes its content's hue: projects Teal, blog Grape, web
+   Kiwi, about Dandelion; the page itself is Berry. The big card follows
+   what it holds (data-feat: a project, or a featured post).
+   ============================================================= */
+:root:not([data-skin-base=none]) .kz-feat__big[data-feat="project"],
+:root:not([data-skin-base=none]) .kz-feat__sm:has(a[href^="/projects/"]),
+:root:not([data-skin-base=none]) .kz-dir__grid { --hue: var(--teal);  --hue-tint: var(--teal-tint);  --hue-fill: var(--teal-fill); }
+:root:not([data-skin-base=none]) .kz-feat__big[data-feat="post"],
+:root:not([data-skin-base=none]) .kz-feat__sm:has(a[href^="/blog/"]),
+:root:not([data-skin-base=none]) .kz-blog,
+:root:not([data-skin-base=none]) :is(.kz-dir__h:has(a[href^="/blog"]), .kz-dir__h:has(a[href^="/blog"]) + .kz-dir__list) {
+  --hue: var(--grape); --hue-tint: var(--grape-tint); --hue-fill: var(--grape-fill);
+}
+:root:not([data-skin-base=none]) .kz-feat__sm:has(a[href^="/web/"])  { --hue: var(--kiwi);  --hue-tint: var(--kiwi-tint);  --hue-fill: var(--kiwi-fill); }
+:root:not([data-skin-base=none]) .kz-feat__sm:has(a[href^="/about"]) { --hue: var(--dandy); --hue-tint: var(--dandy-tint); --hue-fill: var(--dandy-fill); }
+:root:not([data-skin-base=none]) .kz-pick { --hue: var(--berry); --hue-tint: var(--berry-tint); --hue-fill: var(--berry-fill); }
+
+/* ---------- intro + section heads ---------- */
+:root:not([data-skin-base=none]) .kz-intro { padding-top: var(--space-xl); }
+:root:not([data-skin-base=none]) .kz-intro__who {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--hue);
+}
+:root:not([data-skin-base=none]) .kz-intro__title {
+  font-size: clamp(2.1rem, 3.7vw, 2.8rem);
+  line-height: 1.02;
+  color: var(--text-primary);
+}
+/* the five inks as a stripe under the headline */
+:root:not([data-skin-base=none]) .kz-intro__title::after {
+  content: "";
+  display: block;
+  width: 150px; height: 8px;
+  margin-top: 16px;
+  background:
+    linear-gradient(to right,
+      var(--berry-fill) 0 20%, var(--grape-fill) 20% 40%, var(--teal-fill) 40% 60%,
+      var(--kiwi-fill) 60% 80%, var(--dandy-fill) 80% 100%);
+}
+:root:not([data-skin-base=none]) .kz-intro__lede { font-size: 18px; line-height: 1.6; color: var(--text-secondary); }
+:root:not([data-skin-base=none]) .kz-sec-head__bracket {
+  padding: 3px 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--on-fill);
+  background: var(--hue-fill);
+  border: 0;
+  box-shadow: 3px 3px 0 0 var(--border-strong);
+}
+:root:not([data-skin-base=none])[data-theme="dark"] .kz-sec-head__bracket { box-shadow: 0 3px 0 0 var(--hue-edge); }
+:root:not([data-skin-base=none]) .kz-sec-head__title { font-size: clamp(1.4rem, 2.3vw, 1.7rem); color: var(--hue); }
+:root:not([data-skin-base=none]) .kz-sec-head__rule { border-top: 2px solid var(--hue-line); opacity: 0.4; }
+:root:not([data-skin-base=none]) .kz-sec-head__meta { font-size: 13px; color: var(--text-muted); }
+:root:not([data-skin-base=none]) .kz-sec-head__more {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--hue);
+}
+
+/* ---------- Now Featuring ---------- */
+:root:not([data-skin-base=none]) .kz-feat__big-thumb { border-bottom: 0; }
+:root:not([data-skin-base=none]) .kz-feat__big-body { padding-top: var(--space-md); }
+:root:not([data-skin-base=none]) .kz-feat__kicker {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--hue);
+}
+:root:not([data-skin-base=none]) .kz-feat__big-title { font-size: clamp(1.6rem, 2.6vw, 2.1rem); line-height: 1.1; color: var(--text-primary); }
+:root:not([data-skin-base=none]) .kz-feat__big-hook { font-size: 17.5px; line-height: 1.55; }
+:root:not([data-skin-base=none]) .kz-feat__big-facts { font-size: 13px; }
+:root:not([data-skin-base=none]) .kz-feat__big-more { font-size: 14px; font-weight: 600; }
+:root:not([data-skin-base=none]) .kz-feat__big-status {
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: var(--hue-tint);
+  border-top: 2px solid var(--card-rule);
+}
+:root:not([data-skin-base=none])[data-theme="dark"] .kz-feat__big-status { border-top-color: var(--border-color); }
+:root:not([data-skin-base=none]) .kz-feat__state { font-size: 13px; }
+:root:not([data-skin-base=none]) .kz-feat__sm-title { font-size: 20px; line-height: 1.2; color: var(--text-primary); }
+:root:not([data-skin-base=none]) .kz-feat__sm-body { padding: 12px 14px; }
+:root:not([data-skin-base=none]) .kz-feat__sm-hook { flex: 0 1 auto; font-size: 16px; line-height: 1.5; }
+:root:not([data-skin-base=none]) .kz-feat__sm-meta {
+  align-items: center;
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: 13px;
+}
+:root:not([data-skin-base=none]) .kz-feat__sm-meta > * { font-size: inherit; }
+/* The whole card is the link, so its "Read →" prompt isn't one: no
+   underline (that's what links wear). Bold, the section hue and the arrow
+   carry the cue; hovering or focusing the card darkens it and nudges the
+   arrow. */
+:root:not([data-skin-base=none]) .kz-feat__sm-more {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--hue);
+  text-decoration: none;
+  white-space: nowrap;
+}
+:root:not([data-skin-base=none]) .kz-feat__sm-more__arrow { display: inline-block; }
+:root:not([data-skin-base=none]) .kz-feat__sm:is(:hover, :focus-within) .kz-feat__sm-more { color: var(--text-primary); }
+:root:not([data-skin-base=none]) .kz-feat__sm:is(:hover, :focus-within) .kz-feat__sm-more__arrow { transform: translateX(3px); }
+
+/* ---------- directory ---------- */
+:root:not([data-skin-base=none]) .kz-dir__h { font-size: 20px; color: var(--hue); border-bottom: 2px solid var(--hue-line); }
+:root:not([data-skin-base=none]) .kz-dir__h a { color: inherit; }
+:root:not([data-skin-base=none]) .kz-dir__h a:hover { color: var(--text-primary); }
+:root:not([data-skin-base=none]) .kz-dir__h .kz-dir__c { font-weight: 400; }
+:root:not([data-skin-base=none]) .kz-dir__bullet { font-size: 13px; color: var(--hue); }
+:root:not([data-skin-base=none]) .kz-dir__c { font-size: 13px; }
+:root:not([data-skin-base=none]) .kz-dir__list { font-size: 16.5px; }
+:root:not([data-skin-base=none]) .kz-dir__list li::before { font-weight: 700; color: var(--hue); }
+@media (min-width: 761px) {
+  :root:not([data-skin-base=none]) .kz-dir__col + .kz-dir__col { border-left: 2px solid var(--border-color); }
+}
+
+/* ---------- workshop panel ---------- */
+:root:not([data-skin-base=none]) .kz-pick__h {
+  padding: 12px var(--space-sm) 8px;
+  font-size: 17px;
+  color: var(--hue);
+  background: none;
+  border-bottom: 1px dashed var(--border-color);
+}
+:root:not([data-skin-base=none]) .kz-pick__h::before { content: none; }
+:root:not([data-skin-base=none]) :is(.kz-status__note, .kz-status__v, .kz-status__v code) { font-size: 13px; }
+:root:not([data-skin-base=none]) .kz-status__k {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+:root:not([data-skin-base=none]):not([data-theme="dark"]) .kz-pick__hot { background: transparent; border-bottom: 0; }
+:root:not([data-skin-base=none]) .kz-pick__hot-h { font-size: 15px; color: var(--text-primary); }
+:root:not([data-skin-base=none]) .kz-pick__hot-h > [aria-hidden] { display: none; }
+:root:not([data-skin-base=none]) .kz-pick__ol { font-size: 15px; }
+:root:not([data-skin-base=none]) :is(.kz-dir__list, .kz-pick__ol) a {
+  color: var(--text-primary);
+  text-decoration-color: var(--hue-line);
+  text-decoration-thickness: 2px;
+}
+:root:not([data-skin-base=none]) :is(.kz-dir__list, .kz-pick__ol) a:hover { color: var(--marker-ink); background: var(--marker); }
+:root:not([data-skin-base=none]) :is(.kz-pick__n, .kz-pick__src) { font-size: 13px; }
+:root:not([data-skin-base=none]) .kz-pick__ol li::before {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--on-fill);
+  background: var(--hue-fill);
+  border: 1px solid var(--border-strong);
+}
+:root:not([data-skin-base=none])[data-theme="dark"] .kz-pick__ol li::before { border-color: var(--hue-edge); }
+
+/* ---------- more from the blog ---------- */
+:root:not([data-skin-base=none]) .kz-post h3 { font-size: 21px; line-height: 1.2; color: var(--text-primary); }
+:root:not([data-skin-base=none]) .kz-post p { font-size: 16px; line-height: 1.5; }
+:root:not([data-skin-base=none]) .kz-post .kz-post__meta { font-size: 13px; }
+:root:not([data-skin-base=none]) .kz-post .kz-post__meta * { font-size: inherit; }

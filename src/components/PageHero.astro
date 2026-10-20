@@ -1,0 +1,35 @@
+---
+// src/components/PageHero.astro
+// Mockup contract: .page-hero is a 2-column flex (text block left, stamp/badge right).
+// Wrap the title block in <div> so right-side stamp/badge/slot can flex-end correctly.
+export interface Props {
+  crumb: string;
+  title: string;
+  sub?: string;
+  badge?: { label: string; variant?: 'live' | 'archive' | 'draft' };
+  stamp?: string;
+  /** Optional inline style for hero-stamp (variant fills don't exist in tokens). */
+  stampStyle?: string;
+  variant?: '' | 'retro' | 'blog';
+  /** Optional inline style for the page-hero element itself (e.g., to flush padding). */
+  heroStyle?: string;
+}
+
+const { crumb, title, sub, badge, stamp, stampStyle, variant = '', heroStyle } = Astro.props as Props;
+const heroClass = variant ? `page-hero page-hero--${variant}` : 'page-hero';
+---
+
+<header class={heroClass} style={heroStyle}>
+  <div>
+    <p class="crumb">{crumb}</p>
+    <h1>{title}</h1>
+    {sub && <p class="hero-sub">{sub}</p>}
+    <slot name="meta" />
+    <slot name="chips" />
+  </div>
+  {badge && (
+    <span class={`badge badge--${badge.variant ?? 'live'}`}>{badge.label}</span>
+  )}
+  {stamp && <span class="hero-stamp" style={stampStyle}>{stamp}</span>}
+  <slot />
+</header>

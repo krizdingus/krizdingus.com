@@ -1,0 +1,208 @@
+/* =============================================================
+   The 404 page (src/pages/404.astro). Page-scoped: only the 404
+   imports this file. A normal page in the site's chrome, quoting
+   the words of the default server error page everyone saw in 1999
+   ("Not Found", a rule, a server signature), then the way out as
+   a directory listing. One visual language: the quote is set in
+   the site's own mono, like every other heading here; the joke is
+   in the words and the signature line, not in a second typeface.
+   Works in both color schemes and in XP mode.
+   Full frame width: the quote spans it, then notes and listing sit
+   side by side when there's room (container query), one gap
+   (--nf-gap) between groups.
+   ============================================================= */
+.nf {
+  --nf-gap: var(--space-lg);
+  container-type: inline-size;
+  padding: var(--space-xl) var(--space-lg);
+}
+/* One column on a phone; from ~860px of content width the quote spans
+   the frame (its rule runs edge to edge, like the real page's <hr>),
+   and the notes sit left of the listing so the frame is used end to end. */
+.nf-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--nf-gap);
+}
+.nf-grid > * { margin: 0; min-width: 0; }
+.nf p { text-wrap: pretty; }
+@container (min-width: 860px) {
+  .nf-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas:
+      "apache apache"
+      "req    out"
+      "why    out"
+      "mail   out";
+    column-gap: var(--space-2xl);
+  }
+  .nf-apache { grid-area: apache; }
+  .nf-req { grid-area: req; }
+  .nf-why { grid-area: why; }
+  .nf-out { grid-area: out; }
+  .nf-mail { grid-area: mail; }
+}
+/* Narrow frame: the label sits on its own line and the path gets the
+   whole second line, so it breaks only at a slash. */
+@container (max-width: 560px) {
+  .nf .nf-req__path { flex: 1 0 100%; }
+}
+
+/* ---------- the quoted server page ----------
+   Same mono as the rest of the page; only the size says "headline". */
+.nf-apache {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+/* pro.css sizes a section's h1 like a page-hero title; this one is the
+   whole page, so it runs larger (still the site's mono, bold). */
+:root .site-main .nf h1.nf-apache__h {
+  font-family: var(--font-mono) !important;
+  font-weight: 700 !important;
+  font-size: clamp(2.25rem, 1.6rem + 2.8vw, 3.5rem) !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.05 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+  color: var(--text-primary) !important;
+  margin: 0 0 var(--space-sm) !important;
+}
+.nf .nf-apache__p {
+  font-size: clamp(1.0625rem, 0.95rem + 0.45vw, 1.1875rem); /* under 20px: body copy, not a heading */
+  line-height: 1.45;
+  margin: 0;
+  text-wrap: balance;
+}
+/* The requested-path readout: label, then the path. It opens the
+   site's own half, right after the quote's signature, so the quote
+   reads h1, sentence, rule, signature with nothing wedged in. */
+.nf .nf-req {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  align-self: start;
+  gap: var(--space-xs) var(--space-sm);
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--bevel-dark);
+  border-left: 4px solid var(--accent-primary);
+  font-family: var(--font-mono);
+}
+.nf .nf-req[hidden] { display: none; }
+.nf-req__label {
+  font-family: var(--font-pixel);
+  font-size: 0.75rem;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.nf-req__path {
+  flex: 1 1 12ch;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: none;
+  padding: 0;
+  overflow-wrap: anywhere;
+}
+.nf-apache__rule {
+  margin: var(--space-md) 0 var(--space-xs);
+  border: 0;
+  border-top: 1px solid var(--bevel-dark);
+  border-bottom: 1px solid var(--bg-panel-light);
+  height: 0;
+}
+/* The signature keeps the joke: small, muted, upright mono. */
+.nf-apache__sig {
+  font-style: normal;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* ---------- the site's own voice ----------
+   Everything outside the quote is one mono size and one link style,
+   the same as the listing's names. */
+.nf .nf-note {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  line-height: var(--leading-body);
+  color: var(--text-primary);
+}
+.nf-note a,
+.nf-ways__name {
+  color: var(--accent-primary);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.nf-out { display: block; }
+
+:root .site-main .nf h2.nf-h2 {
+  font-family: var(--font-pixel) !important;
+  font-weight: 400 !important;
+  font-size: 0.8125rem !important;
+  letter-spacing: var(--tracking-wide) !important;
+  text-transform: uppercase !important;
+  color: var(--accent-secondary) !important;
+  margin: 0 0 var(--space-xs) !important;
+}
+
+/* A directory listing: [DIR], name, description. */
+.nf-ways {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px dashed var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+}
+.nf-ways li { border-bottom: 1px dashed var(--hairline); }
+.nf-ways a {
+  display: grid;
+  grid-template-columns: 5ch 10ch 1fr;
+  align-items: baseline;
+  gap: var(--space-sm);
+  padding: 10px 8px;
+  min-height: 44px;
+  box-sizing: border-box;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.nf-ways__dir {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.nf-ways__desc { color: var(--text-secondary); }
+/* Normal mode: each row is one link, so the name inside it isn't underlined
+   on its own (underlines mark links); bold accent color and the row's
+   hover/focus bar carry the cue. */
+:root:not([data-skin-base=none]) .nf-ways__name { text-decoration: none; }
+/* Hover and keyboard focus both select the whole row, like a file
+   listing's highlight bar. */
+.nf-ways a:hover,
+.nf-ways a:focus-visible {
+  background: var(--accent-pixel);
+  color: #1a1c1c;
+}
+.nf-ways a:hover .nf-ways__dir,
+.nf-ways a:hover .nf-ways__desc,
+.nf-ways a:focus-visible .nf-ways__dir,
+.nf-ways a:focus-visible .nf-ways__desc { color: #1a1c1c; }
+.nf-ways a:hover .nf-ways__name,
+.nf-ways a:focus-visible .nf-ways__name { color: #6b1640; }
+.nf-ways a:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: -2px;
+}
+
+@media (max-width: 640px) {
+  .nf { padding: var(--space-lg) var(--space-md) var(--space-xl); }
+  .nf .nf-req { padding: var(--space-xs) var(--space-sm); }
+  .nf-ways a { grid-template-columns: 5ch 1fr; gap: 2px var(--space-xs); }
+  .nf-ways__desc { grid-column: 2; }
+}

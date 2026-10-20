@@ -1,0 +1,288 @@
+---
+// src/layouts/BaseLayout.astro
+// Every page renders here. The HTML is normal mode: a plain header, the
+// page's <main>, a footer. It works with JavaScript off and ships no theme
+// markup, CSS or JS. UI themes (src/themes/<id>/) load on demand and
+// transform this same markup in place; see src/themes/README.md.
+import SkipLink from '../components/SkipLink.astro';
+import SiteNav from '../components/SiteNav.astro';
+import Wordmark from '../components/Wordmark.astro';
+import SocialIconTray from '../components/SocialIconTray.astro';
+import { themeManifests, SKIN_STORAGE_KEY, appRoutesTheme, skinOnlyCss } from '../themes/manifests';
+import { buildKicker, THEME_COLORS } from '../themes/kicker';
+import '../styles/colors_and_type.css';
+import '../styles/prose.css';
+import '../styles/site.css';
+import '../styles/pro.css';
+import '../themes/runtime.css';
+import { getCollection } from 'astro:content';
+import { needsReview } from '../lib/blog-helpers';
+import { SITE, SITE_NAME, SHARE_W, SHARE_H, DEFAULT_CARD, abs, isoDay, breadcrumbList, type ShareImage, type JsonLdNode, type Crumb } from '../lib/seo';
+
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  /** Keep this page out of search: emits robots noindex and drops the
+   *  canonical link and og:url. The sitemap leaves such pages out too
+   *  (astro.config.mjs reads the built page's robots tag). */
+  noindex?: boolean;
+  /** The share image (1200x630) and its alt text. Defaults to the home card. */
+  ogImage?: ShareImage;
+  /** og:type. 'article' adds the article:* tags from `article`. */
+  ogType?: 'website' | 'article' | 'profile';
+  /** For ogType 'article': dates only once a post is signed off. */
+  article?: { published?: Date; modified?: Date | null; tags?: string[] };
+  /** schema.org nodes for this page's JSON-LD graph. */
+  schema?: JsonLdNode[];
+  /** Breadcrumb trail below home ("Projects" > "Some project"); emitted as
+   *  a BreadcrumbList. Home itself is added in front. */
+  breadcrumbs?: Crumb[];
+  /** A window title for themes that draw the page inside a window
+   *  (<body data-shell-title>). Each theme picks its own default. */
+  shellTitle?: string;
+  /** Kept for older pages; the XP desktop has no status bar any more. */
+  systemStatus?: string;
+  /** Kept for older pages; the XP desktop has no status bar any more. */
+  statusSegment?: string;
+  /** Additional <body> classes (e.g. "no-card-glitch"). */
+  bodyClass?: string;
+  /** Kept for older pages; unused. */
+  showStatusTray?: boolean;
+  /** Route lock (the /apps/* routes): open this page in the theme whose
+   *  manifest sets `appRoutes`, wherever that theme is available. Elsewhere,
+   *  and with JS off, the page's own content stays hidden and a plain notice
+   *  says what the theme needs. */
+  forcePlainChrome?: boolean;
+}
+
+const {
+  title,
+  description,
+  canonical,
+  noindex = false,
+  ogImage = DEFAULT_CARD,
+  ogType = 'website',
+  article,
+  schema = [],
+  breadcrumbs,
+  shellTitle,
+  bodyClass = '',
+  forcePlainChrome = false,
+} = Astro.props as Props;
+
+// Canonical: absolute, on the apex, with the trailing slash every built
+// route has (/foo/ is served from /foo/index.html).
+const canonicalURL = canonical ?? new URL(Astro.url.pathname, SITE).toString();
+const ogImageURL = abs(ogImage.src);
+
+// JSON-LD: the page's own nodes plus its breadcrumb trail.
+const graph: JsonLdNode[] = [
+  ...schema,
+  ...(breadcrumbs?.length ? [breadcrumbList([{ name: 'Home', path: '/' }, ...breadcrumbs])] : []),
+];
+const jsonLd = graph.length ? JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }) : '';
+
+// Every theme gets its own quiet switch, built from its manifest. The
+// /apps/* routes open in the theme whose manifest sets `appRoutes`.
+const lockManifest = forcePlainChrome ? appRoutesTheme() : undefined;
+const lockTheme = lockManifest?.id;
+// Same crumb shape as the detail pages ("> projects / <slug>"), from the path.
+const lockCrumb = `> ${Astro.url.pathname.split('/').filter(Boolean).join(' / ')}`;
+// The feed link is advertised once rss.xml has an item: it carries the
+// same posts (signed off, not drafts).
+const feedHasItems = (await getCollection('blog', ({ data }) => !data.draft && !needsReview(data))).length > 0;
+const kicker = buildKicker(themeManifests, SKIN_STORAGE_KEY);
+const skinOnly = skinOnlyCss();
+const year = new Date().getFullYear();
+
+// Every page gets exactly one top-level heading. A page body that brings
+// its own <h1> keeps it; one that doesn't (and isn't a locked route, whose
+// notice has one) gets the site name in the header as its <h1>.
+const body = await Astro.slots.render('default');
+const wordmarkIsH1 = !lockManifest && !/<h1[\s>]/i.test(body);
+---
+
+<!doctype html>
+<html lang="en" data-theme-lock={lockTheme}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/* Before the kicker, which points both at the chosen scheme's color. */}
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content={THEME_COLORS.light} />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content={THEME_COLORS.dark} />
+    <script is:inline set:html={kicker}></script>
+    <style is:inline set:html={skinOnly}></style>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonicalURL} />}
+    {feedHasItems && <link rel="alternate" type="application/rss+xml" title="Krizdingus" href="/rss.xml" />}
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {!noindex && <meta property="og:url" content={canonicalURL} />}
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content={String(SHARE_W)} />
+    <meta property="og:image:height" content={String(SHARE_H)} />
+    <meta property="og:image:alt" content={ogImage.alt} />
+    {ogType === 'article' && article?.published && <meta property="article:published_time" content={isoDay(article.published)} />}
+    {ogType === 'article' && article?.published && <meta property="article:modified_time" content={isoDay(article.modified ?? article.published)} />}
+    {ogType === 'article' && <meta property="article:author" content={`${SITE}/about/`} />}
+    {ogType === 'article' && article?.tags?.map((t) => <meta property="article:tag" content={t} />)}
+    {ogType === 'profile' && <meta property="profile:first_name" content="Kris" />}
+    {ogType === 'profile' && <meta property="profile:last_name" content="Williams" />}
+    {ogType === 'profile' && <meta property="profile:username" content="krizdingus" />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+    <meta name="twitter:image:alt" content={ogImage.alt} />
+    {/* The cartridge. The SVG follows the OS light/dark scheme. The ICO
+        declares a single 32x32 size and the 192 tile sits in the manifest
+        rather than a link, the usual arrangement for steering browsers to
+        the SVG; one that still takes the ICO gets the light inks on a paper
+        tile, which reads on any tab strip. */}
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/favicon-180.png" />
+    {jsonLd && <script type="application/ld+json" set:html={jsonLd}></script>}
+  </head>
+  <body class={bodyClass || undefined} data-screen-label={title} data-shell-title={shellTitle || undefined}>
+    <SkipLink />
+
+    <div class="site" data-site>
+      <header class="pro-header">
+        {wordmarkIsH1 ? (
+          <h1 class="pro-wordmark-h1"><a class="pro-wordmark" href="/" aria-label="krizdingus.com, home" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}><span class="sr-only">krizdingus.com</span><Wordmark /></a></h1>
+        ) : (
+          <a class="pro-wordmark" href="/" aria-label="krizdingus.com, home" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}><span class="sr-only">krizdingus.com</span><Wordmark /></a>
+        )}
+        <SiteNav currentPath={Astro.url.pathname} />
+        <div class="pro-tools">
+          <div class="pro-display" data-display>
+            <button type="button" class="theme-toggle pro-theme" aria-label="Toggle dark mode">
+              <svg class="pro-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/></svg>
+              <svg class="pro-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/></svg>
+            </button>
+            <button type="button" class="pro-theme pro-display__more" aria-label="Display options" aria-expanded="false" aria-controls="display-menu" data-display-open>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 3h8v1H1zM2 4h6v1H2zM3 5h4v1H3zM4 6h2v1H4z"/></svg>
+            </button>
+            <div class="display-menu" id="display-menu" hidden>
+              <div class="display-menu__group" role="group" aria-labelledby="display-menu-colors">
+                <p class="display-menu__h" id="display-menu-colors">Colors</p>
+                <button type="button" class="display-menu__opt" data-scheme="auto" aria-pressed="false">Auto <span class="display-menu__note">matches your device</span></button>
+                <button type="button" class="display-menu__opt" data-scheme="light" aria-pressed="false">Light</button>
+                <button type="button" class="display-menu__opt" data-scheme="dark" aria-pressed="false">Dark</button>
+              </div>
+              <div class="display-menu__group display-menu__group--themes" role="group" aria-labelledby="display-menu-themes">
+                <p class="display-menu__h" id="display-menu-themes">Theme</p>
+                <button type="button" class="display-menu__opt" aria-pressed="true" data-display-close>Normal</button>
+                {themeManifests.map((m) => (
+                  <button type="button" class="display-menu__opt" data-theme-switch={m.id} hidden title={m.description}>
+                    {m.label ?? m.name}
+                    {m.glyph && <span class="display-menu__glyph" aria-hidden="true" set:html={m.glyph} />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main id="main" class="site-main" tabindex="-1">
+        {lockManifest ? (
+          <>
+            <section class="content-section lock-note" data-skin-fallback={lockManifest.id} aria-labelledby="lock-note-h">
+              <header class="page-hero">
+                <div>
+                  <p class="crumb">{lockCrumb}</p>
+                  <h1 id="lock-note-h">This page only runs in {lockManifest.name}</h1>
+                </div>
+              </header>
+              <p>{lockManifest.name} needs {lockManifest.needs ?? 'a device that can run it'}. The rest of the site works without any of that.</p>
+              <p class="lock-note__links">
+                <a href="/">Back to the home page</a>
+                <button type="button" class="skin-switch" data-theme-switch={lockManifest.id} hidden>
+                  {lockManifest.glyph && <span class="skin-switch__glyph" aria-hidden="true" set:html={lockManifest.glyph} />}
+                  <span class="skin-switch__label">Open in {lockManifest.label ?? lockManifest.name}</span>
+                </button>
+              </p>
+            </section>
+            <div data-skin-only={lockManifest.id} set:html={body} />
+          </>
+        ) : (
+          <Fragment set:html={body} />
+        )}
+      </main>
+
+      <footer class="pro-footer">
+        <div class="pro-footer__lines">
+          <span><a href="/colophon/">Built with code on a computer.</a> Powered by nicotine.</span>
+          <span>© This is all K. Williams’ fault, 2022–{year}.</span>
+        </div>
+        <SocialIconTray variant="pro-footer" />
+        {themeManifests.filter((m) => m.invite).map((m) => (
+          <button type="button" class="pro-footer__back" data-theme-switch={m.id} hidden>{m.invite}</button>
+        ))}
+      </footer>
+    </div>
+
+    <script>
+      import { initTheme } from '../scripts/theme';
+      import { initThemes } from '../themes/runtime';
+      import { themeEntries } from '../themes/registry';
+      import { installProjectFilter } from '../scripts/filter';
+      import { installGallery } from '../scripts/gallery';
+      import { installShareCopy } from '../scripts/share';
+      import { installBgField } from '../scripts/bg-loader';
+
+      function init() {
+        initTheme();
+        installProjectFilter();
+        installGallery();
+        installShareCopy();
+        void initThemes(themeEntries);
+        installBgField();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    </script>
+  </body>
+</html>
+
+<style>
+  /* The site name as the page's <h1> (pages without one of their own):
+     the same wordmark, no heading type. */
+  .pro-wordmark-h1 {
+    margin: 0;
+    font: inherit;
+    line-height: inherit;
+    flex: none;
+  }
+  /* Dark scheme: the footer's small print sits on the darkest surface,
+     where the muted token falls under 4.5:1. */
+  :global([data-theme="dark"]) .pro-footer {
+    color: var(--text-secondary);
+  }
+  /* The XP-only notice wears the same page hero as every other page
+     (crumb, magenta h1, top rule), flush like the colophon's. */
+  .lock-note .page-hero {
+    padding-left: 0;
+    padding-right: 0;
+    margin-bottom: var(--space-md, 16px);
+  }
+  .lock-note > p { max-width: 62ch; margin: 0 0 var(--space-sm, 12px); }
+  .lock-note__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm, 12px) var(--space-md, 16px);
+  }
+</style>

@@ -1,0 +1,35 @@
+---
+import { pageCard, websiteNode } from '../lib/seo';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import KzFeat from '../components/blocks/KzFeat.astro';
+import KzDir from '../components/blocks/KzDir.astro';
+import KzBlog from '../components/blocks/KzBlog.astro';
+import '../styles/home.css';
+// XP-only set dressing (the KRIZ-WIRE ticker, egg tiles, counter, webring,
+// LEDs, title bars) is built by the XP theme at mount into the empty
+// data-xp-slot points below (src/themes/xp/dressing/). Normal mode ships none.
+const DESCRIPTION = 'Kris Williams is a web developer who makes 3D prints, Game Boy cartridge labels, Mac apps and Discord bots. The files, the code and a few of the stories.';
+---
+<BaseLayout
+  title="Krizdingus — Kris Williams"
+  description={DESCRIPTION}
+  ogImage={pageCard('home')}
+  schema={[websiteNode(DESCRIPTION)]}
+  showStatusTray={false}
+>
+  <div class="kz-home">
+    <section class="kz-intro" aria-labelledby="kz-intro-h">
+      <div class="kz-intro__head">
+        <p class="kz-intro__who">Kris Williams</p>
+        <h1 class="kz-intro__title" id="kz-intro-h">Web developer. Tinkerer. Occasional menace.</h1>
+      </div>
+      <p class="kz-intro__lede">Web is the day job. Otherwise, I write about things that probably don’t warrant this much thought, tinker with old technology, and make things nobody asked for.</p>
+    </section>
+    <KzFeat />
+    <div data-xp-slot="marquee"></div>
+    <KzDir />
+    <div data-xp-slot="eggs"></div>
+    <KzBlog />
+    <div data-xp-slot="foot-strip"></div>
+  </div>
+</BaseLayout>

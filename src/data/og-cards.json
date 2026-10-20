@@ -1,0 +1,24 @@
+{
+  "//": "Share images (Open Graph, 1200x630). scripts/og-cards.mjs draws them into public/images/og/; src/lib/seo.ts points each page at its file. 'pages' are designed title cards. 'projects' lists the projects whose card is one of their own photos: 'photo' crops it to fill the card, 'framed' sets it whole beside the title. A project not listed here gets a designed card. Blog posts aren't listed: a post with a hero_image gets that picture filling its card, one without gets a designed card.",
+  "pages": {
+    "home":     { "path": "/",          "crumb": "> krizdingus",            "title": "Web developer. Tinkerer. Occasional menace.", "sub": "Kris Williams", "hue": "berry", "mood": "paper" },
+    "projects": { "path": "/projects/", "crumb": "> krizdingus / projects", "title": "Projects",  "sub": "Things I 3D-printed, flashed, or wrote.", "hue": "teal", "mood": "paper" },
+    "blog":     { "path": "/blog/",     "crumb": "> krizdingus / blog",     "title": "Blog",      "sub": "How this site is built, and the stories behind a few of the projects.", "hue": "grape", "mood": "plum" },
+    "web":      { "path": "/web/",      "crumb": "> krizdingus / web",      "title": "Web work",  "sub": "The kind of web work I do, and who I've done it for.", "hue": "kiwi", "mood": "paper" },
+    "about":    { "path": "/about/",    "crumb": "> krizdingus / about",    "title": "About",     "sub": "More than you asked for, and how to reach me.", "hue": "dandy", "mood": "paper" },
+    "colophon": { "path": "/colophon/", "crumb": "> krizdingus / colophon", "title": "Colophon",  "sub": "What this site is made of.", "hue": "berry", "mood": "plum" }
+  },
+  "projects": {
+    "cassette-case-gameboy-games":      { "src": "/images/projects/cassette-case-gameboy-games/open-and-closed.webp", "layout": "framed" },
+    "magsafe-zyn-container":            { "src": "/images/projects/magsafe-zyn-container/open-with-pouches.webp", "layout": "photo", "position": "centre" },
+    "zyn-container-easy-open-threaded": { "src": "/images/projects/zyn-container-easy-open-threaded/open-with-pouches.webp", "layout": "photo", "position": "centre" },
+    "dingus-game-kart":                 { "src": "/images/projects/dingus-game-kart/turntable-frame.webp", "layout": "framed" },
+    "fdm-friendly-gameboy-cartridge":   { "src": "/images/projects/fdm-friendly-gameboy-cartridge/tetris-shell.webp", "layout": "framed" },
+    "gameboy-bootleg-cartridge-labels": { "src": "/images/projects/gameboy-bootleg-cartridge-labels/game-boy-wars.webp", "layout": "framed" },
+    "gamepak-discreet-display-stand":   { "src": "/images/projects/gamepak-discreet-display-stand/crystal-front.webp", "layout": "framed" },
+    "gbc-palette-editor":               { "src": "/images/projects/gbc-palette-editor/palette-edit-light.webp", "layout": "framed" },
+    "mouse-bite-labs-cartridge-labels": { "src": "/images/projects/mouse-bite-labs-cartridge-labels/mbc3-cartridge.webp", "layout": "framed" },
+    "peekabu":                          { "src": "/images/projects/peekabu/dashboard.webp", "layout": "framed" },
+    "printable-poopin-stool":           { "src": "/images/projects/printable-poopin-stool/in-place.webp", "layout": "framed" }
+  }
+}

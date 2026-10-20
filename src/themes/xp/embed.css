@@ -1,0 +1,58 @@
+/* =============================================================
+   EMBED MODE — src/themes/xp/embed.css. The iframe body of an XP
+   app window (/apps/<slug>/embed/): it strips all OS chrome and
+   renders just the .app-window full-bleed. The parent window on the
+   XP desktop provides the floating-window chrome. Imported only by
+   the embed route, never by normal mode.
+   ============================================================= */
+body.is-embed {
+  background: var(--bg-primary) !important;
+  background-image: none !important;
+  padding: 0 !important;
+  margin: 0;
+  min-height: 100vh;
+  overflow: hidden;
+}
+body.is-embed .skip-link,
+body.is-embed .os-shell,
+body.is-embed .desktop-layer,
+body.is-embed .boot-overlay,
+body.is-embed .xp-splash,
+body.is-embed #scanlines-canvas,
+body.is-embed .crt-screen-fx,
+body.is-embed .crt-blackout {
+  display: none !important;
+}
+body.is-embed .app-window {
+  position: static !important;
+  width: 100% !important;
+  height: 100vh !important;
+  max-width: none !important;
+  margin: 0 !important;
+  inset: auto !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+/* In embed mode the parent provides the title bar + window controls,
+   so hide the inner page's title bar entirely. The inner status bar
+   stays visible — it carries rich, app-specific real-time info
+   (codec, buffer, clock, etc.) that the generic parent chrome can't.
+   We hide both legacy .app-titlebar (older pages) and the new
+   .title-bar inside any .app-window. */
+body.is-embed .app-titlebar,
+body.is-embed .app-window > .title-bar { display: none !important; }
+body.is-embed .app-windowctrls,
+body.is-embed .app-window > .title-bar .window-controls { display: none !important; }
+
+
+/* The app's name as the iframe document's heading, for screen readers; the
+   parent window's title bar already shows it. */
+body.is-embed .embed-h1 {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

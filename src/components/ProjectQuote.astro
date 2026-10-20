@@ -1,0 +1,26 @@
+---
+// src/components/ProjectQuote.astro — one review line on a project page,
+// from the project's `quote` front matter: the words as the reviewer wrote
+// them, then their handle and the platform, linked to the listing the
+// review sits on. The opening quote mark is drawn in CSS (projects.css),
+// so screen readers get the blockquote and the credit only.
+import ExternalLink from './ExternalLink.astro';
+import { hostLabel } from '../lib/projects-helpers';
+
+interface Props {
+  text: string;
+  by: string;
+  url: string;
+}
+
+const { text, by, url } = Astro.props;
+const where = hostLabel(url);
+---
+<figure class="proj-quote">
+  <blockquote class="proj-quote__text" cite={url}>
+    <p>{text}</p>
+  </blockquote>
+  <figcaption class="proj-quote__by">
+    <ExternalLink href={url}>{by}{where && ` on ${where}`}</ExternalLink>
+  </figcaption>
+</figure>

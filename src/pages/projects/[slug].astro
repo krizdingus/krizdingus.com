@@ -1,0 +1,248 @@
+---
+import ExternalLink from '../../components/ExternalLink.astro';
+import { isExternal } from '../../build/external-links.mjs';
+import fs from 'node:fs';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import FactsCard from '../../components/FactsCard.astro';
+import Pnav from '../../components/Pnav.astro';
+import ProjectQuote from '../../components/ProjectQuote.astro';
+import { getCollection, render } from 'astro:content';
+import { relatedProjects } from '../../lib/related-projects';
+import { sortProjects, slugFromId, showStars, heroDims, variantBase, variantWidths, srcsetFor, shortAlt } from '../../lib/projects-helpers';
+import { splitAlt } from '../../lib/alt-text';
+import { SITE, projectCard, projectNode } from '../../lib/seo';
+import '../../styles/projects.css';
+
+export async function getStaticPaths() {
+  // Prev/next follow the same order as the /projects/ list (newest first).
+  const all = sortProjects(await getCollection('projects', (e) => !e.data.draft));
+  const brief = (e: (typeof all)[number]) => ({ slug: slugFromId(e.id), title: e.data.title });
+  return all.map((entry, i) => ({
+    params: { slug: slugFromId(entry.id) },
+    props: {
+      entry,
+      prev: i > 0 ? brief(all[i - 1]) : null,
+      next: i < all.length - 1 ? brief(all[i + 1]) : null,
+      allSlugs: all.map((e) => ({ slug: slugFromId(e.id), title: e.data.title, data: { title: e.data.title, category: e.data.category, tags: e.data.tags } })),
+    },
+  }));
+}
+
+const { entry, prev, next, allSlugs } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+const slug = slugFromId(entry.id);
+// UTC year so YYYY-01-01 dates don't roll back to the previous year in US timezones.
+const year = d.date_published.getUTCFullYear();
+const fr = d.field_report;
+const fmtNum = (n: number) => n.toLocaleString('en-US');
+const fmtDate = (dt: Date) => dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+const pad2 = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+
+// Pictures: the gallery, or the hero alone, or nothing at all.
+const galleryItems = d.gallery.length > 0
+  ? d.gallery
+  : d.hero_image
+    ? [{ src: d.hero_image, alt: d.title, ...heroDims(d.hero_image, d.gallery) }]
+    : [];
+// Responsive copies (AVIF + WebP at up to 480/800/1200w) and a 200px thumb
+// per picture, cut ahead of time into public/images/projects/<slug>/r/.
+// Anything without them falls back to the original file.
+const HERO_SIZES = '(max-width: 640px) calc(100vw - 52px), (max-width: 1024px) calc(100vw - 88px), min(760px, 52vw)';
+const pictures = galleryItems.map((item) => {
+  const base = variantBase(slug, item.src);
+  const widths = item.width ? variantWidths(item.width).filter((w) => fs.existsSync(`public${base}-${w}.webp`) && fs.existsSync(`public${base}-${w}.avif`)) : [];
+  const thumb = fs.existsSync(`public${base}-thumb.webp`) ? `${base}-thumb.webp` : item.src;
+  return {
+    ...item,
+    avif: widths.length ? srcsetFor(base, widths, 'avif') : '',
+    webp: widths.length ? srcsetFor(base, widths, 'webp') : '',
+    thumb,
+  };
+});
+const totalImages = pictures.length;
+const first = pictures[0];
+// Long alt text keeps a short alt and moves the rest to a hidden description.
+const firstAlt = splitAlt(first?.alt ?? '');
+const DESC_ID = 'proj-img-desc';
+
+type Rel = { slug: string; title: string; data: { title: string; category: string; tags: string[] } };
+const pool = allSlugs as Rel[];
+const seed = pool.find((p) => p.slug === slug)!;
+const related = relatedProjects(pool, seed, 2);
+
+const datePublished = fmtDate(d.date_published);
+// "Also see" links back into this site render as plain internal links.
+const SITE_ORIGIN = 'https://krizdingus.com';
+// Hero meta: date, the first two tags, and the print time, one item each.
+const heroMeta = [datePublished, ...d.tags.slice(0, 2), ...(d.time ? [d.time] : [])];
+
+// XP shell status bar: "Running · 3D PRINT".
+const systemTech = d.tags[0]?.toUpperCase() ?? '';
+const systemStatus = systemTech ? `Running · ${systemTech}` : 'Running';
+
+// Field report: numbers as read off the listing on the captured date. GitHub
+// stars only count from 5 up; a report with no numbers left is dropped.
+const reportRows = fr
+  ? [
+      ...(fr.rating != null ? [{ label: 'Rating', value: `${fr.rating.toFixed(1)} / 5${fr.rating_count ? ` (${fr.rating_count} ratings)` : ''}` }] : []),
+      ...(fr.likes != null ? [{ label: 'Likes', value: fmtNum(fr.likes) }] : []),
+      ...(fr.downloads != null ? [{ label: 'Downloads', value: fmtNum(fr.downloads) }] : []),
+      ...(fr.comments != null ? [{ label: 'Comments', value: fmtNum(fr.comments) }] : []),
+      ...(showStars(fr.stars) ? [{ label: 'Stars', value: fmtNum(fr.stars) }] : []),
+    ]
+  : [];
+---
+
+<BaseLayout
+  title={`${d.seo_title ?? d.title} — Krizdingus`}
+  description={d.description ?? d.summary}
+  shellTitle={`KRIZSCAPE — ${d.title}`}
+  systemStatus={systemStatus}
+  statusSegment={`${slug} / ${totalImages} image${totalImages === 1 ? '' : 's'}`}
+  ogImage={projectCard(slug, d)}
+  schema={[projectNode(`${SITE}/projects/${slug}/`, slug, d)]}
+  breadcrumbs={[{ name: 'Projects', path: '/projects/' }, { name: d.title, path: `/projects/${slug}/` }]}
+>
+  <PageHero crumb={`> projects / ${slug}`} title={d.title} sub={d.summary}>
+    <p class="hero-meta proj-meta" slot="meta">
+      <span class="proj-meta__in">{heroMeta.map((m) => <span class="proj-meta__item">{m}</span>)}</span>
+    </p>
+  </PageHero>
+
+  <div class="proj-detail">
+    <div class="proj-detail__main">
+      {totalImages > 1 && (
+        <section class="proj-viewer" aria-label="Pictures" data-gallery-root>
+          <figure class="proj-viewer__stage">
+            <picture>
+              {first.avif && <source type="image/avif" srcset={first.avif} sizes={HERO_SIZES} />}
+              {first.webp && <source type="image/webp" srcset={first.webp} sizes={HERO_SIZES} />}
+              <img
+                data-gallery-main
+                src={first.src}
+                srcset={first.webp || undefined}
+                sizes={first.webp ? HERO_SIZES : undefined}
+                alt={firstAlt.alt}
+                aria-describedby={firstAlt.desc ? DESC_ID : undefined}
+                width={first.width}
+                height={first.height}
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+              />
+            </picture>
+            <span class="sr-only" id={DESC_ID} data-gallery-desc>{firstAlt.desc}</span>
+          </figure>
+          <div class="proj-viewer__bar">
+            <span class="proj-viewer__count" data-gallery-counter aria-live="polite">{pad2(1)} / {pad2(totalImages)}</span>
+            <div class="proj-viewer__ctrls" data-gallery-ctrls hidden>
+              <button type="button" data-gallery="prev"><span aria-hidden="true">← </span>Prev</button>
+              <button type="button" data-gallery="next">Next<span aria-hidden="true"> →</span></button>
+            </div>
+          </div>
+          <ul class="proj-viewer__thumbs">
+            {pictures.map((item, i) => (
+              <li>
+                <a
+                  class="proj-thumb"
+                  href={item.src}
+                  data-gallery-thumb
+                  data-alt={splitAlt(item.alt).alt}
+                  data-desc={splitAlt(item.alt).desc || undefined}
+                  data-srcset-avif={item.avif || undefined}
+                  data-srcset-webp={item.webp || undefined}
+                  data-w={item.width}
+                  data-h={item.height}
+                  aria-label={`Picture ${pad2(i + 1)} of ${pad2(totalImages)}: ${shortAlt(item.alt)}`}
+                  aria-current={i === 0 ? 'true' : undefined}
+                >
+                  <span class="proj-thumb__n" aria-hidden="true">{pad2(i + 1)}</span>
+                  <img src={item.thumb} alt="" width="200" height="200" loading="lazy" decoding="async" fetchpriority="low" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {totalImages === 1 && (
+        <figure class={first.width && first.height && first.width / first.height < 4 / 3 - 0.01 ? 'proj-shot proj-shot--stage' : 'proj-shot'}>
+          <picture>
+            {first.avif && <source type="image/avif" srcset={first.avif} sizes={HERO_SIZES} />}
+            {first.webp && <source type="image/webp" srcset={first.webp} sizes={HERO_SIZES} />}
+            <img src={first.src} srcset={first.webp || undefined} sizes={first.webp ? HERO_SIZES : undefined} alt={firstAlt.alt} aria-describedby={firstAlt.desc ? DESC_ID : undefined} width={first.width} height={first.height} loading="eager" fetchpriority="high" decoding="async" />
+          </picture>
+          {firstAlt.desc && <span class="sr-only" id={DESC_ID}>{firstAlt.desc}</span>}
+        </figure>
+      )}
+
+      <article class="prose proj-prose">
+        <Content />
+      </article>
+
+      {d.quote && <ProjectQuote text={d.quote.text} by={d.quote.by} url={d.quote.url} />}
+    </div>
+
+    <aside class="proj-detail__side" aria-label="Project facts">
+      <FactsCard
+        title="The specs"
+        xpTitle="PROJECT.INI"
+        rows={[
+          { label: 'Year', value: String(year) },
+          ...(d.time ? [{ label: 'Time', value: d.time }] : []),
+          ...(d.cost ? [{ label: 'Cost', value: d.cost }] : []),
+          { label: 'Tags', value: '', chips: d.tags },
+          ...(d.license ? [{ label: 'License', value: d.license }] : []),
+        ]}
+      />
+
+      {fr && reportRows.length > 0 && (
+        <FactsCard
+          title="Field report"
+          xpTitle="FIELD-REPORT.LOG"
+          note={`${fr.source}, as of ${fmtDate(fr.captured)}`}
+          rows={reportRows}
+        />
+      )}
+
+      {d.links.length > 0 && (
+        <FactsCard
+          title="Also see"
+          xpTitle="LINKS.URL"
+          links={d.links.map((l) => {
+            const own = l.url.startsWith(SITE_ORIGIN);
+            return { href: own ? l.url.slice(SITE_ORIGIN.length) : l.url, label: l.label, external: !own };
+          })}
+        />
+      )}
+
+      {related.length > 0 && (
+        <FactsCard
+          title="Related"
+          xpTitle="SIMILAR.LNK"
+          links={related.map((r) => ({ href: `/projects/${r.slug}/`, label: r.title }))}
+        />
+      )}
+    </aside>
+  </div>
+
+  <div class="cta-block">
+    {isExternal(d.external_url) ? (
+      <ExternalLink class="cta-big" href={d.external_url}>
+        {d.external_label}
+        <span aria-hidden="true">↗</span>
+      </ExternalLink>
+    ) : (
+      <a class="cta-big" href={d.external_url}>
+        {d.external_label}
+        <span aria-hidden="true">↗</span>
+      </a>
+    )}
+  </div>
+
+  <Pnav
+    prev={prev ? { href: `/projects/${prev.slug}/`, label: prev.title, kicker: 'PREVIOUS' } : undefined}
+    next={next ? { href: `/projects/${next.slug}/`, label: next.title, kicker: 'NEXT' } : undefined}
+  />
+</BaseLayout>

@@ -1,0 +1,411 @@
+/* =============================================================
+   blog.css — blog index, tag archives, post chrome.
+   Imported by src/pages/blog/** only. Post bodies are styled by
+   prose.css; this file is everything around them.
+   ============================================================= */
+
+.blog-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+.blog-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: var(--space-lg);
+  align-items: start;
+  /* Air under the hero's bottom rule, as /colophon/ and /projects/ leave. */
+  margin-top: var(--space-md);
+}
+
+/* ---------- Sidebar ---------- */
+.blog-sidebar {
+  font-family: var(--font-mono); font-size: 12px;
+  display: flex; flex-direction: column; gap: var(--space-md);
+}
+.blog-sidebar .sb-card {
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-strong);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+  overflow: hidden;
+}
+/* Title-bar heading: the same strip the post rows wear. */
+.blog-sidebar .sb-head,
+.post-row .post-bar {
+  background: var(--accent-secondary); color: var(--text-on-chrome);
+  padding: 4px 10px;
+  font-family: var(--font-pixel); font-size: 10px; font-weight: 400;
+  letter-spacing: 0.05em; line-height: 1.6;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-strong);
+  margin: 0;
+}
+[data-theme="dark"] .blog-sidebar .sb-head,
+[data-theme="dark"] .post-row .post-bar { background: #34325f; color: #fff; }
+.blog-sidebar .sb-card .body { padding: 10px 12px; }
+.blog-sidebar .sb-note {
+  font-family: var(--font-mono); font-size: 12px; line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0 0 8px;
+}
+.blog-sidebar .sb-card .os-button { width: 100%; justify-content: center; }
+.blog-sidebar .archive-list {
+  list-style: none; margin: 0; padding: 0;
+  line-height: 1.8; color: var(--text-primary);
+}
+.blog-sidebar .archive-list .count { color: var(--text-muted); }
+
+.tag-list-stack { list-style: none; margin: 0; padding: 0; }
+.tag-list-stack a {
+  display: flex; justify-content: space-between; gap: 8px;
+  color: var(--accent-primary);
+  text-decoration: none;
+  padding: 3px 0;
+  border-bottom: 1px dashed transparent;
+}
+.tag-list-stack a:hover { border-bottom-color: var(--accent-primary); }
+.tag-list-stack a .count { color: var(--text-muted); }
+.tag-list-stack a[aria-current="page"] {
+  background: var(--accent-pixel);
+  padding: 3px 6px; margin: 0 -6px;
+  border-bottom-color: transparent;
+}
+.tag-list-stack a[aria-current="page"] .count { color: #1a1c1c; }
+
+/* ---------- Post rows ---------- */
+.post-row {
+  background: var(--bg-primary);
+  border: 2px solid var(--border-strong);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+}
+.post-row.no-hero { grid-template-columns: 1fr; }
+.post-row .post-bar {
+  display: flex; align-items: center; gap: 6px;
+  grid-column: 1 / -1;
+  text-transform: none;
+}
+.post-row .post-bar::before { content: '▤'; color: var(--accent-pixel); font-family: var(--font-mono); }
+.post-row .post-hero {
+  border-right: 1px solid var(--border-strong);
+  background: var(--bg-console);
+  min-height: 165px;
+  position: relative;
+}
+/* The post's picture, cropped to the card from its centre. */
+.post-row .post-hero img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block;
+}
+.post-row .post-body { padding: 14px 18px; }
+.post-row .post-meta {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+}
+.post-row .post-meta .dot { color: var(--accent-secondary); }
+.post-row .post-title {
+  font-family: var(--font-pixel); font-size: 16px; font-weight: 400;
+  color: var(--accent-primary);
+  letter-spacing: 0.04em; line-height: 1.3;
+  margin: 0 0 8px;
+}
+.post-row .post-title a { color: inherit; text-decoration: none; border-bottom: 2px solid transparent; }
+.post-row .post-title a:hover,
+.post-row .post-title a:focus-visible { border-bottom-color: var(--accent-primary); }
+.post-row p {
+  font-family: var(--font-mono); font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0 0 10px;
+  max-width: 70ch;
+}
+.post-row .post-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+/* No screenshot: the excerpt takes the room instead of leaving it empty. */
+.post-row.no-hero .post-body { padding: 16px 22px; }
+.post-row.no-hero p { font-size: 13px; max-width: 92ch; }
+
+/* ---------- "Drafted" flag (posts with review: true) ----------
+   In lists it's one more quiet meta item; the post page carries the note. */
+.post-row .post-meta .review-flag {
+  color: var(--accent-primary);
+  font-style: italic;
+  white-space: nowrap;
+}
+.prose .review-note {
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.55;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px dashed var(--accent-primary);
+  padding: 10px 14px;
+  margin: 0 0 var(--space-lg);
+}
+.prose .review-note strong { color: var(--accent-primary); font-weight: 700; }
+
+/* ---------- Pagination ---------- */
+.pagi {
+  font-family: var(--font-pixel); font-size: 11px;
+  letter-spacing: 0.05em;
+  display: flex; align-items: center; gap: 4px;
+  margin-top: var(--space-md);
+  flex-wrap: wrap;
+}
+.pagi a, .pagi span {
+  padding: 5px 11px;
+  color: var(--text-primary); text-decoration: none;
+  border: 2px solid;
+  border-color: var(--bg-panel-light) var(--border-strong) var(--border-strong) var(--bg-panel-light);
+  background: var(--bg-panel);
+}
+.pagi a:hover { background: var(--accent-pixel); }
+.pagi .current {
+  background: var(--accent-primary); color: #fff;
+  border-color: #c46b8d var(--border-strong) var(--border-strong) #c46b8d;
+}
+.pagi .ellipsis { background: none; border: 0; color: var(--text-muted); }
+
+/* ---------- Tag archive head ---------- */
+.tag-head {
+  background: var(--bg-console); color: var(--text-on-console);
+  border: 2px solid var(--border-strong);
+  padding: 12px 16px;
+  font-family: var(--font-mono);
+  margin-bottom: var(--space-md);
+}
+.tag-head .crumb { font-size: 11px; color: var(--accent-terminal); margin: 0; }
+.tag-head h1 {
+  font-family: var(--font-pixel);
+  font-size: 22px;
+  color: #ff6b9d;
+  letter-spacing: 0.05em;
+  margin: 4px 0 0;
+}
+.tag-head .count { font-family: var(--font-mono); font-size: 11px; color: var(--text-on-console-2); margin: 4px 0 0; }
+.tag-back {
+  margin-top: var(--space-md);
+  font-family: var(--font-mono); font-size: 12px;
+}
+.tag-back a { color: var(--accent-primary); text-decoration: none; border-bottom: 1px solid currentColor; }
+
+/* ---------- Share strip (post page) ---------- */
+.share-strip {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  font-family: var(--font-mono); font-size: 12px;
+}
+.share-strip .label {
+  font-family: var(--font-pixel); font-size: 9px;
+  letter-spacing: 0.08em; color: var(--accent-secondary);
+}
+.share-strip .os-button { font-size: 11px; }
+.share-strip .path {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.visually-hidden-blog {
+  position: absolute !important;
+  width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+@media (max-width: 1024px) {
+  .blog-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+  .post-row { grid-template-columns: 1fr; }
+  .post-row .post-hero {
+    border-right: 0; border-bottom: 1px solid var(--border-strong);
+    min-height: 0; aspect-ratio: 2 / 1;
+  }
+  .post-row.no-hero p { font-size: 12px; }
+}
+@media (max-width: 640px) {
+  .share-strip { padding: var(--space-sm) var(--space-md); }
+  .share-strip .path { display: none; }
+}
+
+/* ---------- Post pager (prev/next): only real tiles render ---------- */
+.post-pager a {
+  box-shadow: 3px 3px 0 var(--shadow-color);
+}
+.post-pager a:hover,
+.post-pager a:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--accent-primary), 3px 3px 0 var(--shadow-color);
+}
+.post-pager .next { grid-column: 2; }
+@media (max-width: 900px) {
+  .post-pager .next { grid-column: auto; }
+}
+
+/* The end of the line: the empty half of the pager points back to the index. */
+.post-pager .is-index { background: var(--bg-secondary); }
+.post-pager .is-index .title { color: var(--text-secondary); }
+/* No one-word last line under the blog headers. */
+.page-hero--blog .hero-sub { text-wrap: pretty; }
+
+/* =============================================================
+   NORMAL MODE — "Two moods" on the blog (Grape). Cards, chips and
+   buttons are shared (site.css); post bodies are prose.css.
+   ============================================================= */
+/* Title-bar strips in the section ink. The sidebar's is an <h2>, so it
+   names its face and stretch over the heading role's. */
+:root:not([data-skin-base=none]) .post-row .post-bar,
+:root:not([data-skin-base=none]) .site-main .blog-sidebar .sb-head {
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  font-stretch: 100%;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--on-hue);
+  background: var(--hue);
+  border-bottom: 0;
+}
+:root:not([data-skin-base=none]) .site-main .blog-sidebar .sb-head { letter-spacing: 0.04em; }
+:root:not([data-skin-base=none]) .post-row .post-bar * { font-size: inherit; }
+:root:not([data-skin-base=none]) .post-row .post-bar::before { color: var(--on-hue); opacity: 0.8; }
+:root:not([data-skin-base=none]) .post-row .post-hero { border-right: 0; }
+:root:not([data-skin-base=none]) .post-row .post-title { font-size: 24px; line-height: 1.15; color: var(--text-primary); }
+:root:not([data-skin-base=none]) .post-row .post-title a:hover { color: var(--hue); border-bottom-color: var(--hue); }
+:root:not([data-skin-base=none]) .post-row p { font-size: 16.5px; line-height: 1.55; }
+:root:not([data-skin-base=none]) .post-row .post-meta { font-size: 13px; }
+:root:not([data-skin-base=none]) .post-row .post-meta * { font-size: inherit; }
+
+/* sidebar */
+:root:not([data-skin-base=none]) .blog-sidebar { font-size: 14.5px; }
+:root:not([data-skin-base=none]) .blog-sidebar .sb-note { font-size: 15px; }
+:root:not([data-skin-base=none]) .tag-list-stack a { color: var(--text-primary); }
+:root:not([data-skin-base=none]) .tag-list-stack a:hover { color: var(--hue); border-bottom-color: var(--hue); }
+:root:not([data-skin-base=none]) .tag-list-stack a .count { font-family: var(--font-mono); font-size: 13px; }
+/* !important: the base sheet pins this text dark for its green chip */
+:root:not([data-skin-base=none]) .tag-list-stack a[aria-current="page"] {
+  color: var(--marker-ink) !important;
+  background: var(--marker);
+  border-radius: 0;
+}
+:root:not([data-skin-base=none]) .tag-list-stack a[aria-current="page"] .count { color: var(--marker-ink); }
+
+/* pagination */
+:root:not([data-skin-base=none]) .pagi { font-size: 13px; }
+:root:not([data-skin-base=none]) .pagi a,
+:root:not([data-skin-base=none]) .pagi span {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+:root:not([data-skin-base=none]) .pagi .current { color: var(--marker-ink); background: var(--marker); border-color: var(--marker-ink); }
+:root:not([data-skin-base=none]) .pagi .ellipsis { border: 0; }
+
+/* share strip + tag archive head */
+:root:not([data-skin-base=none]) .share-strip { background: var(--bg-primary); border-color: var(--hairline); }
+:root:not([data-skin-base=none]) .share-strip .label {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--hue);
+}
+:root:not([data-skin-base=none]) .share-strip > :last-child { font-size: 13px; }
+/* The archive head drops its console box for the page-hero look (site.css):
+   the section wash bled to the section edges, the bright band on top and
+   the halftone in the corner. The crumb link's inline colour:inherit
+   stays; it reads as crumb text, underlined. */
+:root:not([data-skin-base=none]) .tag-head {
+  --dot: color-mix(in srgb, var(--hue-fill) 78%, var(--hue));
+  --dot-w: min(24%, 240px);
+  position: relative;
+  isolation: isolate;
+  margin: calc(-1 * var(--sec-pad)) calc(-1 * var(--sec-pad)) var(--space-lg);
+  padding: calc(var(--space-lg) + 6px) var(--sec-pad) var(--space-lg);
+  color: var(--text-primary);
+  background: var(--hue-tint);
+  border: 0;
+  border-bottom: 2px solid var(--border-strong);
+  box-shadow: inset 0 6px 0 var(--hue-fill);
+}
+:root:not([data-skin-base=none])[data-theme="dark"] .tag-head {
+  --dot: color-mix(in srgb, var(--hue) 30%, transparent);
+  background:
+    linear-gradient(color-mix(in srgb, var(--hue) 9%, transparent), transparent 70%),
+    var(--hue-tint);
+  border-bottom-color: var(--hue-line);
+  box-shadow: inset 0 6px 0 var(--hue);
+}
+:root:not([data-skin-base=none]) .tag-head::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 6px; right: 0; bottom: 0;
+  width: var(--dot-w);
+  pointer-events: none;
+  background: radial-gradient(circle, var(--dot) 0 1.6px, transparent 2.2px) 0 0 / 11px 11px;
+  -webkit-mask-image: radial-gradient(ellipse 100% 120% at 100% 0%, #000 35%, transparent 100%);
+          mask-image: radial-gradient(ellipse 100% 120% at 100% 0%, #000 35%, transparent 100%);
+}
+:root:not([data-skin-base=none]) .tag-head > * { position: relative; z-index: 1; max-width: calc(100% - var(--dot-w) - 20px); }
+:root:not([data-skin-base=none]) .tag-head .crumb { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+:root:not([data-skin-base=none]) .tag-head h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 1.3rem + 3vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.012em;
+  color: var(--hue);
+  margin: 0 0 8px;
+}
+:root:not([data-skin-base=none]) .tag-head .count { font-size: 13px; color: var(--text-secondary); margin-top: 14px; }
+@media (max-width: 640px) {
+  /* phone: the halftone becomes one printed row along the bottom, as on .page-hero */
+  :root:not([data-skin-base=none]) .tag-head { padding-bottom: calc(var(--space-lg) + 12px); }
+  :root:not([data-skin-base=none]) .tag-head > * { max-width: none; }
+  :root:not([data-skin-base=none]) .tag-head::after {
+    top: auto; left: 0; bottom: 4px;
+    width: auto; height: 9px;
+    background: radial-gradient(circle, var(--dot) 0 1.5px, transparent 2.1px) 0 0 / 9px 9px repeat-x;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 75%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 75%);
+  }
+  :root:not([data-skin-base=none]) .tag-head h1 { font-size: clamp(1.8rem, 8.4vw, 2.3rem); }
+}
+
+/* post meta on phones: tags take their own line, no orphan separator */
+@media (max-width: 640px) {
+  :root:not([data-skin-base=none]) .hero-meta__grp:has(.hero-tags) { flex-basis: 100%; }
+  :root:not([data-skin-base=none]) .hero-meta__grp:has(.hero-tags) > .dot { display: none; }
+}
+
+/* ---------- The post's picture (hero_image), above the text ---------- */
+.post-figure {
+  max-width: 760px;
+  margin: 0 auto var(--space-lg);
+  border: 2px solid var(--border-strong);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+  background: var(--bg-console);
+  overflow: hidden;
+}
+.post-figure img {
+  display: block;
+  width: 100%; height: auto;
+}
+.post-figure figcaption {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border-strong);
+  background: var(--bg-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}

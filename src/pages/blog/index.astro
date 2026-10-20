@@ -1,0 +1,115 @@
+---
+import { pageCard } from '../../lib/seo';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import PostRow from '../../components/PostRow.astro';
+import Pagination from '../../components/Pagination.astro';
+import { getCollection } from 'astro:content';
+import { enumerateTags, postsByYear, postDateLabel, readingMinutes, needsReview, postSlug } from '../../lib/blog-helpers';
+import '../../styles/blog.css';
+
+const POSTS_PER_PAGE = 10;
+
+const all = await getCollection('blog', (e) => !e.data.draft);
+all.sort((a, b) => b.data.date_published.getTime() - a.data.date_published.getTime());
+
+const totalPages = Math.max(1, Math.ceil(all.length / POSTS_PER_PAGE));
+const currentPage = 1;
+const pagePosts = all.slice(0, POSTS_PER_PAGE);
+
+const tags = enumerateTags(all);
+const archive = postsByYear(all);
+
+// Status bar: published posts, plus how many are still drafts awaiting sign-off.
+const reviewCount = all.filter((e) => needsReview(e.data)).length;
+const postsLabel = `${all.length} post${all.length === 1 ? '' : 's'}`;
+const reviewLabel = reviewCount > 0 ? ` · ${reviewCount} awaiting review` : '';
+// rss.xml leaves review drafts out, so this is how many items the feed has.
+const feedCount = all.length - reviewCount;
+
+const SUB = 'How this site is built, and the stories behind a few of the projects.';
+---
+
+<BaseLayout
+  title="Blog — Krizdingus"
+  ogImage={pageCard('blog')}
+  breadcrumbs={[{ name: 'Blog', path: '/blog/' }]}
+  description="Posts from krizdingus.com: how this site is built, and the stories behind a few of the projects, from a 3D-print accident to a Game Boy Discord bot."
+  shellTitle="KRIZSCAPE — Blog"
+  statusSegment={`${postsLabel}${reviewLabel}`}
+>
+  <section class="content-section">
+    <PageHero
+      crumb="> krizdingus / blog"
+      title="Blog"
+      sub={SUB}
+      heroStyle="background:var(--bg-primary);padding-left:0;padding-right:0"
+    />
+
+    <div class="blog-layout">
+      <div>
+        <div class="blog-grid">
+          {pagePosts.map((entry) => (
+            <PostRow
+              slug={postSlug(entry.id)}
+              title={entry.data.title}
+              summary={entry.data.summary}
+              date={postDateLabel(entry.data)}
+              readTime={readingMinutes(entry.body ?? '')}
+              tags={entry.data.tags}
+              heroImage={entry.data.hero_image ?? null}
+            />
+          ))}
+        </div>
+
+        <Pagination current={currentPage} total={totalPages} baseHref="/blog/" />
+      </div>
+
+      <aside class="blog-sidebar" aria-label="Blog sidebar">
+        <section class="sb-card" aria-labelledby="sb-tags">
+          <h2 class="sb-head" id="sb-tags">Tags</h2>
+          <div class="body">
+            <ul class="tag-list-stack">
+              {tags.map(({ tag, count }) => (
+                <li>
+                  <a href={`/blog/tags/${tag}/`}>
+                    {tag} <span class="count">{count}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <section class="sb-card" aria-labelledby="sb-feed">
+          <h2 class="sb-head" id="sb-feed">Feed</h2>
+          <div class="body">
+            {feedCount > 0 ? (
+              <>
+                <p class="sb-note">Full posts in the feed, not teasers.{reviewCount > 0 && ' Drafts waiting on review aren’t in it yet.'}</p>
+                <a class="os-button" href="/rss.xml">
+                  <span aria-hidden="true">▣</span> /rss.xml
+                </a>
+              </>
+            ) : (
+              <p class="sb-note">Empty for now. Every post here is still a draft, and drafts stay out of the feed until they’re final.</p>
+            )}
+          </div>
+        </section>
+
+        {archive.length > 1 && (
+          <section class="sb-card" aria-labelledby="sb-archive">
+            <h2 class="sb-head" id="sb-archive">Archive</h2>
+            <div class="body">
+              <ul class="archive-list">
+                {archive.map(({ year, count }) => (
+                  <li>{year} <span class="count">({count} post{count === 1 ? '' : 's'})</span></li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
+      </aside>
+    </div>
+  </section>
+</BaseLayout>

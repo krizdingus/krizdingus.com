@@ -1,0 +1,68 @@
+---
+// src/pages/apps/[slug]/embed.astro
+// Prerendered iframe body for a mini-app. KrizApps.open(slug) (src/themes/xp/apps.ts)
+// points its iframe here. No OS shell, no nav: just the app component on a
+// transparent background. Draft apps get no route.
+import MediaKruzer from '../../../components/apps/MediaKruzer.astro';
+import { getCollection } from 'astro:content';
+import '../../../styles/colors_and_type.css';
+import '../../../styles/motion.css';
+import '../../../styles/site.css';
+import '../../../themes/xp/embed.css';
+
+const slugFromId = (id: string) => id.replace(/\.mdx?$/, '');
+
+const COMPONENTS: Record<string, any> = {
+  mediakruzer: MediaKruzer,
+};
+
+export async function getStaticPaths() {
+  const all = await getCollection('apps', (e) => !e.data.draft);
+  return all.map((entry) => ({
+    params: { slug: entry.data.slug ?? entry.id.replace(/\.mdx?$/, '') },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const slug = entry.data.slug ?? slugFromId(entry.id);
+const isMediaKruzer = slug === 'mediakruzer';
+const Component = COMPONENTS[slug];
+
+if (!Component) {
+  throw new Error(`No component registered for app "${slug}". Add it to COMPONENTS in src/pages/apps/[slug]/embed.astro.`);
+}
+---
+
+<html lang="en" data-theme="light" data-wallpaper="xp">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{entry.data.title}</title>
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem('krizdingus-theme');
+          if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class={`is-embed app-standalone kw-app--${entry.data.chrome}${isMediaKruzer ? ' mediakruzer-page' : ''}`} style="margin: 0; padding: 0; background: transparent;">
+    <main>
+      <h1 class="embed-h1">{entry.data.taskbar_label}</h1>
+      <Component slug={slug} embed={true} entry={entry} />
+    </main>
+    <script is:inline>
+      // Esc inside the app closes its XP window: focus lives in this iframe,
+      // so the parent (src/themes/xp/apps.ts) never sees the key itself.
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape' || e.defaultPrevented || window.parent === window) return;
+        window.parent.postMessage({ type: 'krizapps:escape' }, location.origin);
+      });
+    </script>
+  </body>
+</html>

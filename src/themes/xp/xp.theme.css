@@ -1,0 +1,2082 @@
+/* The named keyframe library (glitches, CRT power-off/boot, wallpaper swap)
+   is XP-only, so it rides in this theme's stylesheet, not the normal bundle. */
+@import '../../styles/motion.css';
+
+/* =============================================================
+   xp.theme.css — the XP/OS theme's styles.
+
+   Loaded by the theme framework only while this theme is mounted
+   (src/themes/runtime.ts adds the <link> before mount and removes it
+   after unmount), so nothing here needs a scoping prefix and none of
+   it reaches normal mode. Content styles stay in src/styles/site.css.
+
+   Sections: desktop wallpaper · OS shell window · title bar · menu bar
+   · window content · mobile drawer · scanlines · CRT effects · desktop
+   icons · taskbar · Start menu · boot overlay · XP splash · staging
+   and reveal · window close · responsive.
+   ============================================================= */
+
+/* ---------- Desktop wallpaper ---------- */
+body {
+  background-color: var(--desktop-bg);
+  background-image: url("/images/wallpapers/console-title-bg_xp.webp");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  transition: background-color 200ms ease;
+}
+[data-wallpaper="canyons"]  body { background-image: url("/images/wallpapers/console-title-bg_canyons.webp"); }
+[data-wallpaper="tulips"]   body { background-image: url("/images/wallpapers/console-title-bg_tulips.webp"); }
+[data-wallpaper="generic"]  body { background-image: url("/images/wallpapers/console-title-bg_generic.webp"); }
+[data-wallpaper="xp"]       body { background-image: url("/images/wallpapers/console-title-bg_xp.webp"); }
+[data-theme="dark"] body { background-color: #0a0c0c; }
+
+/* =============================================================
+   THE OS SHELL — every page renders inside this one window.
+   ============================================================= */
+.os-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: calc(100vh - var(--space-md) * 2);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-strong);
+  box-shadow:
+    inset 1px 1px 0 var(--bg-panel-light),
+    inset -1px -1px 0 var(--bg-panel-dark),
+    4px 4px 0 rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  position: relative;
+}
+.os-shell.is-minimized {
+  position: fixed;
+  bottom: 12px; left: 12px;
+  right: auto; top: auto;
+  width: 240px;
+  min-height: 0;
+  height: 32px;
+  max-width: 240px;
+  overflow: hidden;
+}
+.os-shell.is-minimized .window-content,
+.os-shell.is-minimized .status-bar,
+.os-shell.is-minimized .menu-bar { display: none; }
+.os-shell.is-maximized {
+  max-width: none;
+  margin: 0;
+  min-height: 100vh;
+}
+.os-shell.is-booting { animation: crtBootup 900ms ease-out; }
+
+/* ---------- Title bar ---------- */
+.title-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 34px; padding: 4px 6px 4px 8px;
+  /* Hard-coded deep purple — high-contrast across both themes. The lavender
+     `--accent-secondary` swap in dark theme reads as washed-out, so we
+     intentionally don't use it here. */
+  background: linear-gradient(180deg, #3a3878 0%, #2a2862 100%);
+  color: #fff;
+  border-bottom: 2px solid var(--border-strong);
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  letter-spacing: var(--tracking-pixel);
+  user-select: none;
+  flex: none;
+  cursor: grab;
+}
+[data-theme="dark"] .title-bar {
+  background: linear-gradient(180deg, #4a4890 0%, #322f7a 100%);
+  border-bottom-color: #000;
+}
+.title-bar:active { cursor: grabbing; }
+.title-bar .title-label { display: flex; align-items: center; gap: 8px; }
+.title-bar .exe-icon { width: 18px; height: 18px; image-rendering: pixelated; flex: none; }
+.window-controls { display: flex; gap: 3px; }
+
+/* Window buttons — pixel-art glyphs drawn in CSS so they never disappear
+   into a small Unicode rendering. Each glyph is a centered ::before. */
+.window-btn {
+  width: 24px; height: 24px; /* WCAG 2.5.8 minimum target */
+  background: var(--bg-panel);
+  border: 2px solid;
+  border-color: #ffffff #1a1c1c #1a1c1c #ffffff;
+  cursor: pointer; padding: 0;
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #1a1c1c;
+}
+.window-btn:hover { filter: brightness(1.05); }
+.window-btn:active {
+  border-color: #1a1c1c #ffffff #ffffff #1a1c1c;
+}
+.window-btn:focus-visible {
+  /* Dark ring on the grey face (>= 10:1); white on the red Close button. */
+  outline: 2px solid #1a1c1c;
+  outline-offset: -5px;
+}
+.window-btn-close { background: #c9243d; color: #fff; }
+.window-btn-close:focus-visible { outline-color: #ffffff; }
+.window-btn-close:hover { background: #e0314c; }
+
+.win-glyph {
+  display: block;
+  width: 12px; height: 10px;
+  position: relative;
+}
+.win-glyph-min::after {
+  content: ""; position: absolute; left: 1px; right: 1px; bottom: 0;
+  height: 2px; background: currentColor;
+}
+.win-glyph-max::after {
+  content: ""; position: absolute; inset: 0;
+  border: 2px solid currentColor;
+  border-top-width: 3px;  /* mimic Win95 title-strip on top of the square */
+}
+.win-glyph-restore::before,
+.win-glyph-restore::after {
+  content: ""; position: absolute;
+  box-sizing: border-box;
+  width: 9px; height: 8px;
+  border: 2px solid currentColor;
+  border-top-width: 3px;
+  background: var(--bg-panel);
+}
+/* Restore: two overlapping windows, the front one bottom-left. */
+.win-glyph-restore::before { top: -1px; right: 0; }
+.win-glyph-restore::after  { bottom: -1px; left: 0; }
+.win-glyph-close { color: #fff; }
+.win-glyph-close::before,
+.win-glyph-close::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 50%;
+  height: 2px; background: currentColor; transform-origin: center;
+}
+.win-glyph-close::before { transform: translateY(-50%) rotate(45deg); }
+.win-glyph-close::after  { transform: translateY(-50%) rotate(-45deg); }
+
+/* ---------- Menu bar (doubles as primary nav) ----------
+   Sits below the title bar. Background is the panel tan; text is BLACK
+   in both themes (the panel chrome stays light in dark mode for the
+   classic Win95 reading). Bold weight is load-bearing — at 13px JetBrains
+   Mono in regular weight is too thin to read on a tinted panel. */
+.menu-bar {
+  display: flex; align-items: stretch; justify-content: space-between;
+  background: var(--bg-panel);
+  border-bottom: 2px solid var(--bg-panel-dark);
+  box-shadow: inset 0 -1px 0 var(--bevel-light);
+  padding: 0 4px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1c1c;
+  user-select: none;
+  flex: none;
+  position: relative;
+  z-index: 50;
+}
+.menu-bar nav.primary { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+.menu-bar .menu-toolbar { display: flex; align-items: center; gap: 6px; padding: 3px 4px; }
+
+/* OS menu-style items (File/Edit/View/Help) — click to open dropdown */
+.menu-bar .menu-os {
+  position: relative;
+  background: none; border: 1px dotted transparent;
+  font: inherit; color: #1a1c1c;
+  padding: 6px 12px; height: 30px;
+  cursor: pointer;
+  display: inline-flex; align-items: center;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+.menu-bar .menu-os u {
+  text-decoration: underline;
+  text-decoration-color: var(--accent-primary);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+.menu-bar .menu-os:hover,
+.menu-bar .menu-os.is-open {
+  background: #2a2862; color: #fff;
+}
+.menu-bar .menu-os:hover u,
+.menu-bar .menu-os.is-open u { text-decoration-color: var(--accent-pixel); }
+/* Keyboard focus: the hover fill plus a solid 2px ring, so it reads at a
+   glance on the grey bar (the old dotted 1px border did not). */
+.menu-bar .menu-os:focus-visible {
+  background: #2a2862; color: #fff;
+  outline: 2px solid #1a1c1c; outline-offset: 1px;
+}
+.menu-bar .menu-os:focus-visible u { text-decoration-color: var(--accent-pixel); }
+
+/* Page-route nav items (Projects / Web / Blog / About) — current-page state */
+.menu-bar .menu-route {
+  display: inline-flex; align-items: center;
+  padding: 6px 12px; height: 30px;
+  color: #1a1c1c;
+  text-decoration: none;
+  border: 1px dotted transparent;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+.menu-bar .menu-route u {
+  text-decoration: underline;
+  text-decoration-color: var(--accent-primary);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+.menu-bar .menu-route:hover {
+  background: #2a2862; color: #fff; outline: none;
+}
+.menu-bar .menu-route:hover u { text-decoration-color: var(--accent-pixel); }
+.menu-bar .menu-route:focus-visible {
+  background: #2a2862; color: #fff;
+  outline: 2px solid #1a1c1c; outline-offset: 1px;
+}
+.menu-bar .menu-route:focus-visible u { text-decoration-color: var(--accent-pixel); }
+.menu-bar .menu-route[aria-current] {
+  color: #fff;
+  background: var(--accent-primary);
+  font-weight: 700;
+}
+/* Dark scheme: --accent-primary is a light hot pink, so the label goes dark. */
+[data-theme="dark"] .menu-bar .menu-route[aria-current] { color: #1a1c1c; }
+.menu-bar .menu-route[aria-current] u { text-decoration-color: var(--accent-pixel); }
+.menu-bar .menu-route[aria-current]::before { content: '> '; color: var(--accent-pixel); margin-right: 2px; }
+.menu-bar .menu-route[aria-current]::after {
+  content: '_'; color: var(--accent-pixel); margin-left: 2px;
+  /* A few blinks on arrival, then a steady cursor (WCAG 2.2.2). */
+  animation: menuBlink 1s steps(2, end) 5;
+}
+/* `.inline` variant — for menu-routes used as inline links inside copy, not
+   the actual nav. Resets to a plain link styled like other prose links. */
+.menu-bar .menu-route.inline,
+.menu-route.inline {
+  background: transparent !important;
+  color: var(--accent-primary);
+  padding: 0; height: auto;
+  border: 0;
+}
+.menu-bar .menu-route.inline::before,
+.menu-bar .menu-route.inline::after,
+.menu-route.inline::before,
+.menu-route.inline::after { content: none; }
+@keyframes menuBlink { 50% { opacity: 0; } }
+
+/* Menu-bar separator */
+.menu-bar .sep {
+  width: 1px; align-self: stretch;
+  background: var(--bg-panel-dark);
+  box-shadow: 1px 0 0 var(--bg-panel-light);
+  margin: 4px 6px;
+}
+
+/* Dropdown */
+.menu-dropdown {
+  position: absolute; top: 100%; left: 0;
+  min-width: 240px;
+  background: var(--bg-panel);
+  border: 2px solid;
+  border-color: var(--bg-panel-light) var(--border-strong) var(--border-strong) var(--bg-panel-light);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+  font-family: var(--font-mono); font-size: 13px;
+  padding: 2px 0;
+  z-index: 60;
+  display: none;
+}
+.menu-dropdown[data-open] { display: block; }
+.menu-dropdown .mi {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 14px;
+  /* OS-chrome surfaces are theme-stable (cream --bg-panel in both modes),
+     so text must be hardcoded dark — --text-primary flips to light grey
+     in dark mode and disappears against the panel. */
+  color: #1a1c1c;
+  cursor: default;
+  gap: 14px;
+  white-space: nowrap;
+}
+.menu-dropdown .mi u { text-decoration: underline; }
+.menu-dropdown .mi.has-sub::after { content: '▸'; color: inherit; margin-left: 4px; }
+.menu-dropdown .mi .hk { color: #5a5550; font-size: 11px; }
+.menu-dropdown .mi:hover,
+.menu-dropdown .mi.is-hover {
+  background: #2a2862; color: #fff;
+}
+.menu-dropdown .mi:hover .hk,
+.menu-dropdown .mi.is-hover .hk { color: rgba(255,255,255,0.7); }
+.menu-dropdown .mi.disabled { color: #8a8682; pointer-events: none; }
+.menu-dropdown .mi .chk { width: 12px; color: var(--accent-primary); display: inline-block; text-align: center; }
+.menu-dropdown .sep {
+  width: auto; margin: 2px 0; height: 1px;
+  background: var(--bg-panel-dark);
+  box-shadow: 0 1px 0 var(--bg-panel-light);
+}
+.menu-dropdown .submenu {
+  position: absolute; top: 0; left: 100%;
+  min-width: 220px;
+  background: var(--bg-panel);
+  border: 2px solid;
+  border-color: var(--bg-panel-light) var(--border-strong) var(--border-strong) var(--bg-panel-light);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+  padding: 2px 0;
+  display: none;
+}
+.menu-dropdown .mi.has-sub.is-hover > .submenu,
+.menu-dropdown .mi.has-sub:hover > .submenu { display: block; }
+
+/* Theme toggle */
+.theme-toggle {
+  width: 26px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-panel);
+  border: 2px solid;
+  border-color: var(--bg-panel-light) var(--bg-panel-dark) var(--bg-panel-dark) var(--bg-panel-light);
+  color: var(--text-primary);
+  cursor: pointer; padding: 0;
+}
+.theme-toggle:active {
+  border-color: var(--bg-panel-dark) var(--bg-panel-light) var(--bg-panel-light) var(--bg-panel-dark);
+}
+.theme-toggle svg { width: 14px; height: 14px; }
+.theme-toggle .moon { display: none; }
+[data-theme="dark"] .theme-toggle .sun { display: none; }
+[data-theme="dark"] .theme-toggle .moon { display: block; }
+
+/* The in-window theme toggle is redundant once the desktop taskbar
+   has the system tray's version. Hide it on desktop-enabled pages. */
+body.has-desktop .menu-bar .menu-toolbar .theme-toggle { display: none; }
+/* The in-window status bar is replaced by the desktop taskbar. */
+body.has-desktop .status-bar { display: none; }
+
+/* Hamburger (mobile) */
+.hamburger {
+  display: none;
+  width: 28px; height: 22px;
+  background: var(--bg-panel);
+  border: 2px solid;
+  border-color: var(--bg-panel-light) var(--bg-panel-dark) var(--bg-panel-dark) var(--bg-panel-light);
+  font-family: var(--font-mono); font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer; padding: 0;
+  line-height: 1;
+}
+
+/* ---------- Window content / scroll region ---------- */
+.window-content {
+  flex: 1;
+  /* Faint CRT line texture on the client area; scrolls with the page. */
+  background:
+    repeating-linear-gradient(0deg, transparent 0 2px, rgba(26, 28, 28, 0.035) 2px 3px) local,
+    var(--bg-primary);
+  overflow-y: auto;
+  position: relative;
+}
+[data-theme="dark"] .window-content {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, 0.22) 2px 3px) local,
+    var(--bg-primary);
+}
+
+/* ---------- Status bar ----------
+   Window footer — same purple as the title bar for chrome consistency. */
+.status-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-sm);
+  background: linear-gradient(180deg, #3a3878 0%, #2a2862 100%);
+  color: #fff;
+  border-top: 2px solid var(--border-strong);
+  padding: 6px 12px;
+  font-family: var(--font-mono); font-size: 11px;
+  flex: none;
+  flex-wrap: wrap;
+}
+[data-theme="dark"] .status-bar {
+  background: linear-gradient(180deg, #4a4890 0%, #322f7a 100%);
+  border-top-color: #000;
+}
+.status-bar .status-segment {
+  border: 2px solid;
+  border-color: rgba(0,0,0,0.4) rgba(255,255,255,0.2) rgba(255,255,255,0.2) rgba(0,0,0,0.4);
+  padding: 2px 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.status-bar .status-tray { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+.status-bar .tray-icon {
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-on-chrome);
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+.status-bar .tray-icon:hover, .status-bar .tray-icon:focus-visible {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.4);
+  outline: none;
+}
+.status-bar .tray-icon svg { width: 14px; height: 14px; }
+.status-bar .copyright {
+  font-size: 10px;
+  color: rgba(255,255,255,0.85);
+}
+.status-bar .copyright a { color: inherit; text-decoration: underline; }
+
+/* =============================================================
+   MOBILE NAV DRAWER (off-canvas, slides in from right)
+   ============================================================= */
+.mobile-drawer {
+  position: absolute; top: 32px; right: 0; bottom: 0;
+  width: 78%; max-width: 320px;
+  background: var(--bg-panel);
+  border-left: 2px solid var(--border-strong);
+  box-shadow: -4px 0 0 var(--shadow-color);
+  font-family: var(--font-mono); font-size: 14px;
+  display: none;
+  flex-direction: column;
+  z-index: 90;
+}
+.mobile-drawer.is-open { display: flex; }
+.mobile-drawer a {
+  padding: 14px 18px;
+  color: var(--text-primary);
+  text-decoration: none;
+  border-bottom: 1px solid var(--bg-panel-dark);
+  display: flex; align-items: center; gap: 10px;
+}
+.mobile-drawer a u { text-decoration: underline; }
+.mobile-drawer a:hover, .mobile-drawer a:focus-visible {
+  background: var(--accent-secondary); color: var(--text-on-chrome); outline: none;
+}
+.mobile-drawer a[aria-current] {
+  background: var(--accent-primary); color: #fff;
+}
+.mobile-drawer a[aria-current]::before {
+  content: '> '; color: #fff; font-family: var(--font-mono);
+}
+
+/* =============================================================
+   SCANLINE OVERLAY (canvas hosted)
+   ============================================================= */
+#scanlines-canvas {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 999;
+  mix-blend-mode: multiply;
+}
+/* Dark theme: a black tint × a black bg = nothing. Switch to `screen` so
+   the bright phosphor color we tint with actually *lifts* the underlying
+   pixels instead of cancelling out. */
+[data-theme="dark"] #scanlines-canvas {
+  mix-blend-mode: screen;
+}
+
+/* =============================================================
+   CRT SCREEN EFFECTS — gentle ambient flicker + chroma roll.
+   Pinned-viewport overlay that uses backdrop-filter so we can
+   tint, hue-shift, and brightness-pulse the entire display
+   *without* applying a filter to an ancestor (which would break
+   position:fixed children of body — the taskbar, the os-shell,
+   the start menu).
+   ============================================================= */
+.crt-screen-fx {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 998;
+  /* Always-on baseline: a barely-there breath that keeps the screen
+     from looking too clean. ~6s loop, never spikes. */
+  animation: crtBreathe 6.4s ease-in-out infinite;
+  will-change: backdrop-filter;
+}
+@keyframes crtBreathe {
+  0%, 100% { backdrop-filter: brightness(1) saturate(1); }
+  47%      { backdrop-filter: brightness(1.015) saturate(1.04); }
+  53%      { backdrop-filter: brightness(0.985) saturate(0.97); }
+}
+
+/* One-shot glitches — JS picks one every 4–11s, the first few on each page
+   only, and removes the class once the animation ends. Each is a short
+   distortion that reads like an old monitor losing sync for a frame. */
+.crt-screen-fx.fx-bleed {
+  animation: crtBleed 540ms steps(8, end);
+}
+@keyframes crtBleed {
+  0%   { backdrop-filter: none; }
+  10%  { backdrop-filter: hue-rotate(8deg) saturate(1.6) brightness(1.08); }
+  25%  { backdrop-filter: hue-rotate(-12deg) saturate(2.2) brightness(0.92); }
+  40%  { backdrop-filter: hue-rotate(20deg) saturate(1.3); }
+  60%  { backdrop-filter: hue-rotate(-6deg) saturate(1.5); }
+  80%  { backdrop-filter: hue-rotate(4deg) saturate(1.1); }
+  100% { backdrop-filter: none; }
+}
+
+.crt-screen-fx.fx-flicker {
+  animation: crtFlicker 260ms steps(6, end);
+}
+/* One soft dip per burst (bursts are 4-11 s apart): far under 3 flashes/s. */
+@keyframes crtFlicker {
+  0%, 100% { backdrop-filter: brightness(1); }
+  50%      { backdrop-filter: brightness(0.9); }
+}
+
+/* Horizontal roll-bar — a bright translucent strip that slides down
+   the screen once. Looks like vertical-hold drift. */
+.crt-screen-fx.fx-roll::before {
+  content: "";
+  position: absolute; left: 0; right: 0;
+  height: 18%;
+  top: -20%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255,255,255,0.10) 30%,
+    rgba(255,255,255,0.16) 50%,
+    rgba(255,255,255,0.10) 70%,
+    transparent 100%
+  );
+  mix-blend-mode: overlay;
+  animation: crtRoll 720ms linear forwards;
+}
+[data-theme="dark"] .crt-screen-fx.fx-roll::before {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(164,240,157,0.10) 30%,
+    rgba(164,240,157,0.18) 50%,
+    rgba(164,240,157,0.10) 70%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+}
+@keyframes crtRoll {
+  0%   { top: -22%; }
+  100% { top: 120%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-screen-fx { animation: none; }
+  .crt-screen-fx.fx-bleed,
+  .crt-screen-fx.fx-flicker,
+  .crt-screen-fx.fx-roll::before { animation: none !important; }
+}
+
+/* =============================================================
+   THE DESKTOP — home page only.
+   The body becomes the OS wallpaper. Icons sit on the desktop,
+   the application window (.os-shell) floats above them. A taskbar
+   along the bottom shows running apps + clock.
+   ============================================================= */
+body.has-desktop {
+  padding: 0;
+  min-height: 100vh;
+  /* leave room for the taskbar; everything inside the body sits above it */
+}
+body.has-desktop .os-shell {
+  /* The browser window is a real OS window — pinned to the viewport,
+     above the taskbar, with internal scrolling. This is what lets the
+     start menu rise up over the window's bottom edge without the page
+     content scrolling underneath it. */
+  position: fixed;
+  top: var(--space-md);
+  bottom: calc(48px + var(--space-md));
+  /* Centred on the screen when there's room, otherwise it opens just right
+     of the desktop's icon column (12 + 88 + 12px). Centred, its left edge
+     also covers the wallpaper cloud that used to peek out as a sliver. */
+  left: max(112px, calc((100% - 1200px) / 2)); right: auto;
+  margin: 0;
+  width: min(1200px, calc(100% - 112px - var(--space-md)));
+  min-height: 0;
+  z-index: 30;
+}
+body.has-desktop .os-shell.is-minimized {
+  /* On the desktop, minimize means "actually hide". The taskbar entry
+     is the restore handle. */
+  display: none !important;
+  position: static;
+  width: auto; min-height: 0; height: auto;
+}
+body.has-desktop .os-shell.is-maximized {
+  /* Butts against the top of the 40px taskbar (.desktop-taskbar height). */
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 40px;
+  width: auto; max-width: none; height: auto;
+  margin: 0;
+}
+
+/* ---------- DESKTOP ICONS ---------- */
+.desktop-layer {
+  position: fixed; inset: 0;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  z-index: 1;
+  pointer-events: none;  /* re-enabled on icons + taskbar */
+}
+/* Icons run down the left edge first, the way a desktop fills: one full
+   column, then a second only if the screen is too short. The Krizscape
+   window opens to the right of that column, so every icon stays clickable. */
+.desktop-icons {
+  align-self: stretch;
+  min-height: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(auto-fill, 96px);
+  grid-auto-columns: 88px;
+  gap: 6px;
+  padding: 18px 12px;
+  justify-content: start;
+  align-content: start;
+  pointer-events: none;
+}
+.desktop-icon {
+  pointer-events: auto;
+  background: transparent;
+  border: 1px dotted transparent;
+  width: 88px;
+  padding: 6px 4px 4px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  text-align: center;
+  cursor: pointer;
+  line-height: 1.25;
+  /* type field needs to be small to fit 88px icon cell */
+}
+.desktop-icon .label {
+  display: inline-block;
+  padding: 2px 5px;
+  background: rgba(26,28,28,0.55);
+  text-shadow: 1px 1px 0 #000, 0 0 4px rgba(0,0,0,0.6);
+  border: 1px solid transparent;
+  word-break: break-word;
+  max-width: 100%;
+}
+.desktop-icon .label .lbl-sub {
+  color: var(--accent-pixel);
+  margin-left: 2px;
+}
+.desktop-icon:hover .label,
+.desktop-icon:focus-visible .label {
+  background: var(--accent-primary);
+  color: #fff;
+  outline: none;
+}
+.desktop-icon:focus-visible {
+  border-style: dotted;
+  border-color: #fff;
+  outline: none;
+}
+.desktop-icon.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+.desktop-icon.is-disabled:hover .label {
+  background: rgba(26,28,28,0.6);
+  text-decoration: line-through;
+  text-decoration-color: var(--warning);
+}
+
+/* Icon glyphs — drawn in CSS so they don't depend on font support */
+.desktop-icon .ico {
+  width: 44px; height: 44px;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  image-rendering: pixelated;
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.45));
+}
+.desktop-icon .ico img { width: 36px; height: 36px; image-rendering: pixelated; }
+
+/* Folder: tabbed rectangle */
+.ico-folder {
+  background: #f4c95b;
+  border: 2px solid #1a1c1c;
+  box-shadow:
+    inset 1px 1px 0 #fff2c0,
+    inset -1px -1px 0 #b08400;
+}
+.ico-folder .ico-folder-tab {
+  position: absolute; top: -7px; left: 4px;
+  width: 18px; height: 8px;
+  background: #f4c95b;
+  border: 2px solid #1a1c1c;
+  border-bottom: 0;
+  box-shadow: inset 1px 1px 0 #fff2c0;
+}
+.ico-folder .ico-folder-glyph {
+  font-family: var(--font-pixel); font-size: 13px;
+  color: #5a3a00;
+}
+
+/* Document */
+.ico-doc {
+  width: 36px; height: 44px;
+  background: #fff;
+  border: 2px solid #1a1c1c;
+  position: relative;
+}
+.ico-doc .ico-doc-corner {
+  position: absolute; top: -2px; right: -2px;
+  width: 12px; height: 12px;
+  background: linear-gradient(135deg, #d4d0c8 50%, transparent 50%);
+  border-right: 2px solid #1a1c1c;
+  border-top: 2px solid #1a1c1c;
+}
+.ico-doc .ico-doc-lines {
+  position: absolute; left: 4px; right: 4px; top: 14px;
+  height: 18px;
+  background-image: linear-gradient(180deg, #494786 1px, transparent 1px);
+  background-size: 100% 5px;
+}
+
+/* README */
+.ico-readme {
+  width: 36px; height: 44px;
+  background: #fff;
+  border: 2px solid #1a1c1c;
+  position: relative;
+}
+.ico-readme .ico-doc-corner {
+  position: absolute; top: -2px; right: -2px;
+  width: 12px; height: 12px;
+  background: linear-gradient(135deg, #d4d0c8 50%, transparent 50%);
+  border-right: 2px solid #1a1c1c;
+  border-top: 2px solid #1a1c1c;
+}
+.ico-readme .ico-readme-glyph {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-pixel); font-size: 24px;
+  color: var(--accent-secondary);
+}
+
+/* CRT monitor — for Web/terminal */
+.ico-crt {
+  width: 44px; height: 38px;
+  background: #d4d0c8;
+  border: 2px solid #1a1c1c;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #8a8682;
+  position: relative;
+  margin-top: -2px;
+}
+.ico-crt .ico-crt-screen {
+  position: absolute;
+  inset: 4px 4px 9px 4px;
+  background: #1a1c1c;
+  border: 1px solid #000;
+  color: #a4f09d;
+  font-family: var(--font-mono); font-size: 9px;
+  display: flex; align-items: center; justify-content: center;
+  text-shadow: 0 0 4px currentColor;
+}
+.ico-crt .ico-crt-base {
+  position: absolute;
+  left: 50%; bottom: -6px; transform: translateX(-50%);
+  width: 22px; height: 6px;
+  background: #d4d0c8;
+  border: 2px solid #1a1c1c;
+  border-top: 0;
+  box-shadow: inset 1px 0 0 #fff;
+}
+
+/* Game pad — for Games (TBD) */
+.ico-game {
+  width: 46px; height: 30px;
+  background: #9a2257;
+  border: 2px solid #1a1c1c;
+  border-radius: 14px / 10px;
+  box-shadow: inset 1px 1px 0 #d65a8c, inset -1px -1px 0 #4d0f2b;
+  position: relative;
+}
+.ico-game .ico-game-dpad {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-pixel); font-size: 14px;
+  color: #fff;
+}
+.ico-game::before,
+.ico-game::after {
+  content: ""; position: absolute;
+  width: 6px; height: 6px;
+  background: #a4f09d;
+  border: 1px solid #1a1c1c;
+  border-radius: 50%;
+  top: 50%; transform: translateY(-50%);
+}
+.ico-game::before { right: 12px; }
+.ico-game::after  { right: 4px; }
+
+/* Cassette tape — for Videos (TBD) */
+.ico-tape {
+  width: 44px; height: 30px;
+  background: #d4d0c8;
+  border: 2px solid #1a1c1c;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #8a8682;
+  position: relative;
+}
+.ico-tape::before {
+  content: ""; position: absolute; inset: 4px 4px 14px 4px;
+  background: #1a1c1c;
+  border: 1px solid #000;
+}
+.ico-tape .ico-tape-reel {
+  position: absolute; top: 7px; left: 8px;
+  width: 8px; height: 8px;
+  background: #d4d0c8;
+  border: 1px solid #1a1c1c;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #8a8682;
+}
+.ico-tape .ico-tape-reel.right { left: auto; right: 8px; }
+
+/* Trash bin */
+.ico-trash {
+  width: 30px; height: 38px;
+  position: relative;
+}
+.ico-trash .ico-trash-lid {
+  position: absolute; top: 0; left: -3px; right: -3px;
+  height: 6px;
+  background: #d4d0c8;
+  border: 2px solid #1a1c1c;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #8a8682;
+}
+.ico-trash .ico-trash-lid::before {
+  content: ""; position: absolute; left: 50%; top: -5px;
+  transform: translateX(-50%);
+  width: 10px; height: 4px;
+  background: #d4d0c8;
+  border: 2px solid #1a1c1c;
+  border-bottom: 0;
+}
+.ico-trash .ico-trash-body {
+  position: absolute; top: 8px; left: 0; right: 0; bottom: 0;
+  background: #d4d0c8;
+  border: 2px solid #1a1c1c;
+  border-top: 0;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #8a8682;
+  background-image:
+    linear-gradient(90deg, transparent 6px, #8a8682 6px, #8a8682 7px, transparent 7px),
+    linear-gradient(90deg, transparent 14px, #8a8682 14px, #8a8682 15px, transparent 15px),
+    linear-gradient(90deg, transparent 22px, #8a8682 22px, #8a8682 23px, transparent 23px);
+}
+
+/* App-shortcut .ico-app uses the Krizscape icon img */
+.ico-app {
+  width: 44px; height: 44px;
+  background: var(--bg-panel);
+  border: 2px solid;
+  border-color: #fff #1a1c1c #1a1c1c #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ---------- TASKBAR ----------
+   Pinned to the viewport bottom regardless of how tall the window
+   content is — needs its own fixed positioning + z-index above
+   the os-shell (z-index 30). */
+.desktop-taskbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  pointer-events: auto;
+  background: var(--bg-panel);
+  border-top: 2px solid;
+  border-color: #fff transparent transparent transparent;
+  box-shadow: inset 0 -1px 0 #8a8682;
+  height: 40px;
+  display: flex; align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  font-family: var(--font-mono); font-size: 12px;
+  z-index: 50;
+}
+.start-btn {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  background: var(--bg-panel);
+  color: #1a1c1c;
+  border: 2px solid;
+  border-color: #fff #1a1c1c #1a1c1c #fff;
+  padding: 5px 14px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 30px;
+  font-weight: 700;
+}
+.start-btn u { text-decoration-color: var(--accent-primary); text-decoration-thickness: 2px; text-underline-offset: 2px; }
+.start-btn .start-mark { color: var(--accent-primary); font-size: 14px; }
+.start-btn:hover { filter: brightness(1.05); }
+.start-btn.is-active,
+.start-btn[aria-expanded="true"] {
+  border-color: #1a1c1c #fff #fff #1a1c1c;
+  background: var(--bg-panel-dark);
+}
+.taskbar-divider {
+  width: 2px; height: 24px;
+  background: linear-gradient(180deg, transparent 0, #8a8682 0, #8a8682 12px, #fff 12px, #fff 24px);
+  box-shadow: 1px 0 0 #fff, -1px 0 0 #8a8682;
+  margin: 0 4px;
+}
+.taskbar-spacer { flex: 1; }
+.tb-window {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--bg-panel);
+  border: 2px solid;
+  border-color: #fff #1a1c1c #1a1c1c #fff;
+  padding: 3px 12px;
+  color: #1a1c1c;
+  font-family: var(--font-pixel); font-size: 10px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  height: 30px;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+  font-weight: 400;
+}
+.tb-window:hover { filter: brightness(1.05); }
+/* Open-but-not-minimized: stays raised (same outset bevel as default).
+   The diagonal hatch on the background separates "running app" from
+   the start button visually, without depressing the tile. */
+.tb-window.is-active {
+  background:
+    repeating-linear-gradient(45deg, transparent 0 3px, rgba(0,0,0,0.04) 3px 4px),
+    var(--bg-panel);
+}
+/* Minimized (not is-active): dim text + icon to signal "running in
+   the background" without making it look pressed. */
+.tb-window:not(.is-active) {
+  /* Dimmed but still readable (≥4.5:1 on the grey taskbar). */
+  color: #4a4642;
+}
+.tb-window:not(.is-active) img { filter: saturate(0.4); }
+/* Focused — the front-most window's tile reads as DEPRESSED (inset
+   bevel) with a magenta inset stripe. Visually consistent with the
+   focused window's brighter title bar. */
+.tb-window.is-focused {
+  border-color: #1a1c1c #fff #fff #1a1c1c;
+  background:
+    linear-gradient(rgba(0,0,0,0.08), rgba(0,0,0,0.02)),
+    var(--bg-panel);
+  box-shadow: inset 0 2px 0 var(--accent-primary);
+  /* Same weight as the other tiles: Silkscreen Bold draws the truncation
+     ellipsis as a low bar. The inset bevel and stripe carry the focus. */
+}
+.tb-window img { width: 16px; height: 16px; image-rendering: pixelated; }
+.taskbar-tray {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg-panel);
+  border: 2px solid;
+  border-color: #1a1c1c #fff #fff #1a1c1c;
+  padding: 2px 8px;
+  height: 30px;
+}
+.tray-btn {
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #1a1c1c;
+  cursor: pointer; padding: 0;
+  text-decoration: none;
+}
+.tray-btn:hover { background: var(--bg-panel-dark); border-color: #1a1c1c; }
+.tray-btn svg { width: 14px; height: 14px; }
+.tray-btn .moon { display: none; }
+[data-theme="dark"] .tray-btn .sun { display: none; }
+[data-theme="dark"] .tray-btn .moon { display: block; }
+.taskbar-tray .clock {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #1a1c1c;
+  padding: 0 6px;
+  letter-spacing: 0.03em;
+  font-weight: 700;
+}
+
+/* ---------- START MENU ---------- */
+.start-menu {
+  position: fixed; left: 6px; bottom: 46px;
+  width: 320px;
+  background: var(--bg-panel);
+  border: 2px solid;
+  border-color: #fff #1a1c1c #1a1c1c #fff;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
+  display: none;
+  pointer-events: auto;
+  z-index: 50;
+}
+.start-menu.is-open { display: grid; grid-template-columns: 36px 1fr; }
+.start-rail {
+  background: linear-gradient(180deg, #3a3878 0%, #1a1850 100%);
+  color: #fff;
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-align: center;
+  padding: 12px 6px;
+  line-height: 1.2;
+}
+.start-items { padding: 6px 0; }
+.start-item {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%;
+  padding: 6px 12px;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  text-decoration: none;
+  color: #1a1c1c;
+  font-family: var(--font-mono);
+  cursor: pointer;
+}
+.start-item:hover, .start-item:focus-visible {
+  background: #2a2862; color: #fff; outline: none;
+}
+.start-item .si-ico {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-panel);
+  border: 2px solid;
+  border-color: #fff #1a1c1c #1a1c1c #fff;
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  color: var(--accent-primary);
+  flex: none;
+}
+.start-item:hover .si-ico,
+.start-item:focus-visible .si-ico { color: var(--accent-primary); }
+.start-item .si-text { display: flex; flex-direction: column; gap: 1px; }
+.start-item .si-text b {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  font-weight: 400;
+}
+.start-item .si-text small {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  /* The panel is cream in both color modes; --text-muted is not. */
+  color: #4f4a45;
+}
+.start-item:hover .si-text small,
+.start-item:focus-visible .si-text small { color: rgba(255,255,255,0.75); }
+.start-sep {
+  height: 1px;
+  margin: 4px 8px;
+  background: linear-gradient(180deg, #8a8682 0 1px, #fff 1px 2px);
+}
+
+/* ---------- START MENU — File/Edit/View flyouts ---------- */
+.start-item.has-fly { position: relative; }
+.start-item .si-arrow {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  flex: none;
+}
+.start-item.has-fly:hover .si-arrow,
+.start-item.has-fly:focus-visible .si-arrow,
+.start-item.has-fly[aria-expanded="true"] .si-arrow { color: inherit; }
+.start-item.has-fly[aria-expanded="true"] {
+  background: #2a2862; color: #fff;
+}
+.start-item.has-fly[aria-expanded="true"] .si-text small { color: rgba(255,255,255,0.75); }
+
+/* Flyouts sit on the Start menu's bottom edge and grow upward, so they never
+   run past the screen or over the taskbar (the menu itself is pinned just
+   above the taskbar). */
+.start-flyout {
+  position: absolute;
+  left: 100%;
+  top: auto;
+  bottom: -2px;
+  margin-left: -2px;
+  min-width: 260px;
+  background: var(--bg-panel);
+  border: 2px solid;
+  border-color: #fff #1a1c1c #1a1c1c #fff;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
+  font-family: var(--font-mono); font-size: 13px;
+  padding: 2px 0;
+  z-index: 60;
+  display: none;
+  /* OS-chrome surfaces are theme-stable (cream --bg-panel in both modes),
+     so text must be hardcoded dark — --text-primary flips to light grey
+     in dark mode and disappears against the panel. */
+  color: #1a1c1c;
+}
+.start-flyout.is-open { display: block; }
+.start-flyout .mi {
+  display: flex; align-items: center; justify-content: flex-start;
+  width: 100%;
+  padding: 4px 14px;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: #1a1c1c;
+  cursor: default;
+  gap: 14px;
+  white-space: nowrap;
+  position: relative;
+}
+.start-flyout .mi-group { position: relative; }
+.start-flyout .mi u { text-decoration: underline; }
+/* Columns: label, then the key hint pushed right, then a fixed arrow slot
+   (empty on plain rows), so every hint lines up whether or not a row opens
+   a submenu. */
+.start-flyout .mi .hk { color: #5a5550; font-size: 11px; margin-left: auto; }
+/* A switch that can't change right now (Screen effects under reduced motion). */
+.start-flyout .mi[aria-disabled="true"] { color: #5a5550; }
+.start-flyout .mi::after { content: ''; flex: none; width: 1ch; text-align: right; }
+.start-flyout .mi.has-sub::after { content: '▸'; color: inherit; }
+.start-flyout .submenu .mi::after { content: none; }
+.start-flyout .mi:hover,
+.start-flyout .mi.is-hover,
+.start-flyout .mi:focus-visible,
+.start-flyout .mi-group:hover > .mi,
+.start-flyout .mi-group.is-open > .mi {
+  background: #2a2862; color: #fff;
+}
+.start-flyout .mi:focus-visible { outline: 1px dotted #fff; outline-offset: -3px; }
+.start-flyout .mi:hover .hk,
+.start-flyout .mi.is-hover .hk,
+.start-flyout .mi:focus-visible .hk { color: rgba(255,255,255,0.7); }
+.start-flyout .mi.disabled { color: #8a8682; pointer-events: none; }
+.start-flyout .mi .chk { width: 12px; color: var(--accent-primary); display: inline-block; text-align: center; }
+.start-flyout .sep {
+  width: auto; margin: 2px 0; height: 1px;
+  background: var(--bg-panel-dark);
+  box-shadow: 0 1px 0 var(--bg-panel-light);
+}
+.start-flyout .submenu {
+  /* Open upward: the Start menu sits on the bottom edge of the screen. */
+  position: absolute; top: auto; bottom: -4px; left: 100%;
+  margin-left: -2px;
+  min-width: 220px;
+  background: var(--bg-panel);
+  border: 2px solid;
+  border-color: #fff #1a1c1c #1a1c1c #fff;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
+  padding: 2px 0;
+  display: none;
+}
+.start-flyout .submenu .mi { justify-content: flex-start; gap: 8px; }
+.start-flyout .mi-group:hover > .submenu,
+.start-flyout .mi-group.is-open > .submenu { display: block; }
+
+/* Program list inside Programs flyout — tiny icon + label rows */
+.start-flyout .pmi { display: inline-flex; align-items: center; gap: 10px; }
+.start-flyout .pmi-ico {
+  width: 18px; height: 18px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bg-panel);
+  border: 1px solid;
+  border-color: #fff #1a1c1c #1a1c1c #fff;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  letter-spacing: 0;
+  color: var(--accent-primary);
+  line-height: 1;
+}
+.start-flyout .pmi-ico.pmi-folder { color: #f4c542; background: #d4a017; border-color: #f4c542 #6a4f0a #6a4f0a #f4c542; }
+.start-flyout .pmi-ico.pmi-doc,
+.start-flyout .pmi-ico.pmi-readme { color: var(--text-primary); background: #fff; }
+.start-flyout .pmi-ico.pmi-crt { color: #a4f09d; background: #1a1c1c; border-color: #4a4a4a #000 #000 #4a4a4a; font-size: 8px; }
+.start-flyout .pmi-ico.pmi-game { color: #1a1c1c; background: #b6e6b0; }
+.start-flyout .pmi-ico.pmi-tape { color: var(--accent-secondary); background: #fff; }
+/* The desktop's trash can (.ico-trash), drawn again at menu size: a lid with
+   a handle over a ribbed can. Fixed inks, like the desktop icon. */
+.start-flyout .pmi-ico.pmi-trash { background: var(--bg-panel); }
+.start-flyout .pmi-trash-can {
+  position: relative;
+  width: 8px; height: 8px; margin-top: 4px;
+  background: #d4d0c8;
+  border: 1px solid #1a1c1c;
+  border-top: 0;
+  background-image:
+    linear-gradient(90deg, transparent 2px, #8a8682 2px, #8a8682 3px, transparent 3px),
+    linear-gradient(90deg, transparent 4px, #8a8682 4px, #8a8682 5px, transparent 5px);
+}
+.start-flyout .pmi-trash-can::before { /* lid */
+  content: ""; position: absolute; left: -2px; right: -2px; top: -3px;
+  height: 2px;
+  background: #d4d0c8;
+  border: 1px solid #1a1c1c;
+  box-sizing: content-box;
+}
+.start-flyout .pmi-trash-can::after { /* handle */
+  content: ""; position: absolute; left: 50%; top: -5px;
+  width: 2px; height: 1px;
+  transform: translateX(-50%);
+  border: 1px solid #1a1c1c; border-bottom: 0;
+}
+.start-flyout .pmi-ico img { width: 16px; height: 16px; display: block; }
+.start-flyout .mi:hover .pmi-ico,
+.start-flyout .mi.is-hover .pmi-ico { /* preserve their tinted look on hover */ }
+
+@media (max-width: 560px) {
+  .start-flyout {
+    left: 0; right: 0; top: auto; bottom: 100%;
+    margin-left: 0; margin-bottom: 4px;
+    min-width: 0;
+  }
+  .start-flyout .submenu {
+    position: static; box-shadow: none; border: 0;
+    margin: 0 0 0 18px;
+    padding: 0;
+    display: block;
+    min-width: 0;
+  }
+  .start-flyout .mi.has-sub::after { content: '▾'; }
+}
+
+/* ---------- BOOT OVERLAY (fullscreen) ----------
+   Full-viewport CRT. Boots the whole OS before revealing the desktop. */
+.boot-overlay {
+  position: fixed; inset: 0;
+  z-index: 9999;
+  background: #0a0a0a;
+  color: var(--text-on-console);
+  padding: clamp(20px, 4vh, 48px) clamp(16px, 4vw, 56px);
+  font-family: var(--font-mono);
+  font-size: clamp(12px, 1.1vw, 15px);
+  line-height: 1.7;
+  overflow: hidden;
+  cursor: pointer;  /* click anywhere to skip */
+}
+.boot-overlay::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0,0,0,0.22) 2px 3px);
+  pointer-events: none;
+  z-index: 2;
+}
+.boot-overlay::after {
+  content: '';
+  position: absolute; inset: 0;
+  box-shadow: inset 0 0 140px rgba(0,0,0,0.7);
+  pointer-events: none;
+  z-index: 2;
+}
+.boot-overlay.is-done { animation: bootFadeOut 600ms forwards ease-in; }
+@keyframes bootFadeOut {
+  0%   { opacity: 1; transform: scaleY(1); filter: brightness(1); }
+  40%  { opacity: 1; transform: scaleY(1.02); filter: brightness(1.5); }
+  100% { opacity: 0; transform: scaleY(0); filter: brightness(0); }
+}
+.boot-overlay.is-hidden { display: none; }
+.boot-frame {
+  position: relative; z-index: 1;
+  max-width: 880px;
+  margin: 0 auto;
+}
+.boot-brand {
+  font-family: var(--font-pixel);
+  font-size: clamp(14px, 1.4vw, 18px);
+  letter-spacing: 0.06em;
+  color: var(--accent-terminal);
+  text-shadow: 0 0 10px var(--accent-terminal);
+  margin-bottom: var(--space-md);
+  display: flex; align-items: center; gap: 12px;
+}
+.boot-brand-mark { color: var(--accent-pixel); font-family: var(--font-mono); font-size: 22px; }
+.boot-brand-text {}
+.boot-lines {
+  min-height: 50vh;
+}
+.boot-lines .boot-line {
+  min-height: 1.7em; white-space: pre-wrap;
+}
+.boot-lines .boot-line.cls-system  { color: var(--accent-terminal); }
+.boot-lines .boot-line.cls-loading { color: var(--text-on-console-2); }
+.boot-lines .boot-line.cls-warning { color: #ffaa00; }
+.boot-lines .boot-line.cls-error   { color: #ff4444; }
+.boot-lines .boot-line .ok  { color: var(--accent-terminal); font-weight: 700; }
+.boot-lines .boot-line .val { color: #ffaa00; font-weight: 700; }
+.boot-lines .boot-line.cls-error .val { color: #ff4444; }
+.boot-lines .boot-line.boot-cursor::after { content: '_'; opacity: 0.7; animation: bootCursorBlink 1s steps(2) infinite; margin-left: 4px; }
+@keyframes bootCursorBlink { 50% { opacity: 0; } }
+/* Pinned to the overlay's bottom edge, on the same 880px column as the
+   boot text (left/right = the overlay's side padding, centred by margin). */
+.boot-hint {
+  position: absolute;
+  bottom: clamp(16px, 3vh, 32px);
+  left: clamp(16px, 4vw, 56px); right: clamp(16px, 4vw, 56px);
+  max-width: 880px;
+  margin: 0 auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-on-console-2); /* #a4a0a0 on #0a0a0a ≈ 7.6:1 */
+  z-index: 3;
+}
+/* inline-block keeps the button's underline off the key cap */
+.boot-hint u { display: inline-block; text-decoration: none; color: var(--accent-terminal); border: 1px solid currentColor; padding: 0 5px; margin-right: 2px; line-height: 1.4; }
+.boot-skip {
+  background: none; border: 0; padding: 0;
+  font: inherit; color: var(--text-on-console); letter-spacing: inherit;
+  text-decoration: underline; text-underline-offset: 3px;
+  cursor: pointer;
+}
+.boot-skip:hover { color: var(--accent-terminal); }
+.boot-skip:focus-visible { outline: 2px solid var(--accent-terminal); outline-offset: 3px; }
+
+/* ---------- Reduced motion: skip the boot animation, just fade ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .boot-overlay.is-done { animation: none; opacity: 0; transition: opacity 200ms; }
+}
+
+/* =============================================================
+   WIN-XP PARODY SPLASH — sits between the BIOS boot lines and
+   the staged desktop reveal. Pure black screen, four-pane
+   "flag" in brand colors, KRIZDINGUS XP wordmark, marching-
+   blocks progress bar, dry MacroHard footer.
+
+   Show order: boot-overlay (z 9999) → xp-splash (z 9998) →
+   staged reveal. The splash is `display: none` until the boot
+   sequence's finish() activates it.
+   ============================================================= */
+.xp-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: #000;
+  color: #d8d2cf;
+  font-family: var(--font-mono);
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-items: center;
+  justify-items: center;
+  padding: clamp(32px, 6vh, 80px) 24px;
+  overflow: hidden;
+  /* Soft radial halo to mimic CRT phosphor glow */
+  background:
+    radial-gradient(ellipse at center, rgba(40, 36, 32, 0.55) 0%, #000 55%, #000 100%),
+    #000;
+}
+.xp-splash.is-hidden { display: none; }
+.xp-splash.is-on    { animation: xpSplashIn 420ms steps(6, end) both; }
+.xp-splash.is-fading { animation: xpSplashOut 460ms ease-in forwards; }
+
+/* Hard-cut enter — the splash is opaque from frame 0 so the desktop
+   wallpaper underneath never peeks through. We only modulate brightness
+   to sell the "CRT just snapped on" beat. */
+@keyframes xpSplashIn {
+  0%   { opacity: 1; filter: brightness(0.15); }
+  20%  { opacity: 1; filter: brightness(1.6); }
+  40%  { opacity: 1; filter: brightness(0.6); }
+  60%  { opacity: 1; filter: brightness(1.3); }
+  100% { opacity: 1; filter: brightness(1); }
+}
+@keyframes xpSplashOut {
+  0%   { opacity: 1; filter: brightness(1); }
+  60%  { opacity: 0.85; filter: brightness(1.4); }
+  100% { opacity: 0; filter: brightness(0); }
+}
+
+/* ---- Brand lockup (center) ---- */
+.xp-splash__main {
+  display: grid;
+  place-items: center;
+  width: 100%;
+}
+.xp-splash__brand {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 4vw, 48px);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.xp-splash__flag {
+  width: clamp(72px, 9vw, 112px);
+  height: clamp(72px, 9vw, 112px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 3px;
+  /* Wave-y tilt — XP flag had a perspective skew. */
+  transform: perspective(280px) rotateY(-22deg) rotateZ(-4deg) skewY(-6deg);
+  filter: drop-shadow(0 0 18px rgba(154, 34, 87, 0.55))
+          drop-shadow(0 0 32px rgba(73, 71, 134, 0.35));
+  animation: xpFlagWave 3s ease-in-out infinite;
+}
+.xp-splash__pane {
+  display: block;
+  border-radius: 1px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35);
+}
+.xp-splash__pane--1 { background: #9a2257; }   /* magenta */
+.xp-splash__pane--2 { background: #494786; }   /* purple */
+.xp-splash__pane--3 { background: #ece1cb; }   /* beige  */
+.xp-splash__pane--4 { background: #b6e6b0; }   /* green  */
+
+@keyframes xpFlagWave {
+  0%, 100% { transform: perspective(280px) rotateY(-22deg) rotateZ(-4deg) skewY(-6deg); }
+  50%      { transform: perspective(280px) rotateY(-14deg) rotateZ(-2deg) skewY(-4deg); }
+}
+
+.xp-splash__lockup { text-align: left; }
+.xp-splash__title {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  font-size: clamp(36px, 6vw, 72px);
+  line-height: 1;
+  margin: 0;
+  color: #f3eadb;
+  text-shadow:
+    1px 0 0 rgba(154, 34, 87, 0.6),
+   -1px 0 0 rgba(73, 71, 134, 0.6);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25em;
+}
+.xp-splash__xp {
+  font-family: var(--font-pixel);
+  font-size: 1.15em;
+  color: #ff6b9d;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  transform: skewX(-8deg);
+  display: inline-block;
+  text-shadow:
+    2px 0 0 rgba(154, 34, 87, 0.5),
+   -1px 0 0 rgba(73, 71, 134, 0.5);
+}
+.xp-splash__edition {
+  margin: 12px 0 0;
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 1.1vw, 14px);
+  color: #9c948d;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  font-style: italic;
+}
+.xp-splash__edition em { color: #ff6b9d; font-style: italic; }
+
+/* ---- Bottom block (status + progress + copy) ---- */
+.xp-splash__bottom {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  width: min(560px, 92vw);
+  text-align: center;
+}
+.xp-splash__status {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(12px, 1.2vw, 14px);
+  color: #a4f09d;       /* terminal green for the "doing thing" line */
+  letter-spacing: 0.04em;
+}
+
+/* Marching three-block progress bar — the XP signature.
+   Three highlighted blocks sweep left → right with stagger,
+   masked inside a recessed slot. */
+.xp-splash__bar {
+  position: relative;
+  width: clamp(220px, 32vw, 320px);
+  height: 18px;
+  border: 1px solid #2a2a2a;
+  border-radius: 9px;
+  background: #0a0a0a;
+  padding: 2px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    inset 0 0 0 1px #050505;
+}
+.xp-splash__block {
+  position: absolute;
+  top: 2px; bottom: 2px;
+  width: 22px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #c8ffc0 0%, #6fd866 45%, #2da528 100%);
+  box-shadow:
+    0 0 8px rgba(164, 240, 157, 0.85),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+  left: -28px;
+  animation: xpBlocks 1.4s linear infinite;
+}
+.xp-splash__block:nth-child(1) { animation-delay: 0s; }
+.xp-splash__block:nth-child(2) { animation-delay: 0.18s; }
+.xp-splash__block:nth-child(3) { animation-delay: 0.36s; }
+
+@keyframes xpBlocks {
+  0%   { left: -28px;  opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { left: calc(100% + 4px); opacity: 0; }
+}
+
+.xp-splash__copy {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 1vw, 12px);
+  color: #6b6360;
+  letter-spacing: 0.08em;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.xp-splash__copy b {
+  color: #b8aea4;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+/* CRT scanline overlay — same pattern as the boot screen so the
+   splash feels like the same monitor, not a dialog. */
+.xp-splash__scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0px,
+    rgba(0,0,0,0) 2px,
+    rgba(0,0,0,0.22) 3px
+  );
+  mix-blend-mode: multiply;
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-splash.is-on,
+  .xp-splash.is-fading { animation: none; opacity: 1; }
+  .xp-splash.is-fading { opacity: 0; transition: opacity 200ms; }
+  .xp-splash__flag    { animation: none; }
+  .xp-splash__block   { animation: none; opacity: 1; }
+  /* Park the three blocks at 1/3 spacing so something is still visible */
+  .xp-splash__block:nth-child(1) { left: 12%; }
+  .xp-splash__block:nth-child(2) { left: 44%; }
+  .xp-splash__block:nth-child(3) { left: 76%; }
+}
+
+/* =============================================================
+   POST-BOOT STAGING — after the BIOS overlay collapses, the
+   desktop builds itself the way a real Win95 box did: black
+   wallpaper for a beat, icons painting in row by row, taskbar
+   sliding up, then the browser window launching.
+
+   Two classes drive this:
+   - body.is-staging  — hides icons/taskbar/window during boot
+   - body.is-revealing — runs the animations (added AFTER overlay
+                         collapses and the black-flash clears)
+   ============================================================= */
+body.is-staging .desktop-icons .desktop-icon,
+body.is-staging .desktop-taskbar,
+body.is-staging .os-shell { visibility: hidden; }
+
+body.is-revealing .desktop-icons .desktop-icon {
+  opacity: 0;
+  transform: scale(0.85);
+  animation: iconPop 320ms steps(5, end) backwards;
+}
+body.is-revealing .desktop-icons .desktop-icon:nth-child(1) { animation-delay: 60ms; }
+body.is-revealing .desktop-icons .desktop-icon:nth-child(2) { animation-delay: 140ms; }
+body.is-revealing .desktop-icons .desktop-icon:nth-child(3) { animation-delay: 220ms; }
+body.is-revealing .desktop-icons .desktop-icon:nth-child(4) { animation-delay: 300ms; }
+body.is-revealing .desktop-icons .desktop-icon:nth-child(5) { animation-delay: 380ms; }
+body.is-revealing .desktop-icons .desktop-icon:nth-child(6) { animation-delay: 460ms; }
+body.is-revealing .desktop-icons .desktop-icon:nth-child(7) { animation-delay: 540ms; }
+body.is-revealing .desktop-icons .desktop-icon:nth-child(8) { animation-delay: 620ms; }
+
+@keyframes iconPop {
+  0%   { opacity: 0; transform: scale(0.6) translateY(8px); filter: brightness(2); }
+  60%  { opacity: 1; transform: scale(1.08); filter: brightness(1.4) saturate(1.5); }
+  100% { opacity: 1; transform: scale(1); filter: none; }
+}
+
+body.is-revealing .desktop-taskbar {
+  transform: translateY(100%);
+  animation: taskbarSlide 380ms cubic-bezier(0.4, 1.4, 0.5, 1) backwards;
+  animation-delay: 720ms;
+}
+@keyframes taskbarSlide {
+  0%   { transform: translateY(100%); }
+  70%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+/* The window launches AFTER the desktop is built. Inherits the brutal
+   crtBootup energy but compressed and chromatic-shifted. */
+body.is-revealing .os-shell {
+  opacity: 0;
+  transform: scale(0.94);
+  animation: windowLaunch 460ms steps(8, end) backwards;
+  animation-delay: 1800ms;
+}
+/* One bright frame, then small wobbles: the shake and hue shift carry the
+   glitch, so the brightness swings stay well under 3 flashes a second. */
+@keyframes windowLaunch {
+  0%   { opacity: 0; transform: scale(0.6) translateY(20px); filter: brightness(2) contrast(1.6) hue-rotate(180deg); }
+  15%  { opacity: 1; transform: scale(1.04) translateY(-4px); filter: brightness(1.15) contrast(1.6) hue-rotate(0deg); }
+  30%  { opacity: 1; transform: scale(0.98) translateX(-6px); filter: brightness(0.95) contrast(1.3); }
+  45%  { opacity: 1; transform: scale(1.01) translateX(4px); filter: brightness(1.05) saturate(1.6) hue-rotate(40deg); }
+  70%  { opacity: 1; transform: scale(0.99); filter: brightness(1) contrast(1); }
+  100% { opacity: 1; transform: scale(1); filter: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.is-staging .desktop-icons .desktop-icon,
+  body.is-staging .desktop-taskbar,
+  body.is-staging .os-shell { visibility: visible; }
+  body.is-revealing .desktop-icons .desktop-icon,
+  body.is-revealing .desktop-taskbar,
+  body.is-revealing .os-shell {
+    animation: none !important;
+    opacity: 1; transform: none;
+  }
+}
+
+/* =============================================================
+   WINDOW CLOSE — what `close` and `reboot` do to the app window.
+   This is the SOFTWARE close: a quick zoom-and-fade like a Win95
+   window dismissing itself. The CRT-style shutdown (scan-line
+   collapse, phosphor dot) plays AFTER, on the whole screen, via
+   the .crt-blackout overlay — that's the "system crash + reboot"
+   moment that takes us back to the boot screen.
+   ============================================================= */
+.os-shell.is-closing {
+  animation: windowClose 220ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  transform-origin: center center;
+  pointer-events: none;
+}
+@keyframes windowClose {
+  0%   { opacity: 1; transform: scale(1); filter: brightness(1); }
+  55%  { opacity: 1; transform: scale(0.92); filter: brightness(1.15); }
+  100% { opacity: 0; transform: scale(0.6); filter: brightness(0.6); }
+}
+
+/* A black blanket frame between collapse-out and the empty wallpaper.
+   JS inserts/removes this. */
+.crt-blackout {
+  position: fixed; inset: 0;
+  background: #000;
+  z-index: 9998;
+  pointer-events: none;
+}
+.crt-blackout::after {
+  content: "";
+  position: absolute; left: 0; right: 0; top: 50%;
+  height: 2px;
+  background: rgba(255,255,255,0.85);
+  box-shadow: 0 0 24px rgba(255,255,255,0.9), 0 0 60px rgba(164,240,157,0.5);
+  animation: crtScanCollapse 320ms ease-in forwards;
+}
+@keyframes crtScanCollapse {
+  0%   { transform: scaleX(1) scaleY(8); opacity: 1; }
+  40%  { transform: scaleX(0.7) scaleY(2); opacity: 1; }
+  100% { transform: scaleX(0.001) scaleY(1); opacity: 0; }
+}
+
+/* Faint phosphor dot left behind after the scan collapses */
+.crt-blackout.is-dotting::before {
+  content: "";
+  position: fixed; left: 50%; top: 50%;
+  width: 4px; height: 4px; border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 12px #fff, 0 0 32px rgba(164,240,157,0.6);
+  transform: translate(-50%, -50%);
+  animation: phosphorFade 380ms ease-out forwards;
+}
+@keyframes phosphorFade {
+  0%   { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(0.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .os-shell.is-closing { animation: none !important; opacity: 0; transition: opacity 200ms; }
+  .crt-blackout::after, .crt-blackout::before { animation: none !important; opacity: 0; }
+}
+
+/* ---------- Desktop layer — responsive ---------- */
+@media (max-width: 900px) {
+  body.has-desktop .os-shell {
+    top: 0;
+    bottom: 44px;
+    left: 0; right: 0;
+    margin: 0;
+    width: 100%;
+    border-left: 0; border-right: 0;
+    box-shadow: none;
+  }
+  .desktop-icons {
+    display: none;  /* hide icons on small screens — the window is full-width */
+  }
+  .desktop-taskbar { height: 44px; }
+}
+@media (max-width: 640px) {
+  .desktop-taskbar { font-size: 11px; padding: 4px; }
+  .start-btn { padding: 5px 10px; }
+  .tb-window { max-width: 140px; font-size: 9px; padding: 3px 8px; }
+  .taskbar-tray { padding: 2px 4px; }
+  .taskbar-tray .clock { font-size: 10px; padding: 0 4px; }
+  .start-menu { width: calc(100vw - 12px); left: 6px; }
+}
+
+
+/* ---------- Window chrome on narrow screens ----------
+   The theme's availability query keeps it off phones, but a desktop
+   window can still be dragged narrow. */
+@media (max-width: 900px) {
+  body { background-attachment: scroll; }
+  .menu-bar nav.primary { display: none; }
+  .menu-bar .hamburger { display: inline-flex; align-items: center; justify-content: center; }
+}
+
+/* Taskbar window tiles truncate with an ellipsis instead of clipping. */
+.desktop-taskbar .tb-window > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Reduced motion: the whole OS sits still ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    transition-duration: 0s !important;
+  }
+}
+
+/* =============================================================
+   GLOBAL APPS — floating .app-window injected by src/scripts/apps.ts
+   on the XP desktop. The chrome lives on the parent (here); the app
+   itself is an iframe of /apps/<slug>/embed/ (src/themes/xp/embed.css).
+   Moved out of site.css so normal mode never downloads it.
+
+   Window chrome (title bar, buttons, icons, borders, fonts) is
+   identical to the .os-shell. Only the title-bar gradient color
+   differs per app — declared via .kw-app--<chrome>.
+
+   Z-index lives between the OS-shell (30) and the taskbar (50) by
+   default. KrizWM bumps z-index on focus so windows can be
+   re-ordered on click.
+   ============================================================= */
+.app-window.kw-app {
+  background: var(--bg-primary);
+  /* Match the .os-shell border exactly — solid dark stroke with the
+     same inset bevel shadow set. */
+  border: 2px solid var(--border-strong);
+  box-shadow:
+    inset 1px 1px 0 var(--bg-panel-light),
+    inset -1px -1px 0 var(--bg-panel-dark),
+    4px 4px 0 rgba(0, 0, 0, 0.35);
+  display: flex; flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  z-index: 35;
+}
+.app-window.kw-app.is-minimized { display: none !important; }
+.app-window.kw-app.is-focused {
+  box-shadow:
+    inset 1px 1px 0 var(--bg-panel-light),
+    inset -1px -1px 0 var(--bg-panel-dark),
+    6px 6px 0 rgba(0,0,0,0.45);
+}
+
+/* Per-app title-bar color. The .title-bar default (deep purple,
+   from the .os-shell rule) applies unless overridden. */
+.app-window.kw-app--mk > .title-bar {
+  background: linear-gradient(180deg, #2a6b6b 0%, #14393b 100%);
+  border-bottom-color: #0a1a1c;
+}
+[data-theme="dark"] .app-window.kw-app--mk > .title-bar {
+  background: linear-gradient(180deg, #348888 0%, #1a4548 100%);
+}
+.app-window.kw-app--gk > .title-bar {
+  background: linear-gradient(180deg, #6b1b3a 0%, #3a0b1f 100%);
+  border-bottom-color: #1c0510;
+}
+[data-theme="dark"] .app-window.kw-app--gk > .title-bar {
+  background: linear-gradient(180deg, #8a2049 0%, #4e0f29 100%);
+}
+
+/* Inactive title bar — desaturate when another window has focus.
+   Mirrors Win9x dimming the inactive title bar. */
+.app-window.kw-app:not(.is-focused) > .title-bar { filter: saturate(0.55) brightness(0.85); }
+.os-shell:not(.is-focused) > .title-bar { filter: saturate(0.55) brightness(0.88); }
+
+/* App icons in the title bar — same 18×18 box as the .exe-icon
+   used by the .os-shell. CSS-drawn so they don't need image
+   assets that may drift out of sync with the brand. */
+.exe-icon.kw-exe {
+  position: relative; display: inline-block;
+  width: 18px; height: 18px; flex: none;
+  background: var(--accent-pixel);
+  border: 1px solid #1a1c1c;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.4);
+}
+.exe-icon.kw-exe--mk::before {
+  content: ""; position: absolute;
+  left: 5px; top: 4px;
+  width: 0; height: 0;
+  border-left: 8px solid #1a1c1c;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+.exe-icon.kw-exe--gk::before,
+.exe-icon.kw-exe--gk::after {
+  content: ""; position: absolute; background: #1a1c1c;
+}
+.exe-icon.kw-exe--gk::before { left: 7px; right: 7px; top: 2px; bottom: 2px; }
+.exe-icon.kw-exe--gk::after  { top: 7px; bottom: 7px; left: 2px; right: 2px; }
+
+/* Iframe body — fills the window. Disable iframe scrollbars so the
+   inner content's own scrolling shows through. */
+.app-window.kw-app .app-body.app-body--iframe {
+  flex: 1; min-height: 0;
+  padding: 0;
+  background: var(--bg-primary);
+  position: relative;
+}
+.app-window.kw-app .app-body.app-body--iframe iframe {
+  display: block;
+  width: 100%; height: 100%;
+  border: 0; margin: 0; padding: 0;
+  background: var(--bg-primary);
+}
+
+/* Taskbar entries — same MK / GK pixel icons */
+.desktop-taskbar .tb-window.kw-tb .app-task-ico {
+  display: inline-block; width: 14px; height: 14px; flex: none;
+  position: relative;
+}
+.app-task-ico--mk {
+  background: var(--accent-pixel);
+  border: 1px solid #1a1c1c;
+}
+.app-task-ico--mk span:first-child {
+  position: absolute; left: 3px; top: 3px;
+  width: 0; height: 0;
+  border-left: 6px solid #1a1c1c;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+}
+.app-task-ico--mk span:last-child { display: none; }
+.app-task-ico--gk {
+  background: var(--accent-pixel);
+  border: 1px solid #1a1c1c;
+}
+.app-task-ico--gk::before,
+.app-task-ico--gk::after {
+  content: ''; position: absolute; background: #1a1c1c;
+}
+.app-task-ico--gk::before { left: 5px; right: 5px; top: 1px; bottom: 1px; }
+.app-task-ico--gk::after  { top: 5px; bottom: 5px; left: 1px; right: 1px; }
+
+/* Mobile: kw-apps clamp to viewport */
+@media (max-width: 720px) {
+  .app-window.kw-app {
+    max-width: calc(100vw - 8px);
+    max-height: calc(100vh - 48px - 8px);
+  }
+}
+
+/* =============================================================
+   EGG TILES — home's [data-xp-slot="eggs"] (dressing/eggs.dressing.ts)
+   ============================================================= */
+.kz-eggs { padding-bottom: var(--space-lg); }
+.kz-eggs__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0 var(--space-lg);
+}
+.kz-egg {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  align-items: center;
+  text-align: left;
+  text-decoration: none;
+  color: #fff;
+  padding: 8px 10px;
+  border: 2px solid;
+  border-color: var(--bevel-light) var(--bevel-edge) var(--bevel-edge) var(--bevel-light);
+  box-shadow:
+    inset -1px -1px 0 var(--bevel-dark),
+    inset  1px  1px 0 rgba(255,255,255,0.35),
+    3px 3px 0 rgba(0,0,0,0.32);
+  transition: transform 80ms steps(2), box-shadow 80ms steps(2), filter 120ms ease;
+  font: inherit;
+  cursor: pointer;
+}
+.kz-egg:hover {
+  filter: brightness(1.08) saturate(1.05);
+  transform: translate(-1px, -1px);
+  box-shadow:
+    inset -1px -1px 0 var(--bevel-dark),
+    inset  1px  1px 0 rgba(255,255,255,0.45),
+    4px 4px 0 rgba(0,0,0,0.45);
+}
+.kz-egg:active {
+  transform: translate(2px, 2px);
+  border-color: var(--bevel-edge) var(--bevel-light) var(--bevel-light) var(--bevel-edge);
+  box-shadow: inset 1px 1px 0 var(--bevel-dark);
+}
+/* Focus: a solid ring in the body text colour (>=12:1 on the window in both
+   modes) plus a 1px window-colour gap so it reads against the tile too. */
+.kz-egg:focus-visible {
+  outline: 3px solid var(--text-primary, #272929); outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--bg-primary, #fff);
+}
+.kz-egg--mag { background: linear-gradient(180deg, #b22a6b 0%, #7a1845 100%); }
+.kz-egg--pur { background: linear-gradient(180deg, #5a58a3 0%, #36346b 100%); }
+.kz-egg--grn { background: linear-gradient(180deg, #3f7a3c 0%, #2c5a2a 100%); }
+[data-theme="dark"] .kz-egg--mag { background: linear-gradient(180deg, #ff6b9d 0%, #e0588a 100%); color: #1a1c1c; }
+[data-theme="dark"] .kz-egg--pur { background: linear-gradient(180deg, #a9a9e0 0%, #8d8dcf 100%); color: #1a1c1c; }
+[data-theme="dark"] .kz-egg--grn { background: linear-gradient(180deg, #a4f09d 0%, #86dc80 100%); color: #1a1c1c; }
+.kz-egg__glyph {
+  grid-row: 1 / span 2;
+  font-family: var(--font-mono);
+  font-size: 22px; line-height: 1;
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.30);
+}
+[data-theme="dark"] .kz-egg__glyph { background: rgba(0,0,0,0.12); border-color: rgba(0,0,0,0.35); }
+/* Recycle Bin: a small line-drawn can (lid + body), the desktop icon's shape
+   in the tile's text colour, sized like the character glyphs beside it. */
+.kz-egg__glyph--bin { position: relative; }
+.kz-egg__glyph--bin::before,
+.kz-egg__glyph--bin::after { content: ""; position: absolute; left: 50%; transform: translateX(-50%); }
+.kz-egg__glyph--bin::before { top: 8px; width: 18px; height: 2px; background: currentColor; }
+.kz-egg__glyph--bin::after {
+  top: 12px; width: 12px; height: 15px;
+  border: 2px solid currentColor; border-top: 0;
+  background: linear-gradient(90deg, transparent 3px, currentColor 3px 5px, transparent 5px) center / 8px 100% no-repeat;
+}
+.kz-egg__title {
+  font-family: var(--font-pixel); font-size: 13px;
+  letter-spacing: var(--tracking-pixel);
+  line-height: 1.1;
+}
+.kz-egg__sub { font-family: var(--font-mono); font-size: 11px; line-height: 1.3; }
+.kz-egg { grid-template-columns: 36px minmax(0, 1fr) auto; }
+.kz-egg__title { grid-column: 2; grid-row: 1; }
+.kz-egg__sub { grid-column: 2; grid-row: 2; }
+.kz-egg__key {
+  grid-column: 3; grid-row: 1 / span 2; align-self: center;
+  font-family: var(--font-mono); font-size: 11px; line-height: 1;
+  min-width: 18px; padding: 3px 4px; text-align: center;
+  border: 1px solid currentColor;
+  box-shadow: 1px 1px 0 currentColor;
+}
+@media (max-width: 1180px) {
+  .kz-eggs__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* =============================================================
+   IN-PAGE DIALOGS — dialog.ts (Recycle Bin crash, shortcut sheet)
+   ============================================================= */
+.xp-dialog-scrim {
+  position: fixed; inset: 0;
+  z-index: 9000;
+  display: grid; place-items: center;
+  background: rgba(0, 0, 0, 0.18);
+}
+.xp-dialog {
+  width: min(440px, calc(100vw - 32px));
+  background: var(--bg-panel);
+  color: #1a1c1c;
+  border: 2px solid;
+  border-color: #fff #1a1c1c #1a1c1c #fff;
+  box-shadow: inset -1px -1px 0 #7c7c7c, 4px 4px 0 rgba(0,0,0,0.4);
+}
+.xp-dialog .title-bar { cursor: default; }
+.xp-dialog__body { display: flex; gap: 14px; padding: 16px 16px 8px; font-family: var(--font-mono); font-size: 13px; line-height: 1.45; }
+.xp-dialog__body p { margin: 0 0 8px; }
+.xp-dialog__icon {
+  flex: 0 0 34px; width: 34px; height: 34px;
+  display: grid; place-items: center;
+  font: 700 18px/1 var(--font-mono);
+  color: #fff; background: #c0201f;
+  border: 2px solid #1a1c1c; border-radius: 50%;
+}
+.xp-dialog__details {
+  margin: 8px 0 0; padding: 8px;
+  max-height: 160px; overflow: auto;
+  background: #fff; border: 1px solid #1a1c1c;
+  font: 11px/1.4 var(--font-mono); white-space: pre;
+}
+.xp-dialog__buttons { display: flex; justify-content: flex-end; gap: 8px; padding: 8px 16px 14px; }
+.xp-dialog__btn {
+  min-width: 84px; padding: 4px 12px;
+  font: 13px/1.2 var(--font-mono); color: #1a1c1c;
+  background: var(--bg-panel);
+  border: 2px solid; border-color: #fff #1a1c1c #1a1c1c #fff;
+  cursor: pointer;
+}
+.xp-dialog__btn.is-default { box-shadow: 0 0 0 1px #1a1c1c; }
+.xp-dialog__btn:active { border-color: #1a1c1c #fff #fff #1a1c1c; }
+.xp-dialog__btn:focus-visible { outline: 1px dotted #1a1c1c; outline-offset: -5px; }
+.xp-keys { border-collapse: collapse; width: 100%; }
+.xp-keys th, .xp-keys td { padding: 3px 6px; text-align: left; border-bottom: 1px dashed #9a958d; font-weight: 400; }
+.xp-keys kbd {
+  display: inline-block; min-width: 22px; padding: 0 4px; text-align: center;
+  font: 12px/1.5 var(--font-mono);
+  background: #fff; border: 1px solid #1a1c1c; box-shadow: 1px 1px 0 #1a1c1c;
+}
+.xp-keys__note { margin: 10px 0 0 !important; font-size: 12px; color: #4a4642; }
+
+/* Keyboard focus on the taskbar and tray: the same fill plus solid 2px ring
+   as the menu bar (.menu-os / .menu-route), so Tab reads at a glance. */
+.start-btn:focus-visible,
+.tb-window:focus-visible,
+.tray-btn:focus-visible {
+  background: #2a2862; color: #fff;
+  outline: 2px solid #1a1c1c; outline-offset: 1px;
+  filter: none;
+}
+.start-btn:focus-visible .start-mark { color: var(--accent-pixel); }
+.start-btn:focus-visible u { text-decoration-color: var(--accent-pixel); }
+.tb-window:focus-visible img { filter: none; }
+.desktop-icon.is-full .ico-trash-lid { transform: translateY(-3px) rotate(-8deg); }
+
+/* Relaunching the window after Close: a quick open, no brightness change. */
+.os-shell.is-relaunching { animation: windowRelaunch 240ms cubic-bezier(0.2, 0.8, 0.3, 1); }
+@keyframes windowRelaunch {
+  0%   { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .os-shell.is-relaunching { animation: none; }
+}
+
+/* The window's scroll area takes focus only on pages with nothing else to
+   Tab to (shell.ts); show where it is. */
+.os-shell > .window-content:focus-visible { outline: 1px dotted currentColor; outline-offset: -4px; }
+
+/* Dark mode: the OS chrome labels stay on their light-mode inks. The dark
+   accents (#ff6b9d, #9898d8) are for text on dark panels; under white
+   title-bar text or on the grey XP panel they drop below 4.5:1. */
+:root[data-skin="xp"][data-theme="dark"] .kz-feat__bar--mag { background: #9a2257; }
+:root[data-skin="xp"][data-theme="dark"] .kz-feat__bar--pur,
+:root[data-skin="xp"][data-theme="dark"] .kz-sec-head__bracket,
+:root[data-skin="xp"][data-theme="dark"] .xpd-proj-exe { background: #494786; }
+:root[data-skin="xp"][data-theme="dark"] .kz-feat__bar--grn .kz-feat__bar-icon { background: #494786; }
+:root[data-skin="xp"][data-theme="dark"] .xpd-proj-bar { background: linear-gradient(90deg, #494786, #6c6ab0); }
+:root[data-skin="xp"][data-theme="dark"] .kz-feat__state { color: #404242; }
+
+/* Single-key shortcuts switched off (shortcuts.ts, Settings or the cheat
+   sheet): hide every key hint and mnemonic underline, since none of them work. */
+:root[data-xp-keys="off"] .start-flyout .mi .hk,
+:root[data-xp-keys="off"] .kz-egg__key { visibility: hidden; }
+:root[data-xp-keys="off"] .menu-bar u,
+:root[data-xp-keys="off"] .start-label u { text-decoration: none; }

@@ -1,0 +1,23 @@
+---
+// src/components/SiteNav.astro
+// The site's one primary nav, rendered in normal mode's header from
+// src/data/site-nav.ts. A UI theme that needs its own nav shape builds it
+// at mount time from that data plus this element ([data-site-nav]: which
+// item is current), so the HTML ships a single nav.
+import { headerNav } from '../data/site-nav';
+
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+// The header's wordmark is the home link, so this nav leaves the "/" item
+// out. A theme that builds its own nav (XP's menu bar) takes its items from
+// src/data/site-nav.ts and reads aria-current from this element.
+const items = headerNav(currentPath);
+---
+<nav class="pro-nav" aria-label="Site navigation" data-site-nav>
+  {items.map((item) => (
+    <a href={item.href} aria-current={item.current}>{item.label}</a>
+  ))}
+</nav>

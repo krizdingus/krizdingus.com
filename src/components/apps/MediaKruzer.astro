@@ -1,0 +1,1339 @@
+---
+// src/components/apps/MediaKruzer.astro
+// Renders the WMP-style media player chrome + transport + visualization
+// placeholder + playlist. The playlist (titles and artists, hardcoded in
+// public/apps/mediakruzer/tracks.json) is rendered at build time; nothing
+// is fetched to name a track. YouTube (the IFrame API, thumbnails, the
+// player) loads only when the visitor presses play or picks a track.
+//
+// It renders inside the iframe of an XP app window (/apps/mediakruzer/embed/,
+// opened by src/themes/xp/apps.ts, which also owns drag/min/max/close).
+// The current track and position live in sessionStorage, so the player
+// reopens on the next page where it was, paused.
+import tracks from '../../../public/apps/mediakruzer/tracks.json';
+
+export interface Props {
+  slug: string;
+  embed: boolean;
+  entry: any;
+}
+
+interface Track { id: string; title: string; artist: string; dur: string | null }
+// Typographic apostrophes on screen, like the rest of the site's copy
+// ("Choosin’ Texas"); tracks.json keeps the titles as YouTube lists them.
+const curly = (s: string) => s.replace(/'/g, '\u2019');
+const playlist = (tracks as Track[]).map((t) => ({ id: t.id, title: curly(t.title), artist: curly(t.artist), dur: t.dur ?? '' }));
+---
+
+<section class="app-window kw-app kw-app--mk mk-floating" id="mk-window" aria-label="MediaKruzer 7.0 video player">
+
+  <!-- App title bar — same chrome class set as the .os-shell. -->
+  <div class="title-bar">
+    <div class="title-label">
+      <span class="exe-icon kw-exe kw-exe--mk" aria-hidden="true"></span>
+      <span>MEDIAKRUZER 7.0</span>
+      <span class="sep">—</span>
+      <span class="now" id="mk-now-title">[Now Playing] {playlist[0]?.title}</span>
+    </div>
+    <div class="window-controls">
+      <button class="window-btn" data-act="min" aria-label="Minimize" title="Minimize"><span class="win-glyph win-glyph-min" aria-hidden="true"></span></button>
+      <button class="window-btn" data-act="max" aria-label="Maximize" title="Maximize"><span class="win-glyph win-glyph-max" aria-hidden="true"></span></button>
+      <button class="window-btn window-btn-close" data-act="close" aria-label="Close" title="Close"><span class="win-glyph win-glyph-close" aria-hidden="true"></span></button>
+    </div>
+  </div>
+
+  <!-- App body — player + playlist (no tab strip; this app is just the player) -->
+  <div class="app-body mk-body">
+
+    <!-- LEFT: player stage -->
+    <div class="player-stage">
+
+      <div class="video-frame" id="mk-frame">
+        <!-- The IFrame API replaces this <div> with its own <iframe>. -->
+        <div id="mk-yt" title="MediaKruzer video output"></div>
+        <div class="scanlines" aria-hidden="true"></div>
+        <div class="vignette" aria-hidden="true"></div>
+        <div class="vis-overlay" id="mk-vis" aria-hidden="true">
+          <!-- 24 bars, animated by JS while playing -->
+        </div>
+        <div class="corner-stamp">◊ MEDIAKRUZER 7.0 ◊</div>
+        <button type="button" class="mk-nosignal" id="mk-nosignal">
+          <span class="mk-nosignal__big">NO SIGNAL</span>
+          <span class="mk-nosignal__small">press ▶ to tune in · YouTube loads then, not before</span>
+        </button>
+      </div>
+
+      <!-- Now-playing meta strip -->
+      <div class="now-playing">
+        <div class="np-art" id="mk-art" aria-hidden="true">▣</div>
+        <div class="np-meta">
+          <div class="np-title" id="mk-meta-title">{playlist[0]?.title}</div>
+          <div class="np-sub" id="mk-meta-sub">{playlist[0]?.artist}</div>
+          <div class="np-stats" id="mk-meta-stats">
+            <span class="ok">●</span> source: YouTube
+          </div>
+        </div>
+        <div class="vu-meter" id="mk-vu" aria-hidden="true">
+          <span class="vb"></span><span class="vb"></span><span class="vb"></span>
+          <span class="vb"></span><span class="vb"></span><span class="vb"></span>
+          <span class="vb"></span><span class="vb"></span><span class="vb"></span>
+          <span class="vb"></span>
+        </div>
+      </div>
+
+      <!-- Transport: seek row + controls row -->
+      <div class="transport" role="group" aria-label="Playback controls">
+        <div class="seek-row">
+          <span class="lcd" id="mk-lcd-pos">00:00</span>
+          <div class="scrub" id="mk-scrub" role="slider" tabindex="0"
+               aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="buffer" id="mk-buffer"></div>
+            <div class="progress" id="mk-progress"></div>
+            <div class="thumb" id="mk-thumb"></div>
+          </div>
+          <span class="lcd" id="mk-lcd-dur">00:00</span>
+        </div>
+
+        <div class="controls-row">
+          <button class="ctl" id="mk-prev" aria-label="Previous track" title="Previous track"><span class="glyph prev" aria-hidden="true"></span></button>
+          <button class="ctl" id="mk-play" aria-label="Play / Pause" title="Play / Pause" aria-pressed="false"><span class="glyph play" id="mk-play-glyph" aria-hidden="true"></span></button>
+          <button class="ctl" id="mk-stop" aria-label="Stop" title="Stop"><span class="glyph stop" aria-hidden="true"></span></button>
+          <button class="ctl" id="mk-next" aria-label="Next track" title="Next track"><span class="glyph next" aria-hidden="true"></span></button>
+
+          <span class="ctl-sep" aria-hidden="true"></span>
+
+          <button class="ctl" id="mk-mute" aria-label="Mute" title="Mute" aria-pressed="false"><span class="glyph unmute" id="mk-mute-glyph" aria-hidden="true"></span></button>
+          <div class="volume" id="mk-volume" role="slider" tabindex="0"
+               aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60">
+            <div class="vol-rail" aria-hidden="true"></div>
+            <div class="vol-fill" id="mk-volfill" aria-hidden="true"></div>
+            <div class="vol-thumb" id="mk-volthumb" aria-hidden="true"></div>
+          </div>
+
+          <span class="ctl-sep" aria-hidden="true"></span>
+
+          <button class="ctl wide" id="mk-vis-toggle" aria-label="VIS (visualizer)" title="Visualizer" aria-pressed="false">VIS</button>
+          <button class="ctl wide" id="mk-fs" aria-label="FS (fullscreen)" title="Fullscreen"><span aria-hidden="true">⛶&nbsp;</span>FS</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: playlist -->
+    <aside class="playlist" aria-label="Playlist">
+      <div class="pl-header">
+        <span class="pl-name">SHOP-TAPE.M3U</span>
+        <span class="pl-meta" id="mk-pl-meta">{playlist.length} items</span>
+      </div>
+      <ol class="pl-list" id="mk-list" role="listbox" aria-label="Playlist tracks">
+        {playlist.map((t, i) => (
+          <li class:list={['pl-row', { 'is-current': i === 0 }]} role="option" aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? '0' : '-1'} data-idx={i}>
+            <span class="pl-num">{String(i + 1).padStart(2, '0')}</span>
+            <span class="pl-title"><span class="pl-name">{t.title}</span><span class="pl-artist">{t.artist}</span></span>
+            {/* Empty until the track has loaded once: YouTube is the only
+                source for a length, and it isn't asked before play. */}
+            <span class="pl-dur">{t.dur}</span>
+          </li>
+        ))}
+      </ol>
+      <script type="application/json" id="mk-tracks" set:html={JSON.stringify(playlist)}></script>
+      <div class="pl-toolbar" role="group" aria-label="Playlist toolbar">
+        <button class="ctl" id="mk-shuffle" aria-pressed="false" title="Shuffle">⤭ SHUF</button>
+        <button class="ctl" id="mk-repeat"  aria-pressed="true"  title="Repeat all">↻ RPT</button>
+        <button class="ctl" title="The playlist is fixed" disabled>+ ADD</button>
+        <button class="ctl" id="mk-skin" title="Cycle player skin">◆ SKIN</button>
+        <span class="lab" id="mk-pl-status">queued</span>
+      </div>
+    </aside>
+  </div>
+
+  <!-- App status bar -->
+  <div class="app-statusbar mk-status">
+    <span class="seg"><span class="led" id="mk-led"></span><span id="mk-state">Idle</span></span>
+    <span class="seg" id="mk-codec">Codec: H.264 (sorta)</span>
+    <span class="seg" id="mk-buffer-pct">Buffer: 0%</span>
+    <span class="seg">Net: <span class="meter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span> Cable Modem (24 kbps)</span>
+  </div>
+</section>
+
+<style is:global>
+  /* ===========================================================
+     MEDIAKRUZER 7.0 — local styles only. Builds on site.css.
+     All selectors are scoped under body.mediakruzer-page so
+     they only apply on the MK page, not site-wide.
+     =========================================================== */
+
+  /* CSS custom properties — scoped to the MK page body */
+  body.mediakruzer-page {
+    --mk-chrome-1: #5a8dd6;   /* WMP-blue title gradient top */
+    --mk-chrome-2: #1f4a8a;   /* WMP-blue title gradient bot */
+    --mk-chrome-edge: #0d2747;
+    --mk-chrome-ink: #fff;    /* playlist header text */
+    --mk-chrome-ink-shadow: rgba(0,0,0,0.4);
+    --mk-lcd-bg: #0e1410;
+    --mk-lcd-ink: #a4f09d;
+    --mk-lcd-ink-dim: #2c4a2a;
+    --mk-tab-bg: #cfd6da;
+    --mk-tab-active: #ece1cb;
+    --mk-rail: #6b7a86;
+    --mk-rail-trough: #1a2128;
+    --mk-buffer: #888a7a;
+    --mk-progress: #9a2257;
+    --mk-vu-low: #5cae3c;
+    --mk-vu-mid: #d6c11a;
+    --mk-vu-hi:  #c9243d;
+    --mk-row: var(--accent-secondary); /* selected playlist row (white text) */
+  }
+  /* Dark mode: the lavender accent flips light; keep the selected row deep
+     enough for its white text. */
+  [data-theme="dark"] body.mediakruzer-page { --mk-row: #494786; }
+
+  /* Skins. The SKIN button sets data-mk-skin on <html>, so the skin rules
+     hang off html and override the defaults on body. Each skin re-tints the
+     whole player, not one bar: the panel and bevel tokens (buttons, toolbar,
+     status bar), the stage behind the video, the LCD ink (clocks, NO SIGNAL,
+     VU), the playlist bar and the selected row. Text on every tinted face
+     stays #1a1c1c (≥7:1); the selected rows keep white text (≥5:1). */
+
+  /* RealKruzer: burnt orange and amber, like RealOne Player. */
+  html[data-mk-skin="realkruzer"] body.mediakruzer-page {
+    --bg-panel: #e3c49a;
+    --bevel-light: #fff3e0;
+    --bevel-edge: #4a1f02;
+    --mk-tab-active: #f0dcc0;
+    --mk-playlist: #f6e6cf; /* light mode only; dark keeps --bg-secondary */
+    --mk-chrome-1: #b6520b;
+    --mk-chrome-2: #7a3304;
+    --mk-chrome-edge: #4a1f02;
+    --mk-lcd-bg: #140c04;
+    --mk-lcd-ink: #ffb347;
+    --mk-lcd-ink-dim: #4a3010;
+    --mk-progress: #d9650f;
+    --mk-rail: #3a2a14;
+    --mk-rail-trough: #14110a;
+    --mk-vu-low: #f7a325;
+    --mk-vu-mid: #e0661a;
+    --mk-row: #7a3304;
+  }
+  /* QuickDingus: brushed silver with blue, like QuickTime. */
+  html[data-mk-skin="quickdingus"] body.mediakruzer-page {
+    --bg-panel: #c8ccd2;
+    --bevel-light: #ffffff;
+    --bevel-edge: #3d4249;
+    --mk-tab-active: #e4e7eb;
+    --mk-playlist: #eceef1;
+    --mk-chrome-1: #f4f5f7;
+    --mk-chrome-2: #9ea4ac;
+    --mk-chrome-edge: #3d4249;
+    --mk-chrome-ink: #1a1c1c; /* silver bar: dark text */
+    --mk-chrome-ink-shadow: rgba(255,255,255,0.6);
+    --mk-lcd-bg: #071216;
+    --mk-lcd-ink: #8fe3ff;
+    --mk-lcd-ink-dim: #1d3a44;
+    --mk-progress: #2a6fdb;
+    --mk-rail: #6b7079;
+    --mk-rail-trough: #11161c;
+    --mk-vu-low: #8fe3ff;
+    --mk-vu-mid: #2a6fdb;
+    --mk-row: #174a99;
+  }
+  /* Brushed metal: fine vertical streaks over the silver gradient. */
+  html[data-mk-skin="quickdingus"] body.mediakruzer-page .pl-header,
+  html[data-mk-skin="quickdingus"] body.mediakruzer-page .pl-toolbar,
+  html[data-mk-skin="quickdingus"] body.mediakruzer-page .app-statusbar {
+    background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.22) 0 1px, rgba(0,0,0,0.03) 1px 3px);
+  }
+  html[data-mk-skin="quickdingus"] body.mediakruzer-page .pl-header {
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.22) 0 1px, rgba(0,0,0,0.03) 1px 3px),
+      linear-gradient(180deg, var(--mk-chrome-1) 0%, var(--mk-chrome-2) 100%);
+  }
+
+  /* =========================================================
+     MediaKruzer is its OWN application window on the desktop,
+     not a panel inside the browser. The body gets `.mediakruzer-page`
+     and we render two independent windows: KRIZSCAPE (minimized)
+     and the player (focused, free-floating, draggable).
+     ========================================================= */
+  body.mediakruzer-page .app-window {
+    background: var(--bg-panel);
+    border: 2px solid;
+    border-color: var(--bevel-light) var(--bevel-edge) var(--bevel-edge) var(--bevel-light);
+    box-shadow:
+      inset 1px 1px 0 var(--bg-panel-light),
+      inset -1px -1px 0 var(--bg-panel-dark),
+      4px 4px 0 rgba(0,0,0,0.35);
+    display: flex; flex-direction: column;
+    min-height: 0;
+  }
+
+  /* Free-floating on the desktop — sits above the .os-shell (z-30)
+     and under the taskbar (z-50). The taskbar reserves 48px of
+     viewport. Title bar is draggable via JS. */
+  body.mediakruzer-page .app-window.mk-floating {
+    position: fixed;
+    top: var(--space-md);
+    left: 0; right: 0;
+    bottom: calc(48px + var(--space-md));
+    margin: 0 auto;
+    width: min(1120px, calc(100% - var(--space-md) * 2));
+    z-index: 35;
+  }
+  body.mediakruzer-page .app-window.mk-floating.is-minimized { display: none !important; }
+  body.mediakruzer-page .app-window.mk-floating.is-maximized {
+    top: 0; left: 0; right: 0; bottom: 48px;
+    width: auto; margin: 0;
+  }
+
+  /* The body of the floating window must scroll inside itself, not
+     drag the page. Let app-body flex-grow & internally scroll the
+     playlist column. */
+  body.mediakruzer-page .app-window.mk-floating .app-body {
+    flex: 1;
+    min-height: 0;
+  }
+  body.mediakruzer-page .app-window.mk-floating .player-stage {
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  body.mediakruzer-page .title-bar { cursor: grab; }
+  body.mediakruzer-page .title-bar.is-dragging { cursor: grabbing; }
+
+  /* On this page, the browser window (.os-shell) starts minimized.
+     Its taskbar entry is the restore handle. */
+  body.mediakruzer-page .os-shell .window-content {
+    background: var(--bg-secondary);
+  }
+
+  /* ---------- App-specific title-bar extras ----------
+     Base .title-bar chrome + .window-btn controls live in site.css
+     (same chrome as the .os-shell). We only style the MediaKruzer
+     extras: the now-playing strip and the inline separator. */
+  body.mediakruzer-page .app-window > .title-bar .title-label .sep {
+    color: rgba(255,255,255,0.6); margin: 0 2px;
+  }
+  body.mediakruzer-page .app-window > .title-bar .title-label .now {
+    color: var(--mk-lcd-ink); font-family: var(--font-crt);
+    letter-spacing: 0;
+    font-size: 14px;
+    max-width: 50ch;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  /* ---------- (Tab strip removed — we never built those screens.) ---------- */
+
+  /* ---------- App body: two columns ---------- */
+  body.mediakruzer-page .app-body {
+    background: var(--mk-tab-active);
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 0;
+    border-top: 0;
+    border-bottom: 2px solid var(--bevel-edge);
+    min-height: 0;
+  }
+  @media (max-width: 880px) {
+    body.mediakruzer-page .app-body { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Player stage (left column) ---------- */
+  body.mediakruzer-page .player-stage {
+    padding: 10px 10px 6px;
+    display: flex; flex-direction: column; gap: 8px;
+    min-width: 0;
+    align-items: stretch;
+  }
+
+  body.mediakruzer-page .video-frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    max-height: 56vh;
+    background: #000;
+    border: 2px solid;
+    border-color: var(--bevel-edge) var(--bevel-light) var(--bevel-light) var(--bevel-edge);
+    box-shadow: inset 0 0 60px rgba(164,240,157,0.06), 0 0 0 1px #000;
+    overflow: hidden;
+    align-self: center;
+    width: 100%;
+  }
+  /* Keep the video letterboxed within max-height by capping width via aspect ratio. */
+  @supports (aspect-ratio: 16 / 9) {
+    body.mediakruzer-page .video-frame { width: min(100%, calc(56vh * 16 / 9)); }
+  }
+  /* In its XP window (the embed fills the iframe), the screen takes the
+     column's full width and whatever height the strip and transport leave,
+     so it lines up with the panels below and no dead band opens under the
+     transport. YouTube letterboxes inside the black frame. Single-column
+     layouts (≤880px) keep the 16:9 box above. */
+  @media (min-width: 881px) {
+    /* The row is the window's height, not the playlist's: on a short
+       screen (1024×768) the 11 rows used to stretch it past the status bar,
+       and the transport drew over it. The playlist scrolls instead. */
+    body.is-embed.mediakruzer-page .app-body { grid-template-rows: minmax(0, 1fr); }
+    body.is-embed.mediakruzer-page .playlist { min-height: 0; }
+    body.is-embed.mediakruzer-page .pl-list { min-height: 0; }
+    body.is-embed.mediakruzer-page .video-frame {
+      flex: 1 1 0;
+      min-height: 220px;
+      max-height: none;
+      aspect-ratio: auto;
+      width: 100%;
+    }
+  }
+  body.mediakruzer-page .video-frame iframe,
+  body.mediakruzer-page .video-frame #mk-yt {
+    position: absolute; inset: 0;
+    width: 100% !important; height: 100% !important; border: 0;
+    background: #000;
+  }
+  body.mediakruzer-page .mk-nosignal {
+    position: absolute; inset: 0; z-index: 3;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; border: 0; cursor: pointer;
+    background: repeating-linear-gradient(0deg, #050805 0 2px, #0b120b 2px 4px);
+    color: var(--mk-lcd-ink, #a4f09d);
+    font-family: var(--font-mono);
+  }
+  body.mediakruzer-page .mk-nosignal__big { font-family: var(--font-pixel); font-size: 28px; letter-spacing: 0.2em; }
+  body.mediakruzer-page .mk-nosignal__small { font-size: 12px; color: color-mix(in oklab, var(--mk-lcd-ink) 55%, #fff); }
+  body.mediakruzer-page .mk-nosignal:focus-visible { outline: 2px dotted #c9f5c4; outline-offset: -6px; }
+  body.mediakruzer-page .video-frame.is-tuned .mk-nosignal { display: none; }
+  body.mediakruzer-page .video-frame .scanlines {
+    position: absolute; inset: 0; pointer-events: none; z-index: 2;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0) 0 2px, rgba(0,0,0,0.18) 2px 3px);
+    opacity: 0.45;
+    mix-blend-mode: multiply;
+  }
+  body.mediakruzer-page .video-frame .vignette {
+    position: absolute; inset: 0; pointer-events: none; z-index: 2;
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.55);
+  }
+  body.mediakruzer-page .video-frame .corner-stamp {
+    position: absolute; left: 10px; bottom: 8px; z-index: 3;
+    font-family: var(--font-pixel); font-size: 9px;
+    letter-spacing: 0.08em;
+    color: rgba(164,240,157,0.85);
+    text-shadow: 0 0 4px rgba(164,240,157,0.6), 1px 1px 0 rgba(0,0,0,0.6);
+    pointer-events: none;
+  }
+
+  /* Visualizer — animated bar columns over the video, toggleable */
+  body.mediakruzer-page .vis-overlay {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 38%;
+    display: none;
+    align-items: flex-end; justify-content: center; gap: 3px;
+    padding: 0 10px 10px;
+    z-index: 4; pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 70%);
+  }
+  body.mediakruzer-page .vis-overlay.is-on { display: flex; }
+  body.mediakruzer-page .vis-overlay .bar {
+    flex: 1;
+    max-width: 14px;
+    background: linear-gradient(180deg, var(--mk-vu-hi) 0%, var(--mk-vu-mid) 35%, var(--mk-vu-low) 70%);
+    height: 12%;
+    box-shadow: 0 0 6px rgba(0,0,0,0.6);
+    transition: height 120ms linear;
+  }
+
+  /* Now-playing strip — beneath the video, above the transport */
+  body.mediakruzer-page .now-playing {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    gap: 10px; align-items: center;
+    padding: 6px;
+    background: var(--bg-tertiary);
+    border: 2px solid;
+    border-color: var(--bevel-edge) var(--bevel-light) var(--bevel-light) var(--bevel-edge);
+  }
+  body.mediakruzer-page .np-art {
+    width: 56px; height: 56px;
+    background: #1a1c1c center/cover no-repeat;
+    border: 1px solid var(--bevel-edge);
+    box-shadow: inset 0 0 0 1px var(--bevel-light);
+    image-rendering: pixelated;
+    color: #a4f09d;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-pixel); font-size: 18px;
+  }
+  body.mediakruzer-page .np-meta { min-width: 0; }
+  body.mediakruzer-page .np-title {
+    font-family: var(--font-pixel); font-size: 13px;
+    color: var(--accent-primary);
+    letter-spacing: var(--tracking-pixel);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  body.mediakruzer-page .np-sub {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  body.mediakruzer-page .np-stats {
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  body.mediakruzer-page .np-stats .ok { color: var(--success); }
+  /* VU meter — 10 bars, pulse while playing */
+  body.mediakruzer-page .vu-meter {
+    display: flex; align-items: flex-end; gap: 2px;
+    width: 78px; height: 38px;
+    background: var(--mk-lcd-bg);
+    border: 1px solid var(--bevel-edge);
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.6);
+    padding: 3px;
+  }
+  body.mediakruzer-page .vu-meter .vb {
+    flex: 1;
+    background: var(--mk-lcd-ink-dim);
+    height: 8%;
+  }
+  body.mediakruzer-page .vu-meter.is-on .vb {
+    transition: height 90ms linear, background 90ms linear;
+  }
+
+  /* =========================================================
+     TRANSPORT BAR
+     ========================================================= */
+  body.mediakruzer-page .transport {
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 6px 4px 4px;
+  }
+
+  body.mediakruzer-page .seek-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 8px; align-items: center;
+  }
+  body.mediakruzer-page .lcd {
+    font-family: var(--font-crt); font-size: 18px;
+    color: var(--mk-lcd-ink);
+    background: var(--mk-lcd-bg);
+    border: 2px solid;
+    border-color: var(--bevel-edge) var(--bevel-light) var(--bevel-light) var(--bevel-edge);
+    padding: 2px 8px 0;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 4px color-mix(in oklab, var(--mk-lcd-ink) 55%, transparent);
+    min-width: 64px; text-align: center;
+    line-height: 1.1;
+  }
+  body.mediakruzer-page .lcd::before { content: ''; }
+
+  body.mediakruzer-page .scrub {
+    position: relative;
+    height: 16px;
+    background: var(--mk-rail-trough);
+    border: 2px solid;
+    border-color: var(--bevel-edge) var(--bevel-light) var(--bevel-light) var(--bevel-edge);
+    cursor: pointer;
+  }
+  body.mediakruzer-page .scrub .buffer {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 0;
+    background: repeating-linear-gradient(135deg, var(--mk-buffer) 0 4px, #6e7064 4px 8px);
+  }
+  body.mediakruzer-page .scrub .progress {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 0;
+    background: linear-gradient(180deg, color-mix(in oklab, var(--mk-progress) 80%, #fff) 0%, var(--mk-progress) 100%);
+  }
+  body.mediakruzer-page .scrub .thumb {
+    position: absolute; top: 50%; left: 0;
+    width: 10px; height: 16px;
+    background: linear-gradient(180deg, #fff 0%, #b8b4ad 50%, #6b6660 100%);
+    border: 1px solid #1a1c1c;
+    transform: translate(-50%, -50%);
+    cursor: ew-resize;
+  }
+
+  /* Buttons row — chunky beveled transport buttons */
+  body.mediakruzer-page .controls-row {
+    display: flex; align-items: center; gap: 4px;
+    flex-wrap: wrap;
+  }
+  body.mediakruzer-page .ctl {
+    background: var(--bg-panel);
+    border: 2px solid;
+    border-color: var(--bevel-light) var(--bevel-edge) var(--bevel-edge) var(--bevel-light);
+    width: 38px; height: 32px;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; padding: 0;
+    color: #1a1c1c;
+    font-family: var(--font-mono); font-weight: 700; font-size: 12px;
+    position: relative;
+  }
+  body.mediakruzer-page .ctl:hover { filter: brightness(1.05); }
+  body.mediakruzer-page .ctl:active, body.mediakruzer-page .ctl[aria-pressed="true"] {
+    border-color: var(--bevel-edge) var(--bevel-light) var(--bevel-light) var(--bevel-edge);
+    background: color-mix(in oklab, var(--bg-panel) 88%, #000);
+  }
+  body.mediakruzer-page .ctl:focus-visible {
+    outline: 1px dotted #1a1c1c;
+    outline-offset: -5px;
+  }
+  body.mediakruzer-page .ctl.wide { width: auto; padding: 0 10px; }
+  /* Disabled control: greyed, etched text, no hover, no pointer. */
+  body.mediakruzer-page .ctl:disabled {
+    cursor: default;
+    color: #808080;
+    text-shadow: 1px 1px 0 #fff;
+    filter: none;
+  }
+  body.mediakruzer-page .ctl:disabled:active {
+    border-color: var(--bevel-light) var(--bevel-edge) var(--bevel-edge) var(--bevel-light);
+    background: var(--bg-panel);
+  }
+  /* CSS-drawn glyphs */
+  body.mediakruzer-page .glyph { display: inline-block; width: 14px; height: 14px; position: relative; }
+  body.mediakruzer-page .glyph.prev::before, body.mediakruzer-page .glyph.next::before {
+    content: ''; position: absolute; top: 50%; transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+  }
+  body.mediakruzer-page .glyph.prev::before { left: 3px; border-right: 7px solid currentColor; }
+  body.mediakruzer-page .glyph.next::before { right: 3px; border-left: 7px solid currentColor; }
+  body.mediakruzer-page .glyph.prev::after, body.mediakruzer-page .glyph.next::after {
+    content: ''; position: absolute; top: 2px; bottom: 2px; width: 2px;
+    background: currentColor;
+  }
+  body.mediakruzer-page .glyph.prev::after { left: 1px; }
+  body.mediakruzer-page .glyph.next::after { right: 1px; }
+  body.mediakruzer-page .glyph.play::before {
+    content: ''; position: absolute; left: 3px; top: 50%; transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 9px solid currentColor;
+  }
+  body.mediakruzer-page .glyph.pause::before, body.mediakruzer-page .glyph.pause::after {
+    content: ''; position: absolute; top: 2px; bottom: 2px; width: 3px;
+    background: currentColor;
+  }
+  body.mediakruzer-page .glyph.pause::before { left: 3px; }
+  body.mediakruzer-page .glyph.pause::after  { right: 3px; }
+  body.mediakruzer-page .glyph.stop::before {
+    content: ''; position: absolute; inset: 3px;
+    background: currentColor;
+  }
+  /* Speaker: a small box plus a cone, drawn like the other glyphs; the
+     ::after is the sound (")") or the mute cross ("×"). */
+  body.mediakruzer-page .glyph.mute::before, body.mediakruzer-page .glyph.unmute::before {
+    content: ''; position: absolute; left: 1px; top: 50%; transform: translateY(-50%);
+    width: 3px; height: 4px;
+    background: currentColor; background-clip: content-box;
+    border-right: 5px solid currentColor;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+  }
+  body.mediakruzer-page .glyph.mute::after, body.mediakruzer-page .glyph.unmute::after {
+    position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+    font: 700 11px/1 var(--font-mono);
+  }
+  body.mediakruzer-page .glyph.unmute::after { content: ')'; }
+  body.mediakruzer-page .glyph.mute::after { content: '\00d7'; }
+
+  body.mediakruzer-page .ctl-sep {
+    width: 2px; height: 22px; align-self: center;
+    background: var(--bevel-edge);
+    box-shadow: 1px 0 0 var(--bevel-light);
+    margin: 0 6px;
+  }
+
+  /* Volume slider — horizontal groove with a chrome handle */
+  body.mediakruzer-page .volume {
+    position: relative;
+    width: 110px; height: 22px;
+    display: inline-flex; align-items: center;
+    cursor: pointer;
+  }
+  body.mediakruzer-page .volume .vol-rail {
+    position: absolute; left: 0; right: 0; top: 50%;
+    transform: translateY(-50%);
+    height: 6px;
+    background: var(--mk-rail-trough);
+    border: 1px solid;
+    border-color: var(--bevel-edge) var(--bevel-light) var(--bevel-light) var(--bevel-edge);
+  }
+  body.mediakruzer-page .volume .vol-fill {
+    position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+    width: 60%; height: 6px;
+    background: linear-gradient(90deg, var(--mk-vu-low) 0%, var(--mk-vu-mid) 65%, var(--mk-vu-hi) 100%);
+  }
+  body.mediakruzer-page .volume .vol-thumb {
+    position: absolute; top: 50%; left: 60%;
+    transform: translate(-50%, -50%);
+    width: 10px; height: 18px;
+    background: linear-gradient(180deg, #fff 0%, #b8b4ad 50%, #6b6660 100%);
+    border: 1px solid #1a1c1c;
+  }
+
+  /* Time-elapsed / time-total LCDs ride on the seek row.
+     The position LCD overlays the scrubber on the LEFT, total on the right. */
+
+  /* =========================================================
+     PLAYLIST PANEL (right column)
+     ========================================================= */
+  body.mediakruzer-page .playlist {
+    background: var(--mk-playlist, #ece1cb);
+    border-left: 2px solid var(--bevel-edge);
+    display: flex; flex-direction: column;
+    min-width: 0;
+  }
+  [data-theme="dark"] body.mediakruzer-page .playlist { background: var(--bg-secondary); }
+  body.mediakruzer-page .pl-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 8px;
+    background: linear-gradient(180deg, var(--mk-chrome-1) 0%, var(--mk-chrome-2) 100%);
+    color: var(--mk-chrome-ink);
+    font-family: var(--font-pixel); font-size: 10px;
+    letter-spacing: var(--tracking-pixel);
+    text-shadow: 1px 1px 0 var(--mk-chrome-ink-shadow);
+    border-bottom: 2px solid var(--mk-chrome-edge);
+  }
+  body.mediakruzer-page .pl-header .pl-name { display: flex; align-items: center; gap: 6px; }
+  body.mediakruzer-page .pl-header .pl-name::before {
+    content: '▸'; font-size: 12px;
+  }
+  body.mediakruzer-page .pl-meta { font-size: 9px; opacity: 0.85; }
+
+  body.mediakruzer-page .pl-list {
+    list-style: none; padding: 0; margin: 0;
+    flex: 1;
+    overflow-y: auto;
+    border-top: 1px solid var(--bevel-light);
+  }
+  body.mediakruzer-page .pl-row {
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    gap: 6px;
+    padding: 6px 8px;
+    border-bottom: 1px dotted var(--border-color);
+    cursor: pointer;
+    align-items: center;
+    font-family: var(--font-mono); font-size: 12px;
+    color: var(--text-primary);
+  }
+  body.mediakruzer-page .pl-row:hover { background: rgba(74,71,134,0.10); }
+  body.mediakruzer-page .pl-row:focus-visible { outline: 2px dotted currentColor; outline-offset: -3px; }
+  body.mediakruzer-page .ctl:focus-visible,
+  body.mediakruzer-page .scrub:focus-visible,
+  body.mediakruzer-page .volume:focus-visible { outline: 2px dotted #1a1c1c; outline-offset: 2px; }
+  body.mediakruzer-page .pl-row.is-current {
+    background: var(--mk-row);
+    color: #fff;
+  }
+  body.mediakruzer-page .pl-row.is-current .pl-num { color: var(--mk-lcd-ink); }
+  body.mediakruzer-page .pl-row.is-current .pl-dur { color: #fff; }
+  body.mediakruzer-page .pl-row .pl-num {
+    font-family: var(--font-crt); font-size: 14px;
+    color: var(--accent-secondary); text-align: right;
+  }
+  body.mediakruzer-page .pl-row .pl-title {
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  body.mediakruzer-page .pl-row .pl-title .pl-artist {
+    display: block; font-size: 10px; opacity: 0.75;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  body.mediakruzer-page .pl-row.is-current .pl-title .pl-artist { color: #fff; }
+  body.mediakruzer-page .pl-row .pl-dur {
+    font-family: var(--font-crt); font-size: 13px;
+    color: var(--text-muted);
+  }
+  body.mediakruzer-page .pl-row.is-current .pl-num::before {
+    content: '▸ '; color: var(--mk-lcd-ink);
+  }
+  /* Dark mode: the player's panel (--bg-panel) stays cream, but the text
+     tokens and the lavender accent flip light. Pin them so the selected row,
+     the toolbar label and the status bar keep AA contrast. */
+  [data-theme="dark"] body.mediakruzer-page .pl-toolbar .lab { color: #404242; }
+  [data-theme="dark"] body.mediakruzer-page .app-statusbar { color: #272929; }
+
+  body.mediakruzer-page .pl-toolbar {
+    display: flex; align-items: center; gap: 4px;
+    padding: 4px 6px;
+    background: var(--bg-panel);
+    border-top: 2px solid var(--bevel-edge);
+    flex-wrap: wrap;
+  }
+  body.mediakruzer-page .pl-toolbar .ctl { width: auto; padding: 0 8px; height: 22px; font-size: 11px; }
+  body.mediakruzer-page .pl-toolbar .ctl[aria-pressed="true"] { background: var(--accent-pixel); }
+  body.mediakruzer-page .pl-toolbar .lab {
+    font-family: var(--font-mono); font-size: 10px; color: var(--text-secondary);
+    margin-left: auto;
+  }
+
+  /* =========================================================
+     APP STATUS BAR (the player's own footer — not the OS one)
+     ========================================================= */
+  body.mediakruzer-page .app-statusbar {
+    display: flex; align-items: center; gap: 0;
+    background: var(--bg-panel);
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-primary);
+    border-top: 1px solid var(--bevel-light);
+  }
+  body.mediakruzer-page .app-statusbar .seg {
+    padding: 3px 10px;
+    border-right: 1px solid var(--bevel-edge);
+    box-shadow: inset 1px 0 0 var(--bevel-light);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  body.mediakruzer-page .app-statusbar .seg:first-child { box-shadow: none; }
+  body.mediakruzer-page .app-statusbar .seg:last-child { border-right: 0; margin-left: auto; }
+  body.mediakruzer-page .app-statusbar .led {
+    width: 8px; height: 8px; background: #2f7a2a;
+    border-radius: 50%;
+    box-shadow: 0 0 4px #2f7a2a, inset 0 0 2px rgba(0,0,0,0.4);
+  }
+  body.mediakruzer-page .app-statusbar .led.buffering { background: #d6c11a; box-shadow: 0 0 4px #d6c11a; animation: ledPulse 0.7s steps(2,end) infinite; }
+  body.mediakruzer-page .app-statusbar .led.idle { background: #6b6660; box-shadow: none; }
+  @keyframes ledPulse { 50% { opacity: 0.35; } }
+  body.mediakruzer-page .app-statusbar .meter {
+    display: inline-flex; gap: 1px; vertical-align: middle;
+  }
+  body.mediakruzer-page .app-statusbar .meter i {
+    width: 3px; height: 8px; background: var(--mk-vu-low);
+    display: inline-block;
+  }
+  body.mediakruzer-page .app-statusbar .meter i:nth-child(3) { background: var(--mk-vu-mid); }
+  body.mediakruzer-page .app-statusbar .meter i:nth-child(4),
+  body.mediakruzer-page .app-statusbar .meter i:nth-child(5) { background: var(--mk-vu-hi); }
+
+  /* Banner: "Open in [App ↩]" — pseudo-OS taskbar marker */
+  body.mediakruzer-page .app-breadcrumb {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px var(--space-md) 0;
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-secondary);
+  }
+  body.mediakruzer-page .app-breadcrumb .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 2px 8px;
+    background: var(--bg-panel);
+    border: 2px solid;
+    border-color: var(--bevel-edge) var(--bevel-light) var(--bevel-light) var(--bevel-edge);
+    font-family: var(--font-pixel); font-size: 9px;
+    letter-spacing: var(--tracking-pixel);
+    color: var(--accent-primary);
+  }
+  body.mediakruzer-page .app-breadcrumb .pill::before {
+    content: ''; width: 8px; height: 8px;
+    background: linear-gradient(135deg, #ffd86b, #c92e2e);
+    border: 1px solid var(--bevel-edge);
+    display: inline-block;
+  }
+  body.mediakruzer-page .app-breadcrumb .pill::after {
+    content: ''; width: 8px; height: 8px;
+    background: var(--accent-pixel);
+    border-radius: 50%;
+    box-shadow: 0 0 4px var(--accent-pixel);
+    animation: ledPulse 1.4s steps(2,end) infinite;
+  }
+  body.mediakruzer-page .app-breadcrumb .sep { color: var(--text-muted); }
+
+  /* Reduced motion: kill animations */
+  @media (prefers-reduced-motion: reduce) {
+    body.mediakruzer-page .vis-overlay .bar,
+    body.mediakruzer-page .vu-meter.is-on .vb { transition: none !important; }
+    body.mediakruzer-page .app-statusbar .led.buffering,
+    body.mediakruzer-page .app-breadcrumb .pill::after { animation: none !important; }
+  }
+
+  /* Narrow viewport: stack & shrink chrome */
+  @media (max-width: 720px) {
+    body.mediakruzer-page .app-window.mk-floating {
+      top: 4px;
+      bottom: calc(44px + 4px);
+      width: calc(100% - 8px);
+    }
+    body.mediakruzer-page .app-window > .title-bar .title-label .now { display: none; }
+    body.mediakruzer-page .ctl { width: 34px; height: 30px; }
+    body.mediakruzer-page .volume { width: 84px; }
+    body.mediakruzer-page .lcd { font-size: 14px; min-width: 50px; }
+    body.mediakruzer-page .playlist { border-left: 0; border-top: 2px solid var(--bevel-edge); }
+    body.mediakruzer-page .pl-list { max-height: 220px; }
+  }
+
+  /* Taskbar — MediaKruzer entry. The site's site.js builds the
+     taskbar with one tb-window (the browser). We inject a second
+     one for MediaKruzer with a play-triangle logo. */
+  body.mediakruzer-page .desktop-taskbar .tb-window.mk-tb .mk-tb-icon {
+    display: inline-block; width: 14px; height: 14px;
+    background: linear-gradient(135deg, #ffd86b, #c92e2e);
+    border: 1px solid #1a1c1c;
+    position: relative;
+    flex: none;
+  }
+  body.mediakruzer-page .desktop-taskbar .tb-window.mk-tb .mk-tb-icon::after {
+    content: ''; position: absolute; left: 4px; top: 3px;
+    border-left: 5px solid #fff;
+    border-top: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+  }
+</style>
+
+<script is:inline>
+  // MediaKruzer 7.0 — controller. The playlist is already in the page
+  // (#mk-tracks, rendered at build time). Nothing talks to YouTube until the
+  // visitor presses play or picks a track: then the IFrame API loads and a
+  // youtube-nocookie player replaces #mk-yt. Track and position are kept in
+  // sessionStorage, so the player reopens where it was, paused.
+  (function () {
+    'use strict';
+
+    var SS_KEY = 'mediakruzer-state';
+    var PLAYLIST = [];
+    try { PLAYLIST = JSON.parse(document.getElementById('mk-tracks').textContent || '[]'); } catch (e) {}
+
+    var current = 0;
+    var resumeAt = 0;
+    var player = null;
+    var playerReady = false;
+    var apiRequested = false;
+    var wantPlay = false;
+    var isShuffle = false;
+    var isRepeat = true;
+    var pollT = null;
+    var visT = null;
+    var vuT = null;
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function $(id) { return document.getElementById(id); }
+    function fmt(sec) {
+      sec = Math.max(0, Math.floor(sec || 0));
+      var m = Math.floor(sec / 60), s = sec % 60;
+      return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+    function clamp(n, lo, hi) { return Math.min(hi, Math.max(lo, n)); }
+    function setText(id, txt) { var el = $(id); if (el) el.textContent = txt; }
+
+    // ---------- remembered state ----------
+    function saveState(t) {
+      try { sessionStorage.setItem(SS_KEY, JSON.stringify({ i: current, t: Math.floor(t || 0) })); } catch (e) {}
+    }
+    function loadState() {
+      try {
+        var s = JSON.parse(sessionStorage.getItem(SS_KEY) || 'null');
+        if (s && typeof s.i === 'number' && s.i >= 0 && s.i < PLAYLIST.length) {
+          current = s.i;
+          resumeAt = typeof s.t === 'number' && s.t > 0 ? s.t : 0;
+        }
+      } catch (e) {}
+    }
+    function currentTime() {
+      if (playerReady && player && player.getCurrentTime) {
+        try { return player.getCurrentTime() || 0; } catch (e) {}
+      }
+      return resumeAt;
+    }
+
+    // ---------- playlist ----------
+    function rows() { return Array.prototype.slice.call(document.querySelectorAll('#mk-list .pl-row')); }
+    function syncList() {
+      rows().forEach(function (li, i) {
+        var on = i === current;
+        li.classList.toggle('is-current', on);
+        li.setAttribute('aria-selected', on ? 'true' : 'false');
+        li.tabIndex = on ? 0 : -1;
+      });
+    }
+    function updateNowPlaying() {
+      var t = PLAYLIST[current];
+      if (!t) return;
+      setText('mk-now-title', '[Now Playing] ' + t.title);
+      setText('mk-meta-title', t.title);
+      setText('mk-meta-sub', t.artist);
+      var art = $('mk-art');
+      if (art) {
+        // The thumbnail comes from YouTube, so it waits for a play too.
+        if (player) {
+          art.style.backgroundImage = 'url("https://i.ytimg.com/vi/' + t.id + '/hqdefault.jpg")';
+          art.textContent = '';
+        } else {
+          art.style.backgroundImage = '';
+          art.textContent = '▣';
+        }
+      }
+      syncList();
+    }
+    function bindList() {
+      var ol = $('mk-list');
+      if (!ol) return;
+      ol.addEventListener('click', function (e) {
+        var li = e.target.closest && e.target.closest('.pl-row');
+        if (li) load(parseInt(li.dataset.idx, 10), true);
+      });
+      ol.addEventListener('keydown', function (e) {
+        var li = e.target.closest && e.target.closest('.pl-row');
+        if (!li) return;
+        var all = rows(), i = all.indexOf(li), n = null;
+        if (e.key === 'ArrowDown') n = Math.min(all.length - 1, i + 1);
+        else if (e.key === 'ArrowUp') n = Math.max(0, i - 1);
+        else if (e.key === 'Home') n = 0;
+        else if (e.key === 'End') n = all.length - 1;
+        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); load(i, true); return; }
+        if (n === null) return;
+        e.preventDefault();
+        all.forEach(function (r, j) { r.tabIndex = j === n ? 0 : -1; });
+        all[n].focus();
+      });
+    }
+
+    // ---------- YouTube, on demand ----------
+    function requestApi() {
+      if (apiRequested) return;
+      apiRequested = true;
+      setText('mk-state', 'Connecting…');
+      setText('mk-pl-status', 'dialing up');
+      if (window.YT && window.YT.Player) { createPlayer(); return; }
+      window.onYouTubeIframeAPIReady = createPlayer;
+      var tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      tag.async = true;
+      tag.onerror = function () {
+        apiRequested = false;
+        setText('mk-state', 'Offline');
+        setText('mk-pl-status', '◊ could not reach YouTube ◊');
+      };
+      document.body.appendChild(tag);
+    }
+    function createPlayer() {
+      if (player || !PLAYLIST.length) return;
+      var frame = $('mk-frame'); if (frame) frame.classList.add('is-tuned');
+      player = new window.YT.Player('mk-yt', {
+        host: 'https://www.youtube-nocookie.com',
+        width: '100%',
+        height: '100%',
+        videoId: PLAYLIST[current].id,
+        playerVars: {
+          rel: 0, modestbranding: 1, playsinline: 1,
+          enablejsapi: 1, origin: location.origin, fs: 1,
+          start: Math.floor(resumeAt)
+        },
+        events: { onReady: onReady, onStateChange: onState, onError: onError }
+      });
+      updateNowPlaying();
+    }
+    function onReady() {
+      playerReady = true;
+      player.setVolume(parseInt(($('mk-volume') || {}).getAttribute ? $('mk-volume').getAttribute('aria-valuenow') : 60, 10) || 60);
+      startPoll();
+      if (wantPlay) { wantPlay = false; player.playVideo(); }
+    }
+
+    function onState(ev) {
+      var s = ev.data, YTS = window.YT.PlayerState;
+      var led = $('mk-led'), glyph = $('mk-play-glyph'), play = $('mk-play');
+      if (!led || !glyph || !play) return;
+      led.className = 'led';
+      if (s === YTS.PLAYING) {
+        setText('mk-state', 'Streaming');
+        glyph.className = 'glyph pause';
+        play.setAttribute('aria-pressed', 'true');
+        setText('mk-pl-status', 'playing track ' + (current + 1) + '/' + PLAYLIST.length);
+        startVis(); startVU();
+      } else if (s === YTS.PAUSED) {
+        led.classList.add('idle');
+        setText('mk-state', 'Paused');
+        glyph.className = 'glyph play';
+        play.setAttribute('aria-pressed', 'false');
+        setText('mk-pl-status', 'paused');
+        stopVis(); stopVU();
+        saveState(currentTime());
+      } else if (s === YTS.BUFFERING) {
+        led.classList.add('buffering');
+        setText('mk-state', 'Buffering…');
+        setText('mk-pl-status', 'buffering');
+      } else if (s === YTS.ENDED) {
+        led.classList.add('idle');
+        setText('mk-state', 'Ended');
+        glyph.className = 'glyph play';
+        play.setAttribute('aria-pressed', 'false');
+        stopVis(); stopVU();
+        advance(+1, isRepeat);
+      } else {
+        led.classList.add('idle');
+        setText('mk-state', 'Idle');
+      }
+    }
+    function onError(ev) {
+      setText('mk-state', 'Error ' + ev.data);
+      setText('mk-pl-status', '◊ playback failure ◊');
+    }
+
+    // ---------- transport ----------
+    function play() {
+      if (playerReady) { player.playVideo(); return; }
+      wantPlay = true;
+      requestApi();
+    }
+    function pause() { if (playerReady) player.pauseVideo(); }
+    // The XP desktop asks for quiet before a reboot (src/themes/xp/apps.ts),
+    // so nothing keeps playing behind the boot screen.
+    window.addEventListener('message', function (e) {
+      if (e.origin === location.origin && e.data && e.data.type === 'krizapps:pause') pause();
+    });
+    function togglePlay() {
+      if (!playerReady) { play(); return; }
+      if (player.getPlayerState() === window.YT.PlayerState.PLAYING) pause(); else play();
+    }
+    function resetLcd() {
+      setText('mk-lcd-pos', '00:00');
+      var p = $('mk-progress'), th = $('mk-thumb');
+      if (p) p.style.width = '0%';
+      if (th) th.style.left = '0%';
+    }
+    function stop() {
+      resumeAt = 0;
+      saveState(0);
+      resetLcd();
+      if (playerReady) player.stopVideo();
+    }
+    function load(idx, autoplay) {
+      if (!PLAYLIST.length) return;
+      current = ((idx % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
+      resumeAt = 0;
+      saveState(0);
+      resetLcd();
+      setText('mk-lcd-dur', PLAYLIST[current].dur || '00:00');
+      updateNowPlaying();
+      if (!playerReady) {
+        if (autoplay) play();
+        else if (player) wantPlay = false;
+        return;
+      }
+      if (autoplay) player.loadVideoById(PLAYLIST[current].id);
+      else player.cueVideoById(PLAYLIST[current].id);
+    }
+    function advance(dir, autoplay) {
+      if (isShuffle && PLAYLIST.length > 1) {
+        var n = current;
+        while (n === current) n = Math.floor(Math.random() * PLAYLIST.length);
+        return load(n, autoplay);
+      }
+      var next = current + dir;
+      if (next < 0) next = isRepeat ? PLAYLIST.length - 1 : 0;
+      if (next >= PLAYLIST.length) next = isRepeat ? 0 : PLAYLIST.length - 1;
+      load(next, autoplay);
+    }
+
+    // ---------- poll loop ----------
+    function startPoll() {
+      if (pollT) return;
+      pollT = setInterval(function () {
+        if (!playerReady) return;
+        var cur = 0, dur = 0, buf = 0;
+        try {
+          cur = player.getCurrentTime() || 0;
+          dur = player.getDuration() || 0;
+          buf = player.getVideoLoadedFraction() || 0;
+        } catch (e) {}
+        setText('mk-lcd-pos', fmt(cur));
+        setText('mk-lcd-dur', fmt(dur));
+        var pct = dur > 0 ? (cur / dur) * 100 : 0;
+        $('mk-progress').style.width = pct + '%';
+        $('mk-thumb').style.left = pct + '%';
+        $('mk-buffer').style.width = (buf * 100) + '%';
+        setText('mk-buffer-pct', 'Buffer: ' + Math.round(buf * 100) + '%');
+        $('mk-scrub').setAttribute('aria-valuenow', Math.round(pct));
+        $('mk-scrub').setAttribute('aria-valuetext', fmt(cur) + ' of ' + fmt(dur));
+        if (dur && PLAYLIST[current] && !PLAYLIST[current].dur) {
+          PLAYLIST[current].dur = fmt(dur);
+          var r = rows()[current];
+          if (r) r.querySelector('.pl-dur').textContent = fmt(dur);
+        }
+        if (cur) saveState(cur);
+      }, 500);
+    }
+
+    // ---------- visualizer + VU (decoration; still under reduced motion) ----------
+    function startVis() {
+      if (visT || reduced) return;
+      var box = $('mk-vis');
+      if (!box) return;
+      if (!box.children.length) {
+        for (var i = 0; i < 24; i++) box.appendChild(document.createElement('span')).className = 'bar';
+      }
+      var bars = box.querySelectorAll('.bar');
+      visT = setInterval(function () {
+        bars.forEach(function (b, i) {
+          var base = 12 + Math.sin((Date.now() / 280) + i * 0.6) * 20;
+          b.style.height = clamp(base + Math.random() * 65, 8, 95) + '%';
+        });
+      }, 110);
+    }
+    function stopVis() {
+      clearInterval(visT); visT = null;
+      var box = $('mk-vis');
+      if (box) box.querySelectorAll('.bar').forEach(function (b) { b.style.height = '8%'; });
+    }
+    function setVisOn(on) {
+      var box = $('mk-vis');
+      if (!box) return;
+      box.classList.toggle('is-on', on);
+      $('mk-vis-toggle').setAttribute('aria-pressed', on ? 'true' : 'false');
+      if (on) startVis(); else stopVis();
+    }
+    function startVU() {
+      var box = $('mk-vu');
+      if (!box || reduced) return;
+      box.classList.add('is-on');
+      if (vuT) return;
+      var bars = box.querySelectorAll('.vb');
+      vuT = setInterval(function () {
+        bars.forEach(function (b, i) {
+          var h = clamp(18 + Math.random() * 78 + Math.sin((Date.now() / 220) + i) * 8, 10, 96);
+          b.style.height = h + '%';
+          b.style.background = h > 75 ? 'var(--mk-vu-hi)' : (h > 45 ? 'var(--mk-vu-mid)' : 'var(--mk-vu-low)');
+        });
+      }, 120);
+    }
+    function stopVU() {
+      clearInterval(vuT); vuT = null;
+      var box = $('mk-vu');
+      if (!box) return;
+      box.classList.remove('is-on');
+      box.querySelectorAll('.vb').forEach(function (b) { b.style.height = '8%'; b.style.background = 'var(--mk-lcd-ink-dim)'; });
+    }
+
+    // ---------- scrubber ----------
+    function bindScrub() {
+      var rail = $('mk-scrub');
+      if (!rail) return;
+      function pctFromEvent(e) {
+        var r = rail.getBoundingClientRect();
+        var x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+        return clamp(x / r.width, 0, 1);
+      }
+      function commit(p) {
+        if (!playerReady) return;
+        var dur = player.getDuration() || 0;
+        if (!dur) return;
+        player.seekTo(p * dur, true);
+        $('mk-progress').style.width = (p * 100) + '%';
+        $('mk-thumb').style.left = (p * 100) + '%';
+        setText('mk-lcd-pos', fmt(p * dur));
+      }
+      var dragging = false;
+      rail.addEventListener('mousedown', function (e) { dragging = true; commit(pctFromEvent(e)); });
+      window.addEventListener('mousemove', function (e) { if (dragging) commit(pctFromEvent(e)); });
+      window.addEventListener('mouseup', function () { dragging = false; });
+      rail.addEventListener('touchstart', function (e) { commit(pctFromEvent(e)); }, { passive: true });
+      rail.addEventListener('touchmove', function (e) { commit(pctFromEvent(e)); }, { passive: true });
+      rail.addEventListener('keydown', function (e) {
+        if (!playerReady) return;
+        var dur = player.getDuration() || 0;
+        if (!dur) return;
+        var cur = player.getCurrentTime() || 0;
+        if (e.key === 'ArrowLeft') { player.seekTo(Math.max(0, cur - 5), true); e.preventDefault(); }
+        if (e.key === 'ArrowRight') { player.seekTo(Math.min(dur, cur + 5), true); e.preventDefault(); }
+        if (e.key === 'Home') { player.seekTo(0, true); e.preventDefault(); }
+        if (e.key === 'End') { player.seekTo(dur - 1, true); e.preventDefault(); }
+      });
+    }
+
+    // ---------- volume ----------
+    function bindVolume() {
+      var v = $('mk-volume');
+      if (!v) return;
+      function setVol(p) {
+        p = clamp(p, 0, 1);
+        $('mk-volfill').style.width = (p * 100) + '%';
+        $('mk-volthumb').style.left = (p * 100) + '%';
+        v.setAttribute('aria-valuenow', Math.round(p * 100));
+        $('mk-mute').setAttribute('aria-pressed', p === 0 ? 'true' : 'false');
+        $('mk-mute-glyph').className = 'glyph ' + (p === 0 ? 'mute' : 'unmute');
+        if (playerReady) {
+          player.setVolume(p * 100);
+          if (p === 0) player.mute(); else if (player.isMuted()) player.unMute();
+        }
+      }
+      function pctFromEvent(e) {
+        var r = v.getBoundingClientRect();
+        return clamp((e.clientX - r.left) / r.width, 0, 1);
+      }
+      var drag = false;
+      v.addEventListener('mousedown', function (e) { drag = true; setVol(pctFromEvent(e)); });
+      window.addEventListener('mousemove', function (e) { if (drag) setVol(pctFromEvent(e)); });
+      window.addEventListener('mouseup', function () { drag = false; });
+      v.addEventListener('keydown', function (e) {
+        var cur = parseInt(v.getAttribute('aria-valuenow') || '60', 10);
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { setVol((cur - 5) / 100); e.preventDefault(); }
+        if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { setVol((cur + 5) / 100); e.preventDefault(); }
+      });
+    }
+
+    // ---------- buttons ----------
+    function on(id, fn) { var el = $(id); if (el) el.addEventListener('click', fn); }
+    function bindButtons() {
+      on('mk-prev', function () { advance(-1, !!playerReady); });
+      on('mk-play', togglePlay);
+      on('mk-nosignal', play);
+      on('mk-stop', stop);
+      on('mk-next', function () { advance(+1, !!playerReady); });
+      on('mk-mute', function () {
+        if (!playerReady) return;
+        var muted = player.isMuted();
+        if (muted) player.unMute(); else player.mute();
+        $('mk-mute').setAttribute('aria-pressed', muted ? 'false' : 'true');
+        $('mk-mute-glyph').className = 'glyph ' + (muted ? 'unmute' : 'mute');
+      });
+      on('mk-vis-toggle', function () { setVisOn(!$('mk-vis').classList.contains('is-on')); });
+      on('mk-fs', function () {
+        var frame = $('mk-frame');
+        if (document.fullscreenElement) document.exitFullscreen();
+        else if (frame.requestFullscreen) frame.requestFullscreen().catch(function () {});
+      });
+      on('mk-shuffle', function () {
+        isShuffle = !isShuffle;
+        $('mk-shuffle').setAttribute('aria-pressed', isShuffle ? 'true' : 'false');
+      });
+      on('mk-repeat', function () {
+        isRepeat = !isRepeat;
+        $('mk-repeat').setAttribute('aria-pressed', isRepeat ? 'true' : 'false');
+      });
+
+      var SKINS = ['default', 'realkruzer', 'quickdingus'];
+      var skinBtn = $('mk-skin');
+      function refreshSkinBtn() {
+        if (!skinBtn) return;
+        var cur = document.documentElement.getAttribute('data-mk-skin') || 'default';
+        skinBtn.title = 'Skin: ' + cur.toUpperCase() + ' (click to cycle)';
+      }
+      try {
+        var stored = localStorage.getItem('mediakruzer-skin');
+        if (stored && stored !== 'default' && SKINS.indexOf(stored) > 0) document.documentElement.setAttribute('data-mk-skin', stored);
+      } catch (e) {}
+      refreshSkinBtn();
+      if (skinBtn) skinBtn.addEventListener('click', function () {
+        var cur = document.documentElement.getAttribute('data-mk-skin') || 'default';
+        var next = SKINS[(SKINS.indexOf(cur) + 1) % SKINS.length];
+        if (next === 'default') document.documentElement.removeAttribute('data-mk-skin');
+        else document.documentElement.setAttribute('data-mk-skin', next);
+        try { localStorage.setItem('mediakruzer-skin', next); } catch (e) {}
+        setText('mk-pl-status', 'skin: ' + next);
+        refreshSkinBtn();
+      });
+    }
+
+    // The window is about to go (navigation, close): keep the spot.
+    window.addEventListener('pagehide', function () { saveState(currentTime()); });
+
+    function boot() {
+      loadState();
+      updateNowPlaying();
+      setText('mk-lcd-pos', fmt(resumeAt));
+      setText('mk-lcd-dur', (PLAYLIST[current] && PLAYLIST[current].dur) || '00:00');
+      if (resumeAt) setText('mk-pl-status', 'paused at ' + fmt(resumeAt));
+      bindList();
+      bindScrub();
+      bindVolume();
+      bindButtons();
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+    else boot();
+  })();
+</script>

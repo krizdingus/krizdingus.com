@@ -1,0 +1,133 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import ExternalLink from '../../components/ExternalLink.astro';
+import { splitAlt } from '../../lib/alt-text';
+import { socialLinks } from '../../data/social';
+import { getCollection, render } from 'astro:content';
+import { pageCard, profilePageNode } from '../../lib/seo';
+import './_about.css';
+
+const DESCRIPTION = 'About Kris Williams: a web developer who mods Game Boys and designs 3D prints on the side. The day job, the hobbies, and how to reach me.';
+
+const aboutEntries = await getCollection('about');
+const entry = aboutEntries[0];
+const { Content } = await render(entry);
+
+// Photos: AVIF/WebP per width in public/images/about/, cropped from phone
+// photos with all metadata stripped. The portrait is the LCP element, so it
+// loads eagerly at high priority; the two snapshots under it load lazily.
+const srcsetFor = (base: string, widths: number[], ext: string) =>
+  widths.map((w) => `${base}-${w}.${ext} ${w}w`).join(', ');
+
+const PORTRAIT = '/images/about/kris-nintendo-store';
+const PORTRAIT_WIDTHS = [320, 480, 720];
+const PORTRAIT_SIZES = '(max-width: 900px) 15rem, 15.5rem';
+const portraitAlt = splitAlt('Kris in a beanie and black puffer jacket in a Nintendo store. He holds up two Game Boys in front of a display case of Nintendo handhelds.');
+
+const SNAP_WIDTHS = [360, 540, 720];
+const SNAP_SIZES = '(max-width: 900px) 46vw, 7.5rem';
+const SNAPS = [
+  { base: '/images/about/kris-mt-fuji', alt: 'Kris giving two thumbs up on a path, with Mount Fuji behind him.', caption: 'Fuji, approved.' },
+  { base: '/images/about/kris-deer', alt: 'Kris crouching face to face with a deer on a gravel path.', caption: 'Made a friend.' },
+];
+
+// Contact, lightly obfuscated: the mailto is written as HTML character
+// references and the @ sits in its own span, so a naive scraper looking for
+// "mailto:me@" in the source finds nothing. Browsers decode it as usual.
+const MAIL = 'me@krizdingus.com';
+const toRefs = (s: string) => [...s].map((c) => `&#${c.charCodeAt(0)};`).join('');
+const mailHtml = `<a href="${toRefs(`mailto:${MAIL}`)}">me<span>&#64;</span>krizdingus&#46;com</a>`;
+
+// Display text per account. Accounts and icons come from src/data/social.ts
+// (confirmed accounts only).
+const SOCIAL_TEXT: Record<string, string> = {
+  Instagram: '@krizdingus',
+  GitHub: 'krizdingus',
+  MakerWorld: '@krizdingus',
+};
+---
+
+<BaseLayout
+  title="About — Krizdingus"
+  description={DESCRIPTION}
+  systemStatus="About · readme.txt"
+  statusSegment="Ln 1, Col 1"
+  shellTitle="KRIZSCAPE — README.txt"
+  ogType="profile"
+  ogImage={pageCard('about')}
+  schema={[profilePageNode({ description: DESCRIPTION, image: `${PORTRAIT}-480.jpg` })]}
+  breadcrumbs={[{ name: 'About', path: '/about/' }]}
+>
+  <section class="content-section">
+    <PageHero
+      crumb="> krizdingus / about"
+      title="About"
+      sub="More than you asked for, and how to reach me."
+      badge={{ label: 'README.TXT', variant: 'live' }}
+      heroStyle="background:var(--bg-primary);padding-left:0;padding-right:0"
+    />
+
+    <article class="about-window" aria-labelledby="about-bio-title">
+      <div class="about-window__bar">
+        <span id="about-bio-title">README.TXT — Notepad</span>
+      </div>
+      <div class="about-body">
+        <figure class="about-portrait">
+          <picture>
+            <source type="image/avif" srcset={srcsetFor(PORTRAIT, PORTRAIT_WIDTHS, 'avif')} sizes={PORTRAIT_SIZES} />
+            <source type="image/webp" srcset={srcsetFor(PORTRAIT, PORTRAIT_WIDTHS, 'webp')} sizes={PORTRAIT_SIZES} />
+            <img src={entry.data.portrait} alt={portraitAlt.alt} aria-describedby={portraitAlt.desc ? 'about-portrait-desc' : undefined} width="480" height="605" loading="eager" fetchpriority="high" decoding="async" />
+          </picture>
+          {portraitAlt.desc && <span class="sr-only" id="about-portrait-desc">{portraitAlt.desc}</span>}
+        </figure>
+
+        <div class="about-snaps">
+          {SNAPS.map((snap) => (
+            <figure class="about-snap">
+              <picture>
+                <source type="image/avif" srcset={srcsetFor(snap.base, SNAP_WIDTHS, 'avif')} sizes={SNAP_SIZES} />
+                <source type="image/webp" srcset={srcsetFor(snap.base, SNAP_WIDTHS, 'webp')} sizes={SNAP_SIZES} />
+                <img src={`${snap.base}-540.jpg`} alt={snap.alt} width="540" height="675" loading="lazy" decoding="async" />
+              </picture>
+              <figcaption>{snap.caption}</figcaption>
+            </figure>
+          ))}
+        </div>
+
+        <div class="about-text">
+          <Content />
+        </div>
+
+        <section class="about-finger" aria-labelledby="about-finger-title">
+          <h2 id="about-finger-title" class="about-finger__cmd"><span aria-hidden="true">$ </span>finger kris</h2>
+          <dl class="about-finger__list">
+            <div>
+              <dt>Name</dt>
+              <dd>Kris Williams</dd>
+            </div>
+            <div>
+              <dt>Mail</dt>
+              <dd><Fragment set:html={mailHtml} /></dd>
+            </div>
+            {socialLinks.map((s) => (
+              <div>
+                <dt>{s.label}</dt>
+                <dd>
+                  <ExternalLink href={s.url}>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d={s.svgPath} /></svg>
+                    {SOCIAL_TEXT[s.label] ?? s.label}
+                  </ExternalLink>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      </div>
+      <div class="about-window__status" aria-hidden="true">
+        <span>Ln 1, Col 1</span>
+        <span>readme.txt · UTF-8</span>
+      </div>
+    </article>
+  </section>
+</BaseLayout>

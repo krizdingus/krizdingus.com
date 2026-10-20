@@ -1,0 +1,50 @@
+# Cloudflare Pages headers. https://developers.cloudflare.com/pages/configuration/headers/
+#
+# CSP notes:
+# - script-src keeps 'unsafe-inline' for the inline <head> kicker (theme/mode
+#   applied before paint) and Astro define:vars scripts.
+#   Swapping it for hashes needs a build step that collects them; until then
+#   this is the honest setting.
+# - style-src keeps 'unsafe-inline' for style="" attributes in the markup.
+# - www.youtube.com serves the IFrame API script (MediaKruzer); the player
+#   itself is framed from youtube-nocookie.com; thumbnails come from i.ytimg.com.
+# - Cloudflare Web Analytics (automatic setup): Cloudflare injects its beacon
+#   at the edge; static.cloudflareinsights.com serves it and it reports to
+#   cloudflareinsights.com. No cookies. Nothing in the repo loads it.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.youtube.com; connect-src 'self' https://cloudflareinsights.com; img-src 'self' data: https://i.ytimg.com; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com; frame-ancestors 'self'; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+
+# Caching. Cloudflare Pages applies every rule whose path matches and joins
+# repeated headers, so Cache-Control is set only on these asset paths and
+# never on /*. Pages (HTML) keep Cloudflare's default, which revalidates on
+# every visit, so a new deploy shows at once.
+
+# Fingerprinted build assets never change under the same name.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fonts keep stable names and change rarely; a changed font gets a new
+# filename, so a year is safe. Not immutable, since the names are not hashed.
+/fonts/*
+  Cache-Control: public, max-age=31536000
+
+# Photos and icons keep their names too, but may be re-cut: 30 days.
+/images/*
+  Cache-Control: public, max-age=2592000
+
+/icons/*
+  Cache-Control: public, max-age=2592000
+
+# Search: the site is also served on its pages.dev addresses (the project's
+# own and one per preview deployment). Keep those copies out of search
+# results; only krizdingus.com gets indexed.
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex

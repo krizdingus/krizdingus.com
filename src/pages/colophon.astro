@@ -1,0 +1,98 @@
+---
+import { pageCard } from '../lib/seo';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import '../styles/colophon.css';
+
+// Every line here is sourced from the repo itself: package.json (Astro),
+// src/themes/ (the theme framework), public/fonts/*-OFL.txt (fonts and
+// licences), Cloudflare Web Analytics (injected by Cloudflare, not the repo), src/themes/kicker.ts (localStorage)
+// and the hosting (Cloudflare Pages, built from the GitHub repo). Re-check
+// the hosting line if the host changes.
+const FONTS = [
+  { name: 'Figtree', use: 'the reading text in normal mode', copy: '© 2022 The Figtree Project Authors', licence: '/fonts/Figtree-OFL.txt' },
+  { name: 'Saira', use: 'the headings and the wordmark (drawn as shapes)', copy: '© 2020 The Saira Project Authors', licence: '/fonts/Saira-OFL.txt' },
+  { name: 'JetBrains Mono', use: 'labels, code and most of XP mode', copy: '© 2020 The JetBrains Mono Project Authors', licence: '/fonts/JetBrainsMono-OFL.txt' },
+  { name: 'Silkscreen', use: 'XP mode’s pixel lettering', copy: '© 2001 The Silkscreen Project Authors', licence: '/fonts/Silkscreen-OFL.txt' },
+  { name: 'VT323', use: 'the CRT readouts', copy: '© 2011 The VT323 Project Authors', licence: '/fonts/VT323-OFL.txt' },
+];
+---
+
+<BaseLayout
+  title="Colophon — Krizdingus"
+  ogImage={pageCard('colophon')}
+  breadcrumbs={[{ name: 'Colophon', path: '/colophon/' }]}
+  description="How krizdingus.com is built: Astro, static HTML, an optional theme system, self-hosted fonts and cookie-free analytics."
+  shellTitle="KRIZSCAPE — Colophon"
+>
+  <section class="content-section">
+    <PageHero
+      crumb="> krizdingus / colophon"
+      title="Colophon"
+      sub="What this site is made of."
+      heroStyle="background:var(--bg-primary);padding-left:0;padding-right:0"
+    />
+
+    <div class="colo-window">
+      <div class="colo-window__bar" aria-hidden="true">krizdingus.com Properties</div>
+      <dl class="colo">
+      <div class="colo__row">
+        <dt>Built with</dt>
+        <dd>
+          <p><ExternalLink href="https://astro.build/">Astro</ExternalLink> 7. Every page is rendered to plain HTML when the site is built, so nothing runs on a server when you load one. Most of the words live in Markdown files in the repo.</p>
+        </dd>
+      </div>
+
+      <div class="colo__row">
+        <dt>Normal mode</dt>
+        <dd>
+          <p>What you’re probably looking at. Plain HTML and CSS, and it works with JavaScript turned off. On a wide screen, a bit of JavaScript draws the colored squares either side of the page; they hold still if your system asks for reduced motion.</p>
+        </dd>
+      </div>
+
+      <div class="colo__row">
+        <dt>Themes</dt>
+        <dd>
+          <p>XP mode is a theme: a folder with a manifest and a module that only downloads when you switch it on. It only offers itself on desktop. The whole setup is written up in <a href="/blog/a-theme-is-a-folder/">A theme is a folder</a>.</p>
+        </dd>
+      </div>
+
+      <div class="colo__row">
+        <dt>Type</dt>
+        <dd>
+          <p>Five fonts, self-hosted, all under the SIL Open Font License 1.1.</p>
+          <ul class="colo__fonts">
+            {FONTS.map((f) => (
+              <li>
+                <span class="colo__font">{f.name}</span>, {f.use}. {f.copy}. <a href={f.licence}>License<span class="colo__sr"> for {f.name}</span></a>
+              </li>
+            ))}
+          </ul>
+        </dd>
+      </div>
+
+      <div class="colo__row">
+        <dt>Hosting</dt>
+        <dd>
+          <p>Cloudflare Pages, built from the <ExternalLink href="https://github.com/krizdingus/krizdingus.com">GitHub repo</ExternalLink>.</p>
+        </dd>
+      </div>
+
+      <div class="colo__row">
+        <dt>Tracking</dt>
+        <dd>
+          <p>Cloudflare Web Analytics counts visits. It doesn’t use cookies or follow you from site to site, it’s switched off for visitors in the EU, and that’s the only analytics. Your light/dark and theme choices are saved in your own browser’s localStorage and go nowhere else.</p>
+        </dd>
+      </div>
+
+      <div class="colo__row">
+        <dt>Made by</dt>
+        <dd>
+          <p>Kris Williams.</p>
+        </dd>
+      </div>
+      </dl>
+    </div>
+  </section>
+</BaseLayout>

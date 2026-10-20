@@ -1,0 +1,16 @@
+---
+// src/components/ExternalLink.astro
+// A link off the site: opens in a new tab and says so to screen readers
+// (the same rule the Markdown pipeline applies, src/build/external-links.mjs).
+// Pass `hint={false}` when the link's own text already carries the note.
+import { NEW_TAB_TARGET, NEW_TAB_REL, NEW_TAB_HINT, NEW_TAB_HINT_CLASS } from '../build/external-links.mjs';
+
+interface Props {
+  href: string;
+  class?: string;
+  hint?: boolean;
+  [attr: string]: unknown;
+}
+const { href, class: className, hint = true, ...rest } = Astro.props;
+---
+<a href={href} class={className} target={NEW_TAB_TARGET} rel={NEW_TAB_REL} {...rest}><slot />{hint && <span class={NEW_TAB_HINT_CLASS}>{NEW_TAB_HINT}</span>}</a>

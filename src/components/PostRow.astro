@@ -1,0 +1,56 @@
+---
+// src/components/PostRow.astro
+// .post-row .post-meta: each "·" separator sits inside a group with the item after it,
+// so it never ends a line when the meta wraps on a phone.
+// tag chips live in <div class="post-tags"> (not <p>), so the global .post-row p rules don't bleed in.
+import BlogPicture from './BlogPicture.astro';
+import { blogPicture } from '../lib/blog-images';
+
+export interface Props {
+  slug: string;
+  title: string;
+  summary: string;
+  date: string;        // blog-helpers postDateLabel(): "Mon DD, YYYY", or "Drafted Mon DD, YYYY" while a post waits on review
+  readTime: number;    // minutes
+  tags: string[];
+  heroImage?: string | null;
+  /** Heading level for the title: 2 under a page <h1>, 3 inside a sectioned block. */
+  headingLevel?: 2 | 3;
+}
+
+const { slug, title, summary, date, readTime, tags, heroImage, headingLevel = 2 } = Astro.props as Props;
+const pic = blogPicture(heroImage);
+const articleClass = pic ? 'post-row' : 'post-row no-hero';
+// The picture column is 220px wide, the card's full width under 900px.
+const HERO_SIZES = '(max-width: 900px) calc(100vw - 48px), 220px';
+const Heading = headingLevel === 3 ? 'h3' : 'h2';
+---
+
+<article class={articleClass}>
+  <span class="post-bar" aria-hidden="true">{slug}.md</span>
+  {pic && (
+    <div class="post-hero">
+      <BlogPicture pic={pic} alt="" sizes={HERO_SIZES} />
+    </div>
+  )}
+  <div class="post-body">
+    <div class="post-meta">
+      <span>{date}</span>
+      <span class="meta-grp"><span class="dot" aria-hidden="true">·</span>{readTime} min read</span>
+    </div>
+    <Heading class="post-title"><a href={`/blog/${slug}/`}>{title}</a></Heading>
+    <p>{summary}</p>
+    {tags.length > 0 && (
+      <div class="post-tags">
+        {tags.map((tag) => (
+          <a class="tag-chip" href={`/blog/tags/${tag}/`}>{tag.toUpperCase()}</a>
+        ))}
+      </div>
+    )}
+  </div>
+</article>
+
+<style>
+  .meta-grp { white-space: nowrap; }
+  .meta-grp .dot { margin-right: 8px; }
+</style>

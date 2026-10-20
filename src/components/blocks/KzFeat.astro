@@ -1,0 +1,226 @@
+---
+// src/components/blocks/KzFeat.astro
+// "Now Featuring": the big card, plus a rail of three. The big card is the
+// hand-picked post (featured: true in the blog) when there is one, and the
+// hand-picked project (featured: true in projects) then opens the rail.
+// Without a featured post the project is the big card and the newest post
+// opens the rail. After that: the newest other project, and about.
+// Normal-mode markup only. The XP theme adds its title bars and LEDs at
+// mount (src/themes/xp/dressing/home.dressing.ts reads data-feat).
+import { getCollection } from 'astro:content';
+import { readingMinutes, postDateLabel } from '../../lib/blog-helpers';
+import { shortLabel, TOP_PICK_COUNT } from '../../data/directory';
+import { formatDay } from '../../data/workshop';
+import { homeImage } from '../../data/home-images';
+import { blogPicture } from '../../lib/blog-images';
+import BlogPicture from '../BlogPicture.astro';
+
+const projects = await getCollection('projects', (e) => !e.data.draft);
+projects.sort((a, b) => b.data.date_published.getTime() - a.data.date_published.getTime());
+const featured = projects.find((p) => p.data.featured) ?? projects[0];
+// Newest build that isn't already the big card.
+const newest = projects.find((p) => p !== featured);
+
+const blog = await getCollection('blog', (e) => !e.data.draft);
+blog.sort((a, b) => b.data.date_published.getTime() - a.data.date_published.getTime());
+const featuredPost = blog.find((p) => p.data.featured);
+// The rail's post slot, used only when no post takes the big card.
+const latestPost = featuredPost ? undefined : blog[0];
+
+const slugOf = (e: { id: string; data: { slug?: string } }) => e.data.slug ?? e.id.replace(/\.mdx?$/, '');
+
+const CATEGORY_LABEL: Record<string, string> = {
+  'hardware': 'Hardware',
+  '3d-print': '3D print',
+  'bot': 'Bot',
+  'game-boy': 'Game Boy',
+  'software': 'Software',
+  'other': 'Project',
+};
+const STATUS_LABEL: Record<string, string> = { live: 'Live', archived: 'Archived', wip: 'In progress' };
+
+const fSlug = slugOf(featured);
+const fYear = featured.data.date_published.getUTCFullYear();
+const fCategory = CATEGORY_LABEL[featured.data.category] ?? 'Project';
+const fGlyph = featured.data.crt_glyph ?? featured.data.title.slice(0, 3).toUpperCase();
+// The dated numbers from the project's own field report, when it has any.
+// Downloads are left out when the "Most downloaded" list (KzDir, same
+// ranking as src/data/directory.ts) already prints this project's count.
+const fr = featured.data.field_report;
+const inTopPicks = projects
+  .filter((p) => typeof p.data.field_report?.downloads === 'number')
+  .sort((a, b) => (b.data.field_report!.downloads ?? 0) - (a.data.field_report!.downloads ?? 0))
+  .slice(0, TOP_PICK_COUNT)
+  .includes(featured);
+const fNums = fr
+  ? [
+      fr.downloads !== undefined && !inTopPicks ? `${fr.downloads.toLocaleString('en-US')} downloads` : '',
+      fr.rating !== undefined && fr.rating_count ? `${fr.rating} average from ${fr.rating_count} ratings` : '',
+      fr.stars !== undefined ? `${fr.stars} GitHub stars` : '',
+    ].filter(Boolean)
+  : [];
+const fFacts = fr && fNums.length ? `${fr.source}, ${formatDay(fr.captured)}: ${fNums.join(', ')}` : '';
+
+const nSlug = newest ? slugOf(newest) : '';
+
+// Card photo and avatars at their shown size (src/data/home-images.ts).
+const fImg = featured.data.hero_image ? homeImage(featured.data.hero_image, 800) : null;
+// The big card's real width: the page less its gutters up to 900px (50px
+// of them to 760px, 66px above), then two thirds of the column, which tops
+// out at 720px. Between 901 and 1200px the slot stays at 720px (it renders
+// 526-720px there) so the 800w file stays the pick, as XP mode's desktop
+// also draws this card at those widths. A phone gets the 640w file.
+const FEAT_SIZES = '(max-width: 760px) calc(100vw - 50px), (max-width: 900px) calc(100vw - 66px), 720px';
+const nImg = newest?.data.hero_image ? homeImage(newest.data.hero_image, 128) : null;
+const fAvatar = featured.data.hero_image ? homeImage(featured.data.hero_image, 128) : null;
+
+const bSlug = featuredPost ? slugOf(featuredPost) : '';
+const bPic = featuredPost ? blogPicture(featuredPost.data.hero_image) : null;
+const bMinutes = featuredPost ? readingMinutes(featuredPost.body ?? '') : 0;
+const meImg = homeImage('/images/krizdingus-portrait.jpg', 128);
+
+const pSlug = latestPost ? slugOf(latestPost) : '';
+const pMinutes = latestPost ? readingMinutes(latestPost.body ?? '') : 0;
+const pTags = latestPost ? latestPost.data.tags.slice(0, 2).map((t) => `#${t}`).join(' ') : '';
+// A post still waiting on review is dated "Drafted …", the same label as
+// /blog/ (blog-helpers postDateLabel); that label is the only draft marker.
+---
+
+<section class="kz-feat" aria-labelledby="kz-feat-h">
+  <header class="kz-sec-head kz-sec-head--lead">
+    <span class="kz-sec-head__bracket" aria-hidden="true">[★]</span>
+    <h2 class="kz-sec-head__title" id="kz-feat-h">Now Featuring</h2>
+    <span class="kz-sec-head__rule" aria-hidden="true"></span>
+    <span class="kz-sec-head__meta">{featuredPost ? 'a post, a pick, the newest build, and me' : 'one pick, the newest two, and me'}</span>
+  </header>
+
+  <div class="kz-feat__grid">
+    {featuredPost ? (
+      <article class="kz-feat__big" data-feat="post">
+        <figure class="kz-feat__big-thumb kz-feat__big-thumb--art">
+          {bPic
+            ? <BlogPicture pic={bPic} alt="" sizes={FEAT_SIZES} loading="eager" fetchpriority="high" />
+            : <span class="kz-glyph kz-glyph--big" aria-hidden="true">.MD</span>}
+        </figure>
+        <div class="kz-feat__big-body">
+          <p class="kz-feat__kicker">From the blog · {postDateLabel(featuredPost.data)}</p>
+          <h3 class="kz-feat__big-title">
+            <a class="kz-feat__big-link" href={`/blog/${bSlug}/`}>{featuredPost.data.title}</a>
+          </h3>
+          <p class="kz-feat__big-hook">{featuredPost.data.summary}</p>
+          <div class="kz-feat__big-cta">
+            <span class="kz-feat__go" aria-hidden="true">Read the post <span class="kz-feat__go-arrow">→</span></span>
+            <a class="kz-feat__big-more" href="/blog/">All {blog.length} posts →</a>
+          </div>
+        </div>
+        <div class="kz-feat__big-status">
+          <span class="kz-feat__chips">
+            {featuredPost.data.tags.slice(0, 3).map((t) => <span class="tag-chip">{t}</span>)}
+          </span>
+          <span class="kz-feat__state">{bMinutes} min read</span>
+        </div>
+      </article>
+    ) : (
+      <article class="kz-feat__big" data-feat="project">
+        <figure class="kz-feat__big-thumb">
+          {fImg
+            ? <img src={fImg.src} srcset={fImg.srcset} sizes={fImg.srcset && FEAT_SIZES} alt="" loading="eager" fetchpriority="high" width="1200" height="600" />
+            : <span class="kz-glyph kz-glyph--big" aria-hidden="true">{fGlyph}</span>}
+        </figure>
+        <div class="kz-feat__big-body">
+          <p class="kz-feat__kicker">Project spotlight · {fCategory}</p>
+          <h3 class="kz-feat__big-title">
+            <a class="kz-feat__big-link" href={`/projects/${fSlug}/`}>{featured.data.title}</a>
+          </h3>
+          <p class="kz-feat__big-hook">{featured.data.summary}</p>
+          {fFacts && <p class="kz-feat__big-facts">{fFacts}</p>}
+          <div class="kz-feat__big-cta">
+            <span class="kz-feat__go" aria-hidden="true">Open project <span class="kz-feat__go-arrow">→</span></span>
+            <a class="kz-feat__big-more" href="/projects/">All {projects.length} projects →</a>
+          </div>
+        </div>
+        <div class="kz-feat__big-status">
+          <span class="kz-feat__chips">
+            {featured.data.tags.slice(0, 3).map((t) => <span class="tag-chip">{t}</span>)}
+          </span>
+          <span class="kz-feat__state">{STATUS_LABEL[featured.data.status] ?? 'Live'} · {fYear}</span>
+        </div>
+      </article>
+    )}
+
+    <div class="kz-feat__stack">
+      {featuredPost && (
+        <article class="kz-feat__sm" data-feat="project">
+          <a class="kz-feat__sm-link" href={`/projects/${fSlug}/`}>
+            <div class:list={['kz-feat__sm-body', fAvatar && 'kz-feat__sm-body--media']}>
+              {fAvatar && <img class="kz-feat__avatar" src={fAvatar.src} alt="" width="64" height="64" loading="lazy" />}
+              <div>
+                <p class="kz-feat__kicker">Project spotlight · {fCategory}</p>
+                <h3 class="kz-feat__sm-title">{shortLabel(fSlug, featured.data.title)}</h3>
+                <p class="kz-feat__sm-hook">{featured.data.summary}</p>
+                <p class="kz-feat__sm-meta">
+                  <span>{STATUS_LABEL[featured.data.status] ?? 'Live'} · {fYear}</span>
+                  <span class="kz-feat__sm-more" aria-hidden="true">Open <span class="kz-feat__sm-more__arrow">→</span></span>
+                </p>
+              </div>
+            </div>
+          </a>
+        </article>
+      )}
+
+      {latestPost && (
+        <article class="kz-feat__sm" data-feat="post">
+          <a class="kz-feat__sm-link" href={`/blog/${pSlug}/`}>
+            <div class="kz-feat__sm-body">
+              <p class="kz-feat__kicker">Newest post · {postDateLabel(latestPost.data)}</p>
+              <h3 class="kz-feat__sm-title">{latestPost.data.title}</h3>
+              <p class="kz-feat__sm-hook">{latestPost.data.summary}</p>
+              <p class="kz-feat__sm-meta">
+                <span>{pMinutes} min read{pTags && ` · ${pTags}`}</span>
+                <span class="kz-feat__sm-more" aria-hidden="true">Read <span class="kz-feat__sm-more__arrow">→</span></span>
+              </p>
+            </div>
+          </a>
+        </article>
+      )}
+
+      {newest && (
+        <article class="kz-feat__sm" data-feat="build">
+          <a class="kz-feat__sm-link" href={`/projects/${nSlug}/`}>
+            {/* A photo tile only when the build has a photo; a lettered
+                stand-in next to real thumbnails read as a placeholder. */}
+            <div class:list={['kz-feat__sm-body', newest.data.hero_image && 'kz-feat__sm-body--media']}>
+              {nImg && <img class="kz-feat__avatar" src={nImg.src} alt="" width="64" height="64" loading="lazy" />}
+              <div>
+                <p class="kz-feat__kicker">{CATEGORY_LABEL[newest.data.category] ?? 'Project'} · {formatDay(newest.data.date_published)}</p>
+                <h3 class="kz-feat__sm-title">{shortLabel(nSlug, newest.data.title)}</h3>
+                <p class="kz-feat__sm-hook">{newest.data.summary}</p>
+                <p class="kz-feat__sm-meta">
+                  <span>{STATUS_LABEL[newest.data.status] ?? 'Live'}</span>
+                  <span class="kz-feat__sm-more" aria-hidden="true">Open <span class="kz-feat__sm-more__arrow">→</span></span>
+                </p>
+              </div>
+            </div>
+          </a>
+        </article>
+      )}
+
+      <article class="kz-feat__sm" data-feat="about">
+        <a class="kz-feat__sm-link" href="/about/">
+          <div class="kz-feat__sm-body kz-feat__sm-body--media">
+            <img class="kz-feat__avatar" src={meImg.src} alt="" width="64" height="64" loading="lazy" />
+            <div>
+              <p class="kz-feat__kicker">About the dingus</p>
+              <h3 class="kz-feat__sm-title">That’s me.</h3>
+              <p class="kz-feat__sm-hook">On the internet since 1995. Modding Game Boys since about 2022, printing parts for them soon after. Lives with a dog named Laika and a cat named GG.</p>
+              <p class="kz-feat__sm-meta">
+                <span>web dev by trade</span>
+                <span class="kz-feat__sm-more" aria-hidden="true">Full bio <span class="kz-feat__sm-more__arrow">→</span></span>
+              </p>
+            </div>
+          </div>
+        </a>
+      </article>
+    </div>
+  </div>
+</section>

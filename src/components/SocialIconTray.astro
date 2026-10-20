@@ -1,0 +1,43 @@
+---
+// src/components/SocialIconTray.astro
+// Consumes src/data/social.ts. Renders the social icon tray in one of three
+// variants — used in BaseLayout's status-bar and pro-footer, and (later) in
+// other places that need the same row of icons.
+//
+// 'status-bar' → a <div class="status-tray"> of icons
+// 'pro-footer' → the same icons as <ul><li>
+// 'pro-bio'    → same set; kept for older callers
+// Every variant shows socialLinks: confirmed accounts only (see social.ts).
+import { socialLinks } from '../data/social';
+import { NEW_TAB_HINT } from '../build/external-links.mjs';
+
+interface Props {
+  variant: 'status-bar' | 'pro-footer' | 'pro-bio';
+  class?: string;
+}
+
+const { variant, class: className } = Astro.props;
+const subset = socialLinks;
+---
+{variant === 'pro-footer' ? (
+  <ul class={className ?? 'pro-footer__social'}>
+    {subset.map((s) => (
+      <li>
+        <a href={s.url} target="_blank" rel="noopener" aria-label={s.label + NEW_TAB_HINT}>
+          <svg role="img" viewBox="0 0 24 24" aria-hidden="true"><path d={s.svgPath} /></svg>
+        </a>
+      </li>
+    ))}
+  </ul>
+) : (
+  <div class={className ?? 'status-tray'} aria-label="Social links">
+    {subset.map((s) => (
+      <a class="tray-icon" href={s.url} target="_blank" rel="noopener" aria-label={s.label + NEW_TAB_HINT}>
+        <svg role="img" viewBox="0 0 24 24" fill="currentColor">
+          <title>{s.label}</title>
+          <path d={s.svgPath} />
+        </svg>
+      </a>
+    ))}
+  </div>
+)}

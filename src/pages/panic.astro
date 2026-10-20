@@ -1,0 +1,70 @@
+---
+// /panic: the full-bleed fake blue screen, reached from the XP-mode panic
+// egg. A standalone page on purpose: no header, no theme runtime, the same
+// look in every mode. noindex here, and astro.config.mjs keeps it out of
+// the sitemap. Behavior: src/scripts/panic.ts.
+// JS off: the counter, the "any key" and "restarts on its own" lines and
+// the stop button can't work, so they only show once the head kicker has
+// marked the page `.js`; JS-off visitors get one plain line and the
+// Restart now link (a real href, works anyway).
+import '../styles/colors_and_type.css';
+import '../styles/panic.css';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Panic — Krizdingus</title>
+    <meta name="description" content="A fake blue screen that restarts itself." />
+    <meta name="theme-color" content="#0000aa" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <link rel="preload" href="/fonts/VT323-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Silkscreen-Regular-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="bsod-body">
+    <main class="bsod" aria-labelledby="bsod-h">
+      <div class="bsod__inner">
+        <div class="bsod__chip">krizdingus.com</div>
+        <div class="bsod__face" aria-hidden="true">:(</div>
+        <h1 id="bsod-h" class="bsod__h">Your visit ran into a problem and needs to restart.</h1>
+
+        <div class="bsod__progress" data-panic-js>
+          <span class="bsod__bar" data-panic-bar aria-hidden="true">░░░░░░░░░░░░░░░░░░░░</span>
+          <span class="bsod__pct"><span data-panic-count>0</span>% complete</span>
+        </div>
+
+        <ul class="bsod__list">
+          <li data-panic-js>Press any key or hit Restart now. <span class="bsod__cursor" aria-hidden="true">_</span></li>
+          <li data-panic-js data-panic-auto>Or wait. It restarts on its own at 100%.</li>
+          <li data-panic-nojs>Hit Restart now. <span class="bsod__cursor" aria-hidden="true">_</span></li>
+        </ul>
+
+        <div class="bsod__actions">
+          <a href="/" class="bsod__btn" data-panic-home>Restart now</a>
+          <button type="button" class="bsod__btn" data-panic-js data-panic-stop>Stop the countdown</button>
+        </div>
+        <p class="bsod__status" role="status" data-panic-status></p>
+
+        <dl class="bsod__codes">
+          <div><dt>Stop code:</dt> <dd>PANIC_BUTTON_PRESSED</dd></div>
+          <div><dt>What failed:</dt> <dd>panic.astro</dd></div>
+        </dl>
+      </div>
+    </main>
+    <style is:global>
+      /* Only this page has these hooks. Without the head kicker's `.js` class nothing that
+         needs the script shows; with it, the plain JS-off line goes. */
+      html:not(.js) [data-panic-js],
+      html.js [data-panic-nojs] { display: none !important; }
+    </style>
+    <script>
+      import { initPanic } from '../scripts/panic';
+      initPanic();
+    </script>
+  </body>
+</html>

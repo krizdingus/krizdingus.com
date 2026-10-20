@@ -1,0 +1,123 @@
+/* =============================================================
+   COLOPHON (/colophon/) — page-scoped. Imported by src/pages/colophon.astro
+   only. A properties sheet: label column, value column, dashed rules.
+   ============================================================= */
+
+/* The sheet sits in a window, with the same title bar as README.TXT on
+   /about/: fixed chrome colors so white-on-purple holds in dark mode too. */
+.colo-window {
+  margin: var(--space-md) 0 0;
+  border: 2px solid var(--border-strong);
+  box-shadow: 4px 4px 0 var(--shadow-color);
+  background: var(--bg-primary);
+}
+.colo-window__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  padding: 4px 10px;
+  background: #494786;
+  color: #fff;
+  border-bottom: 2px solid var(--border-strong);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+/* A tiny properties-sheet icon: a white card with a blue header strip. */
+.colo-window__bar::before {
+  content: '';
+  width: 12px;
+  height: 10px;
+  flex: none;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #1a1c1c, inset 0 3px 0 0 #8fb6ff;
+}
+
+.colo {
+  margin: 0;
+  background: var(--bg-primary);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-primary);
+}
+
+.colo__row {
+  display: grid;
+  grid-template-columns: 10rem minmax(0, 1fr);
+  column-gap: var(--space-md);
+  padding: 14px 20px;
+}
+.colo__row + .colo__row { border-top: 1px dashed var(--hairline); }
+.colo__row:nth-child(odd) { background: var(--bg-tertiary); }
+
+.colo dt {
+  padding-top: 3px;
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-secondary);
+}
+.colo dd { margin: 0; min-width: 0; max-width: 68ch; }
+.colo p { margin: 0; }
+.colo p + ul,
+.colo p + p { margin-top: 8px; }
+
+/* Same inline-link treatment as blog and project prose (prose.css). */
+.colo a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent-primary);
+  transition: color 140ms ease, border-color 140ms ease;
+}
+.colo a:hover,
+.colo a:focus-visible {
+  color: var(--accent-secondary);
+  border-bottom-color: var(--accent-secondary);
+}
+.colo a:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.colo__fonts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.colo__fonts li {
+  padding-left: 2ch;
+  text-indent: -2ch;
+}
+.colo__fonts li::before { content: '- '; color: var(--text-muted); }
+.colo__font { font-weight: 700; }
+
+/* Link text extension for screen readers ("License for VT323"). */
+.colo__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 640px) {
+  .colo { font-size: 14px; }
+  .colo__row {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 4px;
+    padding: 12px 14px;
+  }
+  .colo dt { padding-top: 0; }
+}
+
+/* Normal mode: no text under 12px. XP mode keeps the sheet's period-size
+   pixel labels above. */
+:root:not([data-skin-base=none]) .colo-window__bar,
+:root:not([data-skin-base=none]) .colo dt { font-size: 12px; }

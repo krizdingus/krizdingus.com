@@ -1,0 +1,51 @@
+---
+// src/components/blocks/KzBlog.astro
+// The posts Now Featuring doesn't already show (the featured post in its
+// big card, or else the newest one in its rail), newest first: two while
+// the blog is small (under six posts), so the home page never prints the
+// whole blog, three after that.
+// The XP theme adds a "<slug>.md" title bar to each at mount.
+import { getCollection } from 'astro:content';
+import { postDateLabel, readingMinutes } from '../../lib/blog-helpers';
+
+const all = await getCollection('blog', (e) => !e.data.draft);
+all.sort((a, b) => b.data.date_published.getTime() - a.data.date_published.getTime());
+// With one post Now Featuring already shows it; with none there is nothing to list.
+const shown = all.find((e) => e.data.featured) ?? all[0];
+const more = all.filter((e) => e !== shown).slice(0, all.length < 6 ? 2 : 3);
+const slugOf = (e: { id: string; data: { slug?: string } }) => e.data.slug ?? e.id.replace(/\.mdx?$/, '');
+---
+
+{more.length > 0 && (
+  <section class="kz-blog" aria-labelledby="kz-blog-h">
+    <header class="kz-sec-head">
+      <span class="kz-sec-head__bracket" aria-hidden="true">[+]</span>
+      <h2 class="kz-sec-head__title" id="kz-blog-h">More from the blog</h2>
+      <span class="kz-sec-head__rule" aria-hidden="true"></span>
+      <a class="kz-sec-head__more" href="/blog/">All {all.length} posts →</a>
+    </header>
+    <div class:list={['kz-blog__grid', more.length < 3 && 'kz-blog__grid--two']}>
+      {more.map((entry) => {
+        const slug = slugOf(entry);
+        return (
+          <article class="kz-post" data-slug={slug}>
+            <div class="kz-post__body">
+              <p class="kz-post__meta">
+                <time datetime={entry.data.date_published.toISOString().slice(0, 10)}>{postDateLabel(entry.data)}</time>
+                <span class="dot" aria-hidden="true">·</span>
+                <span>{readingMinutes(entry.body ?? '')} min read</span>
+              </p>
+              <h3><a href={`/blog/${slug}/`}>{entry.data.title}</a></h3>
+              <p>{entry.data.summary}</p>
+              <div class="kz-post__tags">
+                {entry.data.tags.slice(0, 3).map((t) => (
+                  <a class="tag-chip" href={`/blog/tags/${t}/`}>{t}</a>
+                ))}
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </section>
+)}

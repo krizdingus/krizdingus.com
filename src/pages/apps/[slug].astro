@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Prerendered standalone page for each non-draft app. The route is locked to
+// the XP theme (forcePlainChrome): where XP can run, the desktop mounts, opens
+// the app in its floating window ([data-app-autolaunch], read by
+// src/themes/xp/xp.theme.ts) and tucks the Krizscape window into the taskbar.
+// Everywhere else (phones, narrow windows, JS off) BaseLayout shows a plain
+// notice instead, and nothing here runs. The iframe body lives at
+// /apps/[slug]/embed/. Draft apps get no route.
+export async function getStaticPaths() {
+  const all = await getCollection('apps', (e) => !e.data.draft);
+  return all.map((entry) => ({
+    params: { slug: entry.data.slug ?? entry.id.replace(/\.mdx?$/, '') },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const slugFromId = (id: string) => id.replace(/\.mdx?$/, '');
+const slug = entry.data.slug ?? slugFromId(entry.id);
+const name = entry.data.taskbar_label;
+---
+
+<BaseLayout
+  title={`${name} — Krizdingus`}
+  description={`${name}, a Krizdingus mini-app for the XP desktop.`}
+  noindex
+  bodyClass={slug === 'mediakruzer' ? 'mediakruzer-page' : undefined}
+  forcePlainChrome={true}
+>
+  <div class="app-route" data-app-autolaunch={slug}>
+    <h1>{name}</h1>
+    <p>It runs in its own window on the desktop.</p>
+    <p><button type="button" class="app-route__open" data-app-open={slug}>Open {name} again</button></p>
+  </div>
+</BaseLayout>

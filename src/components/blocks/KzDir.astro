@@ -1,0 +1,133 @@
+---
+// src/components/blocks/KzDir.astro
+// Yahoo-style portal directory plus the workshop panel. Everything is derived
+// at build time: counts and flags from the collections (src/data/directory.ts),
+// workshop rows from the newest commit and a day count (src/data/workshop.ts). The XP theme adds its title bar, LEDs and status
+// line at mount (src/themes/xp/dressing/home.dressing.ts).
+import { getCollection } from 'astro:content';
+import { buildDirectory } from '../../data/directory';
+import { workshopRows, formatDay, SITE_TZ } from '../../data/workshop';
+import { latestCommit } from '../../data/git';
+
+const now = new Date();
+const slugOf = (e: { id: string; data: { slug?: string } }) => e.data.slug ?? e.id.replace(/\.mdx?$/, '');
+
+const projects = await getCollection('projects', (e) => !e.data.draft);
+const posts = await getCollection('blog', (e) => !e.data.draft);
+
+const dir = buildDirectory(
+  projects.map((p) => ({
+    slug: slugOf(p),
+    title: p.data.title,
+    category: p.data.category,
+    date: p.data.date_published,
+    downloads: p.data.field_report?.downloads,
+    captured: p.data.field_report?.captured,
+    source: p.data.field_report?.source,
+  })),
+  posts.map((p) => ({ slug: slugOf(p), title: p.data.title, date: p.data.date_published, tags: p.data.tags })),
+  now,
+);
+
+const commit = latestCommit();
+const rows = workshopRows({ now, commit });
+
+const half = Math.ceil(dir.columns.length / 2);
+const cols = [dir.columns.slice(0, half), dir.columns.slice(half)];
+const fmt = (n: number) => n.toLocaleString('en-US');
+---
+
+<section class="kz-dir-row" aria-label="Directory and workshop">
+  <div class="kz-dir">
+    <header class="kz-sec-head">
+      <span class="kz-sec-head__bracket" aria-hidden="true">[+]</span>
+      <h2 class="kz-sec-head__title">Dingus Directory</h2>
+      <span class="kz-sec-head__rule" aria-hidden="true"></span>
+      <span class="kz-sec-head__meta">{dir.projectCount} projects · {dir.postCount} posts</span>
+    </header>
+    <div class="kz-dir__grid">
+      {cols.map((group) => (
+        <div class="kz-dir__col">
+          {group.map((col) => (
+            <>
+              <h3 class="kz-dir__h">
+                <span class="kz-dir__bullet" aria-hidden="true">[+]</span>
+                {col.href ? <a href={col.href}>{col.heading}</a> : <span>{col.heading}</span>}
+                <span class="kz-dir__c">({col.count})</span>
+              </h3>
+              <ul class="kz-dir__list">
+                {col.items.map((item) => (
+                  <li>
+                    <a href={item.href}>{item.label}</a>
+                    {item.count !== undefined && <span class="kz-dir__c">({item.count})</span>}
+                    {item.flag === 'new' && <span class="kz-flag kz-flag--new">NEW</span>}
+                  </li>
+                ))}
+              </ul>
+            </>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <aside class="kz-pick" aria-labelledby="kz-pick-h">
+    <h2 class="kz-pick__h" id="kz-pick-h">Workshop status</h2>
+    <dl class="kz-status">
+      {rows.map((row) => (
+        <div class="kz-status__row" data-status={row.status} data-key={row.key}>
+          <dt class="kz-status__k">{row.key}</dt>
+          <dd class="kz-status__v">
+            {row.href
+              ? <a href={row.href}>{row.text}</a>
+              : row.code
+                ? <code data-commit={commit?.hash}>{row.text}</code>
+                : <span data-uptime-since={row.since} data-uptime-tz={row.since && SITE_TZ}>{row.text}</span>}
+            {row.note && <span class="kz-status__note">{row.note}</span>}
+            {row.asOf && <span class="kz-status__note" data-uptime-asof>({row.asOf})</span>}
+          </dd>
+        </div>
+      ))}
+    </dl>
+
+    {dir.topPicks.length > 0 && (
+      <div class="kz-pick__hot">
+        <h3 class="kz-pick__hot-h">Most downloaded</h3>
+        <ol class="kz-pick__ol">
+          {dir.topPicks.map((pick) => (
+            <li>
+              <a href={pick.href}>{pick.label}</a>
+              <span class="kz-pick__n">{fmt(pick.downloads)}</span>
+            </li>
+          ))}
+        </ol>
+        {dir.topPicksCaptured && (
+          <p class="kz-pick__src">{dir.topPicksSource ?? 'MakerWorld'} downloads, counted {formatDay(dir.topPicksCaptured)}</p>
+        )}
+      </div>
+    )}
+  </aside>
+</section>
+
+{/* The build-time day count is stale from the next day on: recount it from
+    the start date in the visitor's browser and drop the "counted" line.
+    Without JS the build-day count stays, dated. */}
+<script is:inline>
+  (function () {
+    var el = document.querySelector('[data-uptime-since]');
+    if (!el) return;
+    try {
+      var today = new Intl.DateTimeFormat('en-CA', {
+        timeZone: el.getAttribute('data-uptime-tz') || undefined,
+        year: 'numeric', month: '2-digit', day: '2-digit',
+      }).format(new Date());
+      var days = Math.floor(
+        (Date.parse(today + 'T00:00:00Z') - Date.parse(el.getAttribute('data-uptime-since') + 'T00:00:00Z')) / 864e5,
+      );
+      if (!(days >= 0)) return;
+      el.textContent = days.toLocaleString('en-US') + ' days';
+      var asOf = document.querySelector('[data-uptime-asof]');
+      if (asOf) asOf.remove();
+    } catch (e) {}
+  })();
+</script>

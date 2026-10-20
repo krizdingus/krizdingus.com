@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostRow from '../../../components/PostRow.astro';
+import { getCollection } from 'astro:content';
+import { enumerateTags, postsByTag, postDateLabel, readingMinutes, postSlug, needsReview } from '../../../lib/blog-helpers';
+import { pageCard } from '../../../lib/seo';
+import '../../../styles/blog.css';
+
+export async function getStaticPaths() {
+  const all = await getCollection('blog', (e) => !e.data.draft);
+  const tags = enumerateTags(all).map((t) => t.tag);
+  return tags.map((tag) => ({ params: { tag } }));
+}
+
+const { tag } = Astro.params;
+const all = await getCollection('blog', (e) => !e.data.draft);
+all.sort((a, b) => b.data.date_published.getTime() - a.data.date_published.getTime());
+
+const tagged = postsByTag(all, tag);
+const tags = enumerateTags(all);
+// Tag pages are thin until a tag has a few signed-off posts: noindex (links
+// still followed) until it has three, which also keeps them out of the sitemap.
+const signedOff = tagged.filter((e) => !needsReview(e.data)).length;
+const thin = signedOff < 3;
+const countLabel = `${tagged.length} post${tagged.length === 1 ? '' : 's'}`;
+---
+
+<BaseLayout
+  title={`#${tag} — Krizdingus blog`}
+  description={`Blog posts tagged ${tag}: ${tagged.map((e) => e.data.title).join(', ')}.`}
+  shellTitle={`KRIZSCAPE — Blog · #${tag}`}
+  noindex={thin}
+  ogImage={pageCard('blog')}
+  breadcrumbs={[{ name: 'Blog', path: '/blog/' }, { name: `#${tag}`, path: `/blog/tags/${tag}/` }]}
+  statusSegment={`${countLabel} in #${tag}`}
+>
+  <section class="content-section">
+    <div class="tag-head">
+      <p class="crumb">&gt; <a href="/blog/" style="color:inherit">blog</a> / tags / {tag}</p>
+      <h1>#{tag}</h1>
+      <p class="count">{countLabel} · filtered from {all.length}</p>
+    </div>
+
+    <div class="blog-layout">
+      <div>
+        <div class="blog-grid">
+          {tagged.map((entry) => (
+            <PostRow
+              slug={postSlug(entry.id)}
+              title={entry.data.title}
+              summary={entry.data.summary}
+              date={postDateLabel(entry.data)}
+              readTime={readingMinutes(entry.body ?? '')}
+              tags={entry.data.tags}
+              heroImage={entry.data.hero_image ?? null}
+            />
+          ))}
+        </div>
+
+        <p class="tag-back"><a href="/blog/">← All posts</a></p>
+      </div>
+
+      <aside class="blog-sidebar" aria-label="Tag sidebar">
+        <nav class="sb-card" aria-labelledby="sb-alltags">
+          <h2 class="sb-head" id="sb-alltags">All tags</h2>
+          <div class="body">
+            <ul class="tag-list-stack">
+              {tags.map(({ tag: t, count }) => (
+                <li>
+                  <a href={`/blog/tags/${t}/`} aria-current={t === tag ? 'page' : undefined}>
+                    {t} <span class="count">{count}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>

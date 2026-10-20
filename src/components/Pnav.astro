@@ -1,0 +1,66 @@
+---
+// src/components/Pnav.astro
+// Mockup contract: .pnav is a 2-column grid; each cell is <a> containing
+// .step (small pixel kicker) + .title (larger label). Right cell gets .next.
+export interface PnavEntry {
+  href: string;
+  label: string;
+  /** Optional override for the small pixel kicker ("PREVIOUS" / "NEXT", "PREV POST" / "NEXT POST", "LEDGER", etc.). */
+  kicker?: string;
+}
+
+export interface Props {
+  prev?: PnavEntry;
+  next?: PnavEntry;
+  /** Default kicker for the empty/disabled cells. Falls back to PREVIOUS/NEXT
+   *  if not provided. Use when a page wants its disabled-state label (e.g.,
+   *  "PREV POST" / "NEXT POST") to stay consistent with the active cells. */
+  fallbackPrevKicker?: string;
+  fallbackNextKicker?: string;
+}
+
+const { prev, next, fallbackPrevKicker = 'PREVIOUS', fallbackNextKicker = 'NEXT' } = Astro.props as Props;
+const prevKicker = prev?.kicker ?? fallbackPrevKicker;
+const nextKicker = next?.kicker ?? fallbackNextKicker;
+---
+
+<nav class="pnav" aria-label="Page navigation">
+  {prev ? (
+    <a href={prev.href}>
+      <span class="step">← {prevKicker}</span>
+      <span class="title">{prev.label}</span>
+    </a>
+  ) : (
+    <span class="is-disabled" aria-disabled="true">
+      <span class="step">← {prevKicker}</span>
+      <span class="title">(none)</span>
+    </span>
+  )}
+  {next ? (
+    <a class="next" href={next.href}>
+      <span class="step">{nextKicker} →</span>
+      <span class="title">{next.label}</span>
+    </a>
+  ) : (
+    <span class="next is-disabled" aria-disabled="true">
+      <span class="step">{nextKicker} →</span>
+      <span class="title">(none)</span>
+    </span>
+  )}
+</nav>
+
+<style>
+  /* Titles are whole project and post names, so they read in the body mono
+     face rather than pixel caps; the pixel kicker stays as the label.
+     `nav.pnav` outranks the base .pnav rules in site.css. */
+  nav.pnav .step {
+    font-size: 10px;
+  }
+  nav.pnav .title {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.4;
+  }
+</style>

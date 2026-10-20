@@ -1,0 +1,217 @@
+/* =============================================================
+   motion.css — the named keyframe library
+
+   Every animation has a job and a name. None of them are necessary;
+   all of them are load-bearing. If you can't make it work statically
+   under `prefers-reduced-motion`, it doesn't ship.
+
+   Naming rule: evocative + specific. A keyframe is called
+   `chromaBleed`, not `glitch-effect-3`. The bit is the bit.
+
+   Import after colors_and_type.css. The reduced-motion block at the
+   bottom kills every named keyframe at once, so anything in here is
+   safe to apply with confidence — the user's setting wins.
+   ============================================================= */
+
+/* ------- Motion tokens (re-declared from colors_and_type.css for clarity) ------- */
+:root {
+  --dur-instant: 80ms;
+  --dur-fast:    140ms;
+  --dur-base:    200ms;
+  --dur-slow:    400ms;
+  --dur-extra:   800ms;
+
+  --ease-base:  cubic-bezier(0.2, 0.7, 0.3, 1);
+  --ease-snap:  steps(4, end);
+  --ease-chunk: steps(8, end);     /* for static / corruption — read as 1998 */
+}
+
+/* =============================================================
+   1. chromaBleed
+   RGB offset on text + shadow. Mimics looking at a 3D movie
+   without the glasses. Use on featured-title hover and as a
+   200ms one-shot when the theme toggle flips.
+   ============================================================= */
+@keyframes chromaBleed {
+  0%, 100% {
+    text-shadow: none;
+    box-shadow: 0 4px 12px var(--shadow-color);
+  }
+  25% {
+    text-shadow:
+      2px 0 0 rgba(255, 0, 0, 0.55),
+     -2px 0 0 rgba(0, 255, 255, 0.55);
+    box-shadow:
+      2px 0 0 rgba(255, 0, 0, 0.30),
+     -2px 0 0 rgba(0, 255, 255, 0.30),
+      0 4px 12px var(--shadow-color);
+  }
+  50% {
+    text-shadow:
+      3px 0 0 rgba(255, 0, 0, 0.70),
+     -3px 0 0 rgba(0, 255, 255, 0.70);
+  }
+  75% {
+    text-shadow:
+      1px 0 0 rgba(255, 0, 0, 0.30),
+     -1px 0 0 rgba(0, 255, 255, 0.30);
+  }
+}
+
+/* =============================================================
+   2. quickGlitch
+   The ambient haunt. Apply to project cards on a roulette so
+   one card per ~3s twitches. 300ms, ease-in-out.
+   ============================================================= */
+@keyframes quickGlitch {
+  0%   { transform: translate(0); filter: none; }
+  20%  { transform: translate(2px,-1px) skew(1deg);   filter: hue-rotate(90deg) saturate(1.5); }
+  40%  { transform: translate(-1px,2px) skew(-0.5deg); filter: invert(0.1) hue-rotate(180deg); }
+  60%  { transform: translate(1px,1px);               filter: sepia(0.3) saturate(2); }
+  80%  { transform: translate(-2px,0);                 filter: contrast(1.2) brightness(1.1); }
+  100% { transform: translate(0); filter: none; }
+}
+
+/* =============================================================
+   3. pixelCorruption
+   Steps(8) static overlay. The "this JPEG is haunted" effect.
+   Use as a pseudo-element on top of a card during transition.
+   ============================================================= */
+@keyframes pixelCorruption {
+  0%    { opacity: 0;   background-position: 0 0; }
+  12.5% { opacity: 0.8; background-position: -2px 2px; }
+  25%   { opacity: 0.4; background-position: 2px -2px; }
+  37.5% { opacity: 0.9; background-position: -1px -3px; }
+  50%   { opacity: 0.3; background-position: 3px 1px; }
+  62.5% { opacity: 0.7; background-position: -3px 0; }
+  75%   { opacity: 0.5; background-position: 1px 3px; }
+  87.5% { opacity: 0.8; background-position: 0 -1px; }
+  100%  { opacity: 0;   background-position: 0 0; }
+}
+.pixel-corruption {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='10' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='2' height='2' fill='%23ff0000'/%3E%3Crect width='2' height='2' x='4' y='4' fill='%2300ff00'/%3E%3Crect width='2' height='2' x='8' y='8' fill='%230000ff'/%3E%3C/svg%3E");
+  background-size: 10px 10px;
+  animation: pixelCorruption 0.6s steps(8);
+  z-index: 8;
+}
+
+/* =============================================================
+   4. borderFlicker
+   90s-cable-modem border seizures. 400ms, infinite-on-hover,
+   one-shot on focus. Use on the OS shell when something inside
+   it errors out.
+   ============================================================= */
+@keyframes borderFlicker {
+  0%, 100% { border-color: var(--border-strong); }
+  10%      { border-color: var(--accent-primary); }
+  20%      { border-color: var(--accent-secondary); }
+  30%      { border-color: var(--error); }
+  45%      { border-color: var(--accent-terminal); }
+  60%      { border-color: var(--warning); }
+  80%      { border-color: var(--accent-primary); }
+}
+
+/* =============================================================
+   5. colorShift
+   Slow hue-rotate. "This JPEG is haunted, calmly." Apply to
+   ambient page elements like the desktop wallpaper or section
+   dividers. 6s infinite, ease-in-out.
+   ============================================================= */
+@keyframes colorShift {
+  0%, 100% { filter: hue-rotate(0deg) saturate(1); }
+  33%      { filter: hue-rotate(30deg) saturate(1.1); }
+  66%      { filter: hue-rotate(-20deg) saturate(0.95); }
+}
+
+/* =============================================================
+   6. crtPowerOff
+   The TV shutting off. ScaleY → 0, brightness up, then snap to
+   nothing. Use when closing an OS window or dismissing a glitch
+   banner. 600ms.
+   ============================================================= */
+@keyframes crtPowerOff {
+  0%   { transform: scaleY(1) scaleX(1); filter: brightness(1); opacity: 1; }
+  20%  { transform: scaleY(0.85) scaleX(1.02); filter: brightness(1.2); }
+  60%  { transform: scaleY(0.01) scaleX(1); filter: brightness(3); opacity: 1; }
+  80%  { transform: scaleY(0.01) scaleX(0.005); filter: brightness(2); opacity: 0.6; }
+  100% { transform: scaleY(0) scaleX(0); filter: brightness(0); opacity: 0; }
+}
+
+/* =============================================================
+   7. extremeGlitch
+   The featured-project transition effect. 800ms. Hue rotation,
+   clip-path scramble, skew. This is the bit. Pair with
+   `dramaticGlitchWarning` for the "CARTRIDGE READ FAILURE" stamp.
+   ============================================================= */
+@keyframes extremeGlitch {
+  0%   { filter: none; transform: none; clip-path: inset(0); }
+  10%  { filter: hue-rotate(90deg) saturate(5) contrast(3);  transform: translate(15px,-5px) skewX(10deg); clip-path: inset(20% 0 30% 0); }
+  25%  { filter: invert(1) hue-rotate(180deg) saturate(8);    transform: translate(-12px,8px) skewX(-8deg); clip-path: inset(0 20% 0 15%); }
+  40%  { filter: sepia(1) saturate(10) hue-rotate(270deg);    transform: translate(8px,-12px) skewY(5deg);   clip-path: inset(40% 0 10% 0); }
+  60%  { filter: contrast(8) brightness(0.2) saturate(0);     transform: translate(-18px,3px) rotate(2deg);  clip-path: inset(0 30% 0 0); }
+  80%  { filter: hue-rotate(-180deg) saturate(6) contrast(4); transform: translate(10px,-8px) skewX(15deg);  clip-path: inset(15% 0 25% 10%); }
+  100% { filter: none; transform: none; clip-path: inset(0); }
+}
+
+/* =============================================================
+   8. dramaticGlitchWarning
+   The "◊ CARTRIDGE READ FAILURE ◊" stamp. Pops in scaled-up,
+   wobbles, then fades. 1.2s ease-out. Always pair with a
+   text-shadow stamp on the banner element.
+   ============================================================= */
+@keyframes dramaticGlitchWarning {
+  0%   { transform: translate(-50%,-50%) scale(0)   rotate(0deg);  opacity: 0; filter: hue-rotate(0deg); }
+  10%  { transform: translate(-50%,-50%) scale(1.3) rotate(5deg);  opacity: 1; filter: hue-rotate(180deg) saturate(3); }
+  15%  { transform: translate(-45%,-55%) scale(0.8) rotate(-3deg); filter: invert(1) hue-rotate(90deg); }
+  20%  { transform: translate(-55%,-45%) scale(1.1) rotate(2deg);  filter: sepia(1) saturate(5) hue-rotate(270deg); }
+  30%  { transform: translate(-48%,-52%) scale(1.05) rotate(1deg); filter: hue-rotate(45deg) saturate(2); }
+  70%  { transform: translate(-50%,-50%) scale(1)   rotate(0deg);  opacity: 1; filter: none; }
+  100% { transform: translate(-50%,-50%) scale(0.95);              opacity: 0; }
+}
+
+/* =============================================================
+   9. crtBootup
+   The monitor coming on. Vertical collapse → wide blast →
+   settle. 900ms ease-out. Use once on initial page load and on
+   theme toggle if you're feeling spicy.
+   ============================================================= */
+@keyframes crtBootup {
+  0%   { filter: brightness(1) contrast(1);          transform: scaleY(1); }
+  15%  { filter: brightness(0.1) contrast(8) saturate(0); transform: scaleY(0.01); }
+  25%  { filter: brightness(3) contrast(2) hue-rotate(180deg); transform: scaleY(0.8); }
+  40%  { filter: brightness(0.3) contrast(5) invert(1);        transform: scaleY(1.1) scaleX(0.98); }
+  55%  { filter: brightness(2) contrast(3) sepia(1) saturate(3); transform: scaleY(0.95) scaleX(1.02); }
+  70%  { filter: brightness(0.8) contrast(6) hue-rotate(90deg);  transform: scaleY(1.05) scaleX(0.99); }
+  100% { filter: brightness(1) contrast(1); transform: scaleY(1) scaleX(1); }
+}
+
+/* =============================================================
+   10. wallpaperChange
+   Crossfade between two pixel-art desktops. Apply to the body's
+   background-image swap. 1.2s ease, with a quick brightness spike
+   in the middle so the change feels like a CRT shock, not a fade.
+   ============================================================= */
+@keyframes wallpaperChange {
+  0%   { filter: brightness(1) contrast(1); opacity: 1; }
+  30%  { filter: brightness(2) contrast(0.8) saturate(0); opacity: 0.6; }
+  50%  { filter: brightness(0.3) contrast(2); opacity: 0.2; }
+  100% { filter: brightness(1) contrast(1); opacity: 1; }
+}
+
+/* =============================================================
+   Reduced-motion guard
+   One block. Kills every named animation, restores baseline
+   transforms/filters, leaves color and layout alone. Anything in
+   this file is safe to use under `prefers-reduced-motion: reduce`
+   because of this block.
+   ============================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:    0.001ms !important;
+    animation-iteration-count: 1   !important;
+    transition-duration:   0.001ms !important;
+  }
+  .pixel-corruption { display: none !important; }
+}

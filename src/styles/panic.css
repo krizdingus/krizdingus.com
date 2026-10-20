@@ -1,0 +1,145 @@
+/* =============================================================
+   /panic: the fake blue screen (src/pages/panic.astro).
+   Page-scoped: nothing else imports this file. A memory of the
+   text-mode 9x blue screen (VGA blue, grey title chip, VT323 for
+   the 80x25 text) with the later ":(" and percentage counter.
+   Same in every mode and color scheme: a blue screen is blue.
+   Motion: one 1 Hz cursor blink (well under 3 flashes/s), and
+   nothing at all under prefers-reduced-motion.
+   ============================================================= */
+.bsod-body {
+  margin: 0;
+  background: #0000aa;
+  color: #ffffff;
+}
+.bsod-body ::selection { background: #ffffff; color: #0000aa; }
+
+.bsod {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #0000aa;
+  color: #ffffff;
+  font-family: var(--font-crt);
+  font-size: clamp(1.375rem, 1.1rem + 0.9vw, 1.75rem);
+  line-height: 1.25;
+  padding: clamp(24px, 7vh, 96px) clamp(16px, 7vw, 112px) clamp(24px, 5vh, 64px);
+  overflow-wrap: anywhere;
+}
+/* Faint CRT rows. Static: no flicker. */
+.bsod::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, 0.12) 2px 3px);
+  pointer-events: none;
+}
+.bsod__inner {
+  position: relative;
+  max-width: 52rem;
+}
+
+.bsod__chip {
+  display: inline-block;
+  margin: 0 0 1.25rem;
+  padding: 0 0.5em;
+  background: #aaaaaa;
+  color: #0000aa;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.bsod__face {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-pixel);
+  font-size: clamp(4.5rem, 3rem + 7vw, 9rem);
+  line-height: 1;
+}
+.bsod__h {
+  margin: 0 0 1.75rem;
+  font-family: var(--font-crt);
+  font-weight: 400;
+  font-size: clamp(1.875rem, 1.3rem + 2.2vw, 2.875rem);
+  line-height: 1.1;
+  max-width: 30ch;
+}
+
+.bsod__progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 1rem;
+  margin: 0 0 1.5rem;
+}
+.bsod__bar {
+  letter-spacing: 0;
+  white-space: nowrap;
+  font-size: 0.9em;
+}
+.bsod__pct { font-size: 1.35em; }
+
+.bsod__list {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+}
+.bsod__list li { padding-left: 1.5ch; text-indent: -1.5ch; }
+.bsod__list li::before { content: '* '; }
+
+.bsod__cursor { animation: bsod-blink 1s steps(1, end) infinite; }
+@keyframes bsod-blink { 50% { opacity: 0; } }
+
+.bsod__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 0 0 0.5rem;
+}
+.bsod__btn {
+  font: inherit;
+  color: #ffffff;
+  background: none;
+  border: 0;
+  padding: 0.125rem 0.25rem;
+  margin: 0;
+  cursor: pointer;
+  text-decoration: none;
+  /* 44px tall target without changing the text-mode look */
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.bsod__btn::before { content: '[ '; white-space: pre; }
+.bsod__btn::after { content: ' ]'; white-space: pre; }
+.bsod__btn:hover,
+.bsod__btn:focus-visible {
+  background: #ffffff;
+  color: #0000aa;
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+.bsod__btn:disabled {
+  cursor: default;
+  color: #c8c8ff;
+  background: none;
+  outline: 0;
+}
+.bsod__status { min-height: 1.25em; margin: 0 0 1.25rem; }
+
+.bsod__codes {
+  margin: 0;
+  font-size: 0.9em;
+}
+.bsod__codes div { display: flex; flex-wrap: wrap; gap: 0 1ch; }
+.bsod__codes dt,
+.bsod__codes dd { margin: 0; }
+
+/* The restart: the screen goes black, once, then the home page loads. */
+.is-restarting .bsod-body,
+.is-restarting .bsod { background: #000000; }
+.is-restarting .bsod > * { visibility: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bsod__cursor { animation: none; }
+}

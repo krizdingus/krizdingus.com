@@ -1,0 +1,508 @@
+/* =============================================================
+   KRIZDINGUS DESIGN SYSTEM — tokens
+   Retro OS / CRT terminal aesthetic for krizdingus.com
+   Game Boy palette + 1994-2001 web nostalgia + modern glitch.
+
+   Merges Krizdingus's existing CSS vars (light/dark theme) with
+   an OpenCode-style hairline-and-monospace overlay: ASCII bracket
+   markers as bullets, 96px section rhythm option, terminal blocks.
+
+   Light theme is the default. Add [data-theme="dark"] on <html>
+   to flip every token at once.
+
+   The :root and [data-theme="dark"] blocks are the XP desktop's palette
+   (and the MediaKruzer embed's and /panic/'s, which import this file
+   without BaseLayout). Normal mode ("Two moods") re-points the same
+   tokens further down, scoped to a BaseLayout page with no base:none
+   theme mounted, so XP never sees them.
+   ============================================================= */
+
+/* ------- Self-hosted fonts (all SIL OFL 1.1; licenses in /fonts/*-OFL.txt) ------- */
+/* Figtree (normal mode's reading face) and Saira (its headings): Google
+   Fonts' variable woff2 subsets, latin + latin-ext, self-hosted. Saira
+   is cut down (fontTools varLib.instancer) to the range the CSS uses:
+   weight 500-800, width 100%-110%; the headings sit a little wide. */
+@font-face {
+  font-family: "Figtree";
+  src: url("/fonts/Figtree-VariableFont_wght-latin.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Figtree";
+  src: url("/fonts/Figtree-VariableFont_wght-latin-ext.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Figtree";
+  src: url("/fonts/Figtree-Italic-VariableFont_wght-latin.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: italic;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Figtree";
+  src: url("/fonts/Figtree-Italic-VariableFont_wght-latin-ext.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: italic;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Saira";
+  src: url("/fonts/Saira-VariableFont_wdth-wght-latin.woff2") format("woff2");
+  font-weight: 500 800;
+  font-style: normal;
+  font-stretch: 100% 110%;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Saira";
+  src: url("/fonts/Saira-VariableFont_wdth-wght-latin-ext.woff2") format("woff2");
+  font-weight: 500 800;
+  font-style: normal;
+  font-stretch: 100% 110%;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* Silkscreen: Google Fonts' woff2 subsets (latin + latin-ext), self-hosted. */
+@font-face {
+  font-family: "Silkscreen";
+  src: url("/fonts/Silkscreen-Regular-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Silkscreen";
+  src: url("/fonts/Silkscreen-Regular-latin-ext.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Silkscreen";
+  src: url("/fonts/Silkscreen-Bold-latin.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Silkscreen";
+  src: url("/fonts/Silkscreen-Bold-latin-ext.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* JetBrains Mono + VT323: woff2 converted from the upstream TTFs.
+   JetBrains Mono is split like Silkscreen: a "-latin" subset (Latin-1,
+   punctuation, arrows, shapes and the symbol blocks the site uses; cut with
+   fontTools, axes and features kept) loads on every page, and the full
+   upstream file only loads when a page has a character from the rest
+   (Latin Extended, Greek, Cyrillic, box drawing). All four files are
+   instanced with fontTools varLib.instancer to the weight range the site
+   uses (400 to 700, in both modes), so the light end of the axis isn't
+   shipped. */
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-wght400-700.woff2") format("woff2-variations"),
+       url("/fonts/JetBrainsMono-wght400-700.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-0130, U+0134-0151, U+0154-02BA, U+02BD-02C5, U+02C7-02D9, U+02DB, U+02DD-0303, U+0305-0307, U+0309-0328, U+032A-03FF, U+0400-04FF, U+1E00-1EFF, U+2070-208F, U+20A0-20AB, U+20AD-20BF, U+2100-2121, U+2123-218F, U+2500-257F, U+27E8-27F7, U+2B58, U+E0A0-E0B3;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-wght400-700-latin.woff2") format("woff2-variations"),
+       url("/fonts/JetBrainsMono-wght400-700-latin.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2190-21FF, U+2200-22FF, U+2300-23FF, U+2580-259F, U+25A0-25FF, U+2600-26FF, U+2700-27BF, U+2900-297F, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Italic-wght400-700.woff2") format("woff2-variations"),
+       url("/fonts/JetBrainsMono-Italic-wght400-700.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: italic;
+  font-display: swap;
+  unicode-range: U+0100-0130, U+0134-0151, U+0154-02BA, U+02BD-02C5, U+02C7-02D9, U+02DB, U+02DD-0303, U+0305-0307, U+0309-0328, U+032A-03FF, U+0400-04FF, U+1E00-1EFF, U+2070-208F, U+20A0-20AB, U+20AD-20BF, U+2100-2121, U+2123-218F, U+2500-257F, U+27E8-27F7, U+2B58, U+E0A0-E0B3;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Italic-wght400-700-latin.woff2") format("woff2-variations"),
+       url("/fonts/JetBrainsMono-Italic-wght400-700-latin.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: italic;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2190-21FF, U+2200-22FF, U+2300-23FF, U+2580-259F, U+25A0-25FF, U+2600-26FF, U+2700-27BF, U+2900-297F, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "VT323";
+  src: url("/fonts/VT323-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ------- COLOR — LIGHT THEME (OS desktop on white surface) ------- */
+  --bg-primary:        #ffffff;   /* content area inside the OS window */
+  --bg-secondary:      #f6f3eb;   /* alternating section row, slightly warm */
+  --bg-tertiary:       #fbfaf6;   /* project card surface, barely a tint */
+  --bg-panel:          #d4d0c8;   /* OS window outer chrome panel */
+  --bg-panel-light:    #e8e4dc;   /* highlight bevel */
+  --bg-panel-dark:     #8a8682;   /* shadow bevel */
+  --bg-console:        #1a1c1c;   /* terminal/console (always dark) */
+  --bg-console-soft:   #242727;
+  --bg-console-elev:   #2e3131;
+  --desktop-bg:        #6b8eb8;   /* fallback for the wallpaper "desktop" */
+
+  --text-primary:      #272929;
+  --text-secondary:    #404242;
+  --text-muted:        #6b6660;
+  --text-on-console:   #c4bebb;
+  --text-on-console-2: #a4a0a0;
+  --text-on-chrome:    #ffffff;   /* white text on the purple title/status bar */
+
+  --accent-primary:    #9a2257;   /* magenta — H1, primary CTA, links */
+  --accent-secondary:  #494786;   /* purple — chrome title bar, status bar, nav */
+  --accent-tertiary:   #494786;
+  --accent-pixel:      #b6e6b0;   /* pale Game Boy green — tags / hover */
+  --accent-terminal:   #a4f09d;   /* brighter green — terminal text only */
+
+  --border-color:      #b8a584;   /* warm tan — component borders */
+  --border-strong:     #1a1c1c;   /* heavy black — OS window outer edge */
+  --hairline:          rgba(39, 41, 41, 0.14);
+  --shadow-color:      rgba(39, 41, 41, 0.12);
+  --shadow-deep:       rgba(39, 41, 41, 0.30);
+
+  /* Windows-95 chunky bevel — used on every OS button, every panel.
+     `out` = raised (the default for buttons + panels), `in` = pressed. */
+  --bevel-light:       #ffffff;
+  --bevel-mid:         var(--bg-panel);
+  --bevel-dark:        #8a8682;
+  --bevel-edge:        #1a1c1c;
+
+  /* Scanline overlay — applied as a repeating-linear-gradient or via canvas */
+  --scanline-rgb:        0, 0, 0;
+  --scanline-intensity:  0.08;
+
+  --error:             #b8002f;   /* boot-line error */
+  --warning:           #b86b00;   /* boot-line warning */
+  --success:           #2f7a2a;
+  --info:              #494786;
+
+  /* ------- TYPOGRAPHY ------- */
+  --font-pixel:   "Silkscreen", "Press Start 2P", "Courier New", monospace;
+  --font-mono:    "JetBrains Mono", "Courier New", "Monaco", Consolas, monospace;
+  --font-crt:     "VT323", "Courier New", monospace;    /* CRT readout / boot */
+  --font-body:    var(--font-mono);
+
+  /* Type scale — clamps so it survives tiny terminals + ultrawides */
+  --type-h1:      clamp(1.8rem, 4vw,   2.5rem);   /* Silkscreen, accent-primary */
+  --type-h2:      clamp(1.4rem, 3vw,   2rem);     /* Silkscreen, accent-secondary */
+  --type-h3:      clamp(1.1rem, 2.5vw, 1.4rem);   /* Silkscreen, accent-primary */
+  --type-display: clamp(2rem,   5vw,   3rem);     /* console title, hero */
+  --type-body:    1rem;
+  --type-small:   0.9rem;
+  --type-tiny:    0.75rem;
+  --type-tag:     0.75rem;        /* tech tags */
+
+  --leading-tight: 1.2;
+  --leading-snug:  1.4;
+  --leading-body:  1.6;
+  --tracking-pixel: 0.05em;       /* default Silkscreen tracking */
+  --tracking-wide:  0.10em;       /* console title */
+
+  /* ------- SPACING (8px base + half-step) ------- */
+  --space-xxs: 0.25rem;   /*  4px */
+  --space-xs:  0.5rem;    /*  8px */
+  --space-sm:  1rem;      /* 16px */
+  --space-md:  1.5rem;    /* 24px */
+  --space-lg:  2rem;      /* 32px */
+  --space-xl:  3rem;      /* 48px */
+  --space-2xl: 4.5rem;    /* 72px */
+  --space-section: 6rem;  /* 96px — OpenCode-style rhythm between blocks */
+
+  /* ------- LAYOUT ------- */
+  --container-width:  1200px;
+  --container-text:   720px;
+  --container-narrow: 576px;
+
+  /* ------- BORDERS & RADII ------- */
+  --border-width: 2px;
+  --radius-sm: 4px;       /* every interactive element */
+  --radius-md: 6px;
+  --radius-none: 0;       /* sections, OS windows */
+
+  /* ------- ELEVATION ------- */
+  --shadow-card:    0 2px 8px var(--shadow-color);
+  --shadow-hover:   0 8px 24px var(--shadow-color);
+  --shadow-os:      4px 4px 0 var(--border-strong);  /* pixel/chiseled */
+  --shadow-glow:    0 0 12px var(--accent-tertiary);
+  --shadow-inset:   inset 0 0 20px rgba(0, 0, 0, 0.2);
+
+  /* ------- MOTION ------- */
+  --ease-base:  cubic-bezier(0.2, 0.7, 0.3, 1);
+  --ease-snap:  steps(4, end);
+  --dur-fast:   140ms;
+  --dur-base:   200ms;
+  --dur-slow:   400ms;
+  --transition: all var(--dur-base) ease;
+
+  --scan-line-height: 2px;
+}
+
+/* ------- DARK THEME (CRT terminal) ------- */
+[data-theme="dark"] {
+  --bg-primary:        #1a1c1c;
+  --bg-secondary:      #242727;
+  --bg-tertiary:       #2e3131;
+
+  --text-primary:      #c4bebb;
+  --text-secondary:    #a4a0a0;
+  --text-muted:        #9c9898;
+
+  --accent-primary:    #ff6b9d;   /* hot pink */
+  --accent-secondary:  #9898d8;   /* lavender */
+  --accent-tertiary:   #a4f09d;   /* terminal green — promoted in dark */
+  --accent-pixel:      #a4f09d;
+  --accent-terminal:   #a4f09d;
+
+  --border-color:      #404242;
+  --border-strong:     #6b6b6b;
+  --hairline:          rgba(196, 190, 187, 0.18);
+  --shadow-color:      rgba(0, 0, 0, 0.30);
+  --shadow-deep:       rgba(0, 0, 0, 0.55);
+
+  --error:             #ff4444;
+  --warning:           #ffaa00;
+  --success:           #a4f09d;
+
+  /* Dark-theme bevel — softer because everything's already glowing */
+  --bevel-light:       #4a4848;
+  --bevel-mid:         var(--bg-secondary);
+  --bevel-dark:        #1a1c1c;
+  --bevel-edge:        #000;
+
+  --scanline-rgb:        164, 240, 157;
+  --scanline-intensity:  0.10;
+}
+
+/* =============================================================
+   NORMAL MODE: "Two moods". One skeleton, one hue per section, two
+   inks. Day is a riso print on warm paper (ink hues, bright fills,
+   flat offsets); night is deep plum with the same hues lit up.
+   Sections: home Berry, projects Teal, blog Grape, web Kiwi, about
+   Dandelion (pro.css picks the hue per page as --hue).
+   Scope: a BaseLayout page (html > body > .site) with no base:none
+   theme mounted. XP sets data-skin-base="none", and the embed and
+   /panic/ pages have no .site, so all three keep the palette above.
+   Type in both moods: Figtree to read, Saira (a little wide) for
+   headings, JetBrains Mono for code, meta and labels. The wordmark is
+   drawn as SVG (src/components/Wordmark.astro), so Silkscreen never loads
+   here; it is XP's face. --font-pixel points at the mono, so every old
+   pixel-font label reads as mono here.
+   ============================================================= */
+
+/* ------- day: warm paper, riso inks ------- */
+:root:not([data-skin-base=none]):has(> body > .site) {
+  color-scheme: light;               /* native controls and scrollbars match the mood */
+  --font-body:    "Figtree", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Saira", "Figtree", system-ui, sans-serif;
+  --font-pixel:   var(--font-mono);
+
+  /* per hue: ink (text-safe on paper and its own tint), fill (the
+     bright riso drum: dots, offsets, stripes, buttons), tint (wash) */
+  --berry: #b5105f;  --berry-fill: #ff4fae;
+  --teal:  #00666c;  --teal-fill:  #2ec4b6;
+  --grape: #5a3aa0;  --grape-fill: #a68cf4;
+  --kiwi:  #2d6512;  --kiwi-fill:  #6cc24a;
+  --dandy: #7a5200;  --dandy-fill: #ffe34f;
+  --tint-amt: 20%;
+  --berry-tint: color-mix(in srgb, var(--berry-fill) var(--tint-amt), var(--bg-primary));
+  --teal-tint:  color-mix(in srgb, var(--teal-fill)  var(--tint-amt), var(--bg-primary));
+  --grape-tint: #efe4ec;            /* violet warmed toward the paper; mixed by hand */
+  --kiwi-tint:  color-mix(in srgb, var(--kiwi-fill)  var(--tint-amt), var(--bg-primary));
+  --dandy-tint: color-mix(in srgb, var(--dandy-fill) var(--tint-amt), var(--bg-primary));
+  --dandy-shell: var(--dandy-fill);
+  --marker: #ffe34f;                /* the yellow highlighter, both moods */
+  --marker-ink: #22202c;            /* text on the marker, both moods */
+  --mark: rgba(255, 227, 79, 0.85); /* highlighter behind bold */
+  --on-hue: #ffffff;                /* text on an ink fill */
+  --on-fill: #22202c;               /* text on a bright fill */
+  --edge-mix: #22202c;
+  --edge-amt: 70%;
+
+  --bg-primary:   #fbf5e8;   /* paper */
+  --bg-secondary: #f4ead3;   /* darker stock */
+  --bg-tertiary:  #fffbf2;   /* card stock */
+  --page-bg:      #ece0c4;   /* the table the sheet sits on */
+  /* background pixels: each fill mixed 40% toward its ink (riso ink on tan) */
+  --px-berry: #e1368e; --px-teal: #1c9e98; --px-grape: #886bd2; --px-kiwi: #539d34; --px-dandy: #caa92f;
+  --bg-console:      #1d1530;
+  --bg-console-soft: #261d3b;
+  --bg-console-elev: #30264a;
+
+  --text-primary:   #22202c; /* blue-black ink */
+  --text-secondary: #3a3746;
+  --text-muted:     #5f5a68;
+  --text-on-console:   #e6def0;
+  --text-on-console-2: #b5a9c6;
+
+  --accent-secondary: var(--grape);
+  --accent-tertiary:  var(--teal);
+  --accent-pixel:     var(--marker);
+
+  --border-color:  #c4ae86;
+  --border-strong: #22202c;
+  --hairline:      rgba(34, 32, 44, 0.16);
+  --shadow-color:  rgba(34, 32, 44, 0.16);
+  --card-rule:     #c4ae86;
+
+  --warning: #7a5200;
+  --success: #2d6512;
+  --error:   #b3122e;
+
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --leading-body: 1.6;
+}
+
+/* ------- night: deep plum, the hues glow ------- */
+:root:not([data-skin-base=none])[data-theme="dark"]:has(> body > .site) {
+  color-scheme: dark;
+  --berry: #ff7bb0;  --berry-tint: #36162f;  --berry-fill: #ff7bb0;
+  --grape: #c4a3ff;  --grape-tint: #2c2047;  --grape-fill: #c4a3ff;
+  --teal:  #4fe0d2;  --teal-tint:  #12303a;  --teal-fill:  #4fe0d2;
+  --kiwi:  #a6df5f;  --kiwi-tint:  #1f3120;  --kiwi-fill:  #a6df5f;
+  --dandy: #ffd447;  --dandy-tint: #2f2140;  --dandy-fill: #ffd447;
+  --dandy-shell: #ffd447;
+  --marker: #ffd447;
+  --marker-ink: #191225;
+  --mark: rgba(255, 212, 71, 0.22);
+  --on-hue: #191225;
+  --on-fill: #191225;
+  --edge-mix: #191225;
+  --edge-amt: 55%;
+
+  --bg-primary:   #191225;
+  --bg-secondary: #211831;
+  --bg-tertiary:  #261c38;
+  --page-bg:      #211831;
+  /* background pixels: the lit fills */
+  --px-berry: var(--berry-fill); --px-teal: var(--teal-fill); --px-grape: var(--grape-fill); --px-kiwi: var(--kiwi-fill); --px-dandy: var(--dandy-fill);
+  --bg-console:      #110b1a;
+  --bg-console-soft: #1a1226;
+  --bg-console-elev: #241a33;
+
+  --text-primary:   #f0eaf7;
+  --text-secondary: #d0c6de;
+  --text-muted:     #ab9fbf;
+  --text-on-console:   #e6def0;
+  --text-on-console-2: #b5a9c6;
+
+  --border-color:  #43365c;
+  --border-strong: #9a8cb3;
+  --hairline:      rgba(240, 234, 247, 0.12);
+  --shadow-color:  rgba(0, 0, 0, 0.4);
+  --card-rule:     #43365c;
+
+  --warning: #ffb547;
+  --success: #a6df5f;
+  --error:   #ff8a8a;
+}
+
+/* ------- normal-mode type roles -------
+   Saira for headings, Figtree for copy, mono for labels. The base rules
+   (site.css, the page sheets) keep the XP faces; these swap the families.
+   Bundles don't keep sheet order (a page's own sheet can land first), so
+   these never rely on it: the bare h1-h4 rule is kept one step lighter
+   than a component's own normal-mode rule (.page-hero h1, .prose h2),
+   which therefore always wins; the named roles carry their weight. */
+:root:not([data-skin-base=none]) :where(.site-main) :is(h1, h2, h3, h4),
+:root:not([data-skin-base=none]) :is(.section-title, .kz-sec-head__title, .kz-feat__big-title, .kz-feat__sm-title,
+  .kz-dir__h, .kz-post h3, .project-card h3, .kz-intro__title, .post-row .post-title,
+  .proj-row__title, .facts__h, .featured-title, .web-wp__title, .kz-pick__h, .kz-pick__hot-h) {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-stretch: 108%;
+  letter-spacing: -0.005em;
+  text-shadow: none;
+  text-transform: none;
+}
+/* Copy that the XP look sets in mono reads in the body face. */
+:root:not([data-skin-base=none]) :is(.kz-intro__lede, .kz-feat__big-hook, .kz-feat__sm-hook, .kz-post p,
+  .post-row p, .proj-row__sum, .intro-block, .page-hero .hero-sub, .featured-hook,
+  .facts__note, .facts__row dd, .facts__links a, .blog-sidebar .sb-note, .about-text,
+  .prose .review-note, .proj-empty, .kz-dir__list, .kz-pick__ol, .tag-list-stack, .web-wp) {
+  font-family: var(--font-body);
+  font-style: normal;
+  letter-spacing: 0;
+}
+
+/* ===== BEVEL HELPERS =====
+   Raised (.bevel-out) for default panel/button state.
+   Pressed (.bevel-in) for `:active` or "inset" inputs. */
+.bevel-out {
+  border: 2px solid;
+  border-color: var(--bevel-light) var(--bevel-edge) var(--bevel-edge) var(--bevel-light);
+}
+.bevel-in {
+  border: 2px solid;
+  border-color: var(--bevel-edge) var(--bevel-light) var(--bevel-light) var(--bevel-edge);
+}
+.bevel-out:active { border-color: var(--bevel-edge) var(--bevel-light) var(--bevel-light) var(--bevel-edge); }
+
+/* =============================================================
+   SEMANTIC ROLES (use these in product code rather than the raw
+   tokens above — keeps surface code stable when palette shifts)
+   ============================================================= */
+
+.h1, .h2, .h3, .display { font-family: var(--font-pixel); font-weight: 400; letter-spacing: var(--tracking-pixel); }
+.h1      { font-size: var(--type-h1);      color: var(--accent-primary); }
+.h2      { font-size: var(--type-h2);      color: var(--accent-secondary); }
+.h3      { font-size: var(--type-h3);      color: var(--accent-primary); }
+.display { font-size: var(--type-display); color: var(--accent-primary); letter-spacing: var(--tracking-wide); text-shadow: 2px 2px 0 var(--shadow-color); }
+
+.body       { font-family: var(--font-body); font-size: var(--type-body);  line-height: var(--leading-body); color: var(--text-primary); }
+.body-muted { font-family: var(--font-body); font-size: var(--type-small); line-height: var(--leading-body); color: var(--text-secondary); font-style: italic; }
+.mono       { font-family: var(--font-mono); }
+.crt-text   { font-family: var(--font-crt);  color: var(--accent-terminal); }
+.pixel-text { font-family: var(--font-pixel); letter-spacing: var(--tracking-pixel); }
+
+/* Link convention: magenta with underline on hover/focus, never naked */
+.link, a.link {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-weight: bold;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+.link:hover, .link:focus-visible {
+  border-bottom-color: var(--accent-primary);
+  outline: none;
+}
+
+/* ASCII bracket markers (OpenCode-style — used in feature lists,
+   FAQ rows, terminal output). Render literally in markup:
+   <li class="ascii-row"><span class="ascii-bracket">[+]</span> Label</li> */
+.ascii-bracket { font-family: var(--font-mono); color: var(--accent-secondary); user-select: none; }
+.ascii-bracket--ok    { color: var(--success); }
+.ascii-bracket--err   { color: var(--error); }
+.ascii-bracket--warn  { color: var(--warning); }
+.ascii-bracket--mute  { color: var(--text-muted); }
