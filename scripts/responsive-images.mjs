@@ -6,8 +6,9 @@
 //             gallery), at 480, 800 and 1200 px, plus a 200px square thumb
 //             for the gallery strip. Output:
 //             public/images/projects/<slug>/r/<base>-<w>.<ext>, <base>-thumb.webp
-//   blog      each post's hero_image, at 480, 800, 1200 and 1600 px. Output:
-//             public/images/blog/r/<base>-<w>.<ext>
+//   blog      each post's hero_image, at 480, 800, 1200 and 1600 px, with
+//             a credit line in the metadata (scripts/image-credit.mjs).
+//             Output: public/images/blog/r/<base>-<w>.<ext>
 //
 //   npm run images               (both)
 //   npm run images -- blog       (just one: blog or projects)
@@ -19,6 +20,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
+import { withCredit } from './image-credit.mjs';
 
 const root = process.cwd();
 const only = process.argv[2];
@@ -31,13 +33,16 @@ function frontMatter(file) {
   return fs.readFileSync(file, 'utf8').split(/^---$/m)[1] ?? '';
 }
 
-async function variants(input, out, base, widths) {
+async function variants(input, out, base, widths, { credit = false } = {}) {
   fs.mkdirSync(out, { recursive: true });
   const meta = await sharp(input).metadata();
   const ws = widths.filter((w) => w < meta.width);
   if (meta.width <= widths[widths.length - 1] && !ws.includes(meta.width)) ws.push(meta.width);
   for (const w of ws) {
-    const img = () => sharp(input).resize({ width: w, withoutEnlargement: true });
+    const img = () => {
+      const p = sharp(input).resize({ width: w, withoutEnlargement: true });
+      return credit ? withCredit(p) : p;
+    };
     await img().webp({ quality: 76, effort: 6 }).toFile(path.join(out, `${base}-${w}.webp`));
     await img().avif({ quality: 52, effort: 6 }).toFile(path.join(out, `${base}-${w}.avif`));
   }
@@ -73,7 +78,7 @@ if (!only || only === 'blog') {
     const input = path.join(root, 'public', hero);
     if (!fs.existsSync(input)) { console.warn('missing', input); continue; }
     const base = path.basename(hero).replace(/\.[^.]+$/, '');
-    const { width, ws } = await variants(input, path.join(root, 'public/images/blog/r'), base, [480, 800, 1200, 1600]);
+    const { width, ws } = await variants(input, path.join(root, 'public/images/blog/r'), base, [480, 800, 1200, 1600], { credit: true });
     console.log('blog', base, width, ws.join(','));
   }
 }

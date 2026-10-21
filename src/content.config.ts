@@ -117,6 +117,9 @@ export const blogSchema = z.object({
   summary: z.string(),
   // Meta description when the summary runs past about 160 characters.
   description: z.string().optional(),
+  // Replaces the title in <title> when "<title> — Krizdingus blog" would
+  // pass about 62 characters. The page itself still shows `title`.
+  seo_title: z.string().optional(),
   // The post's picture: a 16:9 JPEG master in public/images/blog/, with
   // responsive copies cut by `npm run images -- blog`. It heads the post,
   // fills the post's share card and shows on the blog list. `hero_alt`

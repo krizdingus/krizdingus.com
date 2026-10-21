@@ -39,5 +39,5 @@ export const webring = {
   ] as WebringLink[],
 };
 
-/** Evergreen fuel joke (PHILOSOPHY.md: "drinking White Monsters"). */
+/** Evergreen fuel joke ("drinking White Monsters"). */
 export const fuelPing: FooterPing = { status: 'warn', key: 'fuel', value: 'White Monster' };

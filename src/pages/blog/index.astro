@@ -27,14 +27,14 @@ const reviewLabel = reviewCount > 0 ? ` · ${reviewCount} awaiting review` : '';
 // rss.xml leaves review drafts out, so this is how many items the feed has.
 const feedCount = all.length - reviewCount;
 
-const SUB = 'How this site is built, and the stories behind a few of the projects.';
+const SUB = 'Essays, build stories, and whatever else I can\'t stop thinking about.';
 ---
 
 <BaseLayout
   title="Blog — Krizdingus"
   ogImage={pageCard('blog')}
   breadcrumbs={[{ name: 'Blog', path: '/blog/' }]}
-  description="Posts from krizdingus.com: how this site is built, and the stories behind a few of the projects, from a 3D-print accident to a Game Boy Discord bot."
+  description="Writing from krizdingus.com: essays, the stories behind the projects and this site, and whatever else I can't stop thinking about."
   shellTitle="KRIZSCAPE — Blog"
   statusSegment={`${postsLabel}${reviewLabel}`}
 >

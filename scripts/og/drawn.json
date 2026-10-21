@@ -26,7 +26,7 @@
   "hue": "grape",
   "crumb": "> krizdingus / blog",
   "title": "Blog",
-  "sub": "How this site is built, and the stories behind a few of the projects.",
+  "sub": "Essays, build stories, and whatever else I can't stop thinking about.",
   "url": "krizdingus.com/blog/"
  },
  {
@@ -68,6 +68,17 @@
   "url": "krizdingus.com/blog/",
   "kind": "photo",
   "src": "/images/blog/a-theme-is-a-folder.jpg",
+  "position": "centre"
+ },
+ {
+  "out": "blog/documentaries-should-probably-take-a-few-years-off.jpg",
+  "mood": "plum",
+  "hue": "grape",
+  "crumb": "> blog / documentaries-should-probably-take-a-few-years-off",
+  "title": "Documentaries should probably take a few years off",
+  "url": "krizdingus.com/blog/",
+  "kind": "photo",
+  "src": "/images/blog/documentaries-should-probably-take-a-few-years-off.jpg",
   "position": "centre"
  },
  {

@@ -23,6 +23,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
+import { withCredit } from './image-credit.mjs';
 import { cardJobs, DRAWN_FILE } from './og/jobs.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -243,7 +244,7 @@ for (const j of jobs) {
     const flat = await base.composite([{ input: Buffer.from(svg) }]).png().toBuffer();
     let buf;
     for (let q = 82; q >= 70; q -= 2) {
-      buf = await sharp(flat).jpeg({ quality: q, mozjpeg: true }).toBuffer();
+      buf = await withCredit(sharp(flat)).jpeg({ quality: q, mozjpeg: true }).toBuffer();
       if (buf.length < 196 * 1024) break;
     }
     fs.writeFileSync(path.join(OUT, j.out), buf);
@@ -274,8 +275,8 @@ for (const j of jobs) {
     ${framed}
     ${block.svg}
   </svg>`;
-  const buf = await sharp(Buffer.from(svg))
-    .composite(composites)
+  const buf = await withCredit(sharp(Buffer.from(svg))
+    .composite(composites))
     .jpeg({ quality: 86, mozjpeg: true, chromaSubsampling: '4:4:4' })
     .toBuffer();
   fs.writeFileSync(path.join(OUT, j.out), buf);

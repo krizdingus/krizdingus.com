@@ -57,7 +57,7 @@ const wordLabel = formatWords(wordCount);
 ---
 
 <BaseLayout
-  title={`${entry.data.title} — Krizdingus blog`}
+  title={`${entry.data.seo_title ?? entry.data.title} — Krizdingus blog`}
   description={entry.data.description ?? entry.data.summary}
   shellTitle={`KRIZSCAPE — ${entry.data.title}`}
   systemStatus={`Reading · ${minutes} min`}
@@ -108,10 +108,12 @@ const wordLabel = formatWords(wordCount);
     {pic && (
       <figure class="post-figure">
         <BlogPicture pic={pic} alt={heroAlt.alt} describedby={heroAlt.desc ? HERO_DESC_ID : undefined} sizes={POST_HERO_SIZES} loading="eager" fetchpriority="high" />
-        {heroAlt.desc && <span class="sr-only" id={HERO_DESC_ID}>{heroAlt.desc}</span>}
         {entry.data.hero_caption && <figcaption>{entry.data.hero_caption}</figcaption>}
       </figure>
     )}
+    {/* Outside the figure: its dark console background sits behind the
+        hidden text, and WAVE counts that as a light-mode contrast error. */}
+    {pic && heroAlt.desc && <span class="sr-only" id={HERO_DESC_ID}>{heroAlt.desc}</span>}
     <article class="prose" style="margin:0 auto">
       <Content />
     </article>

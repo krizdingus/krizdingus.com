@@ -3,7 +3,7 @@
   "pages": {
     "home":     { "path": "/",          "crumb": "> krizdingus",            "title": "Web developer. Tinkerer. Occasional menace.", "sub": "Kris Williams", "hue": "berry", "mood": "paper" },
     "projects": { "path": "/projects/", "crumb": "> krizdingus / projects", "title": "Projects",  "sub": "Things I 3D-printed, flashed, or wrote.", "hue": "teal", "mood": "paper" },
-    "blog":     { "path": "/blog/",     "crumb": "> krizdingus / blog",     "title": "Blog",      "sub": "How this site is built, and the stories behind a few of the projects.", "hue": "grape", "mood": "plum" },
+    "blog":     { "path": "/blog/",     "crumb": "> krizdingus / blog",     "title": "Blog",      "sub": "Essays, build stories, and whatever else I can't stop thinking about.", "hue": "grape", "mood": "plum" },
     "web":      { "path": "/web/",      "crumb": "> krizdingus / web",      "title": "Web work",  "sub": "The kind of web work I do, and who I've done it for.", "hue": "kiwi", "mood": "paper" },
     "about":    { "path": "/about/",    "crumb": "> krizdingus / about",    "title": "About",     "sub": "More than you asked for, and how to reach me.", "hue": "dandy", "mood": "paper" },
     "colophon": { "path": "/colophon/", "crumb": "> krizdingus / colophon", "title": "Colophon",  "sub": "What this site is made of.", "hue": "berry", "mood": "plum" }
