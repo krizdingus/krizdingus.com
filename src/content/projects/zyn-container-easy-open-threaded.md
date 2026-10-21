@@ -46,7 +46,7 @@ I go through a lot of these, and there isn't always a trash can around when I'm 
 
 Two parts, base and lid, that thread together. There's no glue and no magnets. The threads are printed, so they're a little tight for the first few opens and then wear in. A few turns and a rinse and they run smooth.
 
-The ribbed texture on the outside was an accident. I modeled a smooth wall, and the print came out with a grip pattern I liked better. For a while I told people a slicer setting did it. It didn't. The ribs only show up on the blue band, which is its own part in the model, so my best guess is the way the slicer handles that part. I wrote [a whole post](/blog/the-texture-lives-in-the-profile/) about getting that wrong.
+The ribbed texture on the outside was an accident. I modeled a smooth wall, and the print came out with a grip pattern I liked better. For a while I told people a slicer setting did it. It didn't. The ribs only show up on the blue band, which is its own part in the model, so my best guess is the way the slicer handles that part. I wrote [a whole post](/blog/the-texture-wasnt-in-the-profile/) about getting that wrong.
 
 ## PLA, or two-tone
 

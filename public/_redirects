@@ -14,6 +14,13 @@
 # Old sitemap location (Astro's sitemap integration writes sitemap-index.xml).
 /sitemap.xml /sitemap-index.xml 301
 
+# "The texture lives in the profile" was retitled "The texture wasn't in the
+# profile" (2026-10-21) and its slug followed. The share card goes too, so
+# old shares keep their picture.
+/blog/the-texture-lives-in-the-profile /blog/the-texture-wasnt-in-the-profile/ 301
+/blog/the-texture-lives-in-the-profile/ /blog/the-texture-wasnt-in-the-profile/ 301
+/images/og/blog/the-texture-lives-in-the-profile.jpg /images/og/blog/the-texture-wasnt-in-the-profile.jpg 301
+
 # Old /mousebitelabs/ label page (2024-25). The label images go to the same
 # labels on the project page, the print-ready zip to the repo that holds the
 # files, and everything else under it to the project page.

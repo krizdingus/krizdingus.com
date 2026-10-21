@@ -1,7 +1,7 @@
 ---
 title: "The texture wasn't in the profile"
 summary: "The ribs on my threaded Zyn can showed up on the test print, and when a guy asked how, I confidently explained the wrong solution."
-hero_image: "/images/blog/the-texture-lives-in-the-profile.jpg"
+hero_image: "/images/blog/the-texture-wasnt-in-the-profile.jpg"
 hero_alt: "A smooth wireframe container points toward a ribbed teal version with a divided interior and floating lid beneath a 3D printer nozzle."
 hero_caption: "Cool and embarrassing at the same time."
 date_published: 2026-09-09
