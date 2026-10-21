@@ -86,7 +86,7 @@ Then he had the models and blueprints destroyed, so when somebody made a sequel 
 
 *2001* is the harder sell. People still watch it for the first time, usually because they've decided it's time to get serious about movies. I first watched *2001* sometime in high school, can't remember exactly the year. I know it was a VHS copy, not a DVD, and I remember being a dork about it. It was late and I fell asleep twice watching it. I really wanted to love it, and in a lot of ways I do, but it can be a chore to watch.
 
-I recently saw someone on Threads give it "10/10. I kinda hated it." It's a movie about space travel, evolution, artificial intelligence, and whatever the hell was happening in that hotel room. It takes all of it extremely seriously, including the long stretches where nothing happens.
+I recently saw someone on Threads give it "10/10. I kinda hated it." Yeah, me too I guess. It's a movie about space travel, evolution, artificial intelligence, and whatever the hell was happening in that hotel room. It takes all of it extremely seriously, including the long stretches where nothing happens.
 
 <figure>
   <picture>
