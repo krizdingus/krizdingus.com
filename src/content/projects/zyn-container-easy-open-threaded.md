@@ -3,7 +3,7 @@ title: "Zyn Container (Easy-open, Threaded)"
 summary: "A screw-top Zyn can with a divided inside: two-thirds for fresh pouches, one-third for used ones or a second flavor."
 description: "A screw-top Zyn can you print yourself, with a divided inside: two-thirds for fresh pouches, one-third for used ones or a second flavor. No glue, no magnets."
 category: "3d-print"
-tags: ["3D Print", "PETG", "Shapr3D"]
+tags: ["3D Print", "PLA", "Shapr3D"]
 hero_image: "/images/projects/zyn-container-easy-open-threaded/open-with-pouches.webp"
 gallery:
   - src: "/images/projects/zyn-container-easy-open-threaded/open-with-pouches.webp"
@@ -46,18 +46,18 @@ I go through a lot of these, and there isn't always a trash can around when I'm 
 
 Two parts, base and lid, that thread together. There's no glue and no magnets. The threads are printed, so they're a little tight for the first few opens and then wear in. A few turns and a rinse and they run smooth.
 
-The ribbed texture on the outside was an accident. I modeled a smooth wall, and the print came out with a grip pattern I liked better. In my slicer's "Other" tab there's a setting called infill gap, and somewhere along the way it ended up at 100% instead of 150%, without my meaning to. That's the one difference I know of. The ribs only exist in the designer profile, which is the set of print settings I uploaded with the model. Print the raw STL with your own settings and you get a smooth can. How exactly it happened, I don't know, and I wrote [a whole post](/blog/the-texture-lives-in-the-profile/) about not knowing.
+The ribbed texture on the outside was an accident. I modeled a smooth wall, and the print came out with a grip pattern I liked better. For a while I told people a slicer setting did it. It didn't. The ribs only show up on the blue band, which is its own part in the model, so my best guess is the way the slicer handles that part. I wrote [a whole post](/blog/the-texture-lives-in-the-profile/) about getting that wrong.
 
-## PETG, or two-tone
+## PLA, or two-tone
 
 - 0.16 mm layers, 2 walls, 15% infill, about 3.5 hours
-- PETG, which has a little give to it. People have also done it in ABS and in clear PETG with a colored lid, and the two-tone looks sharp
+- PLA. People have also done it in PETG, including clear PETG with a colored lid, and the two-tone looks sharp
 - No supports
 
 ## On selling these
 
-I get asked about commercial licensing a lot, so, for the record: printing a handful for friends or coworkers, putting your crew's logo on some for the shop, or running a batch to raise money for your volunteer fire department, all fine. One guy printed a set for the guys at his fire station, which is exactly the kind of thing I like to hear. What's not fine is mass-printing them and listing them as a product.
+I get asked about commercial licensing a lot, so, for the record: printing a handful for friends or coworkers, putting your crew's logo on some for the shop, or running a batch to raise money for your volunteer fire department, all fine. Somebody printed a set for the boys at their fire station, which is exactly the kind of thing I like to hear. What's not fine is mass-printing them and listing them as a product.
 
 ## Files
 
-STL, STEP, and OBJ, because I'd rather you remix it than reverse-engineer it. None of the three has the ribs.
+STL, STEP, and OBJ, because I'd rather you remix it than reverse-engineer it.
