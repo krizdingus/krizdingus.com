@@ -31,8 +31,6 @@ I think the post might be right. At the very least, documentary filmmakers shoul
 
 *Walk Hard* took every convention of the musical biopic and played each one completely straight. The childhood tragedy is young Dewey Cox accidentally cutting his brother in half with a machete. His father spends the rest of the movie reminding him the wrong kid died. The drugs, the marriages, the backup singer who's obviously the one, the run-in with the Beatles: it's all in there. Before one show, somebody backstage explains, very seriously, that Dewey has to think about his entire life before he plays.
 
-I first saw *Walk Hard* on DVD. We didn't have cable and just a PS2 for entertainment. Often DVDs would just be on loop for like 2 weeks straight. *Walk Hard* ended up being one of them.
-
 <figure>
   <picture>
     <source type="image/avif" srcset="/images/blog/documentaries/r/walk-hard-sam-tim-meadows-480.avif 480w, /images/blog/documentaries/r/walk-hard-sam-tim-meadows-800.avif 800w, /images/blog/documentaries/r/walk-hard-sam-tim-meadows-1199.avif 1199w" sizes="(max-width: 640px) calc(100vw - 48px), 580px" />
@@ -42,7 +40,11 @@ I first saw *Walk Hard* on DVD. We didn't have cable and just a PS2 for entertai
   <figcaption>A24, marketing <em>You Can See Everything</em>.</figcaption>
 </figure>
 
-*Walk Hard* bombed at the box office. John C. Reilly later told [The Ringer](https://www.theringer.com/2019/05/29/movies/walk-hard-dewey-cox-oral-history-john-c-reilly-music-biopic-jake-kasdan-judd-apatow), "we tried to kill the musical biopic with this movie." It didn't work.
+*Walk Hard* bombed at the box office. Hell, at the time I even worked at a movie theater, and I didn't see it. Unless I was screening a print I'd built, I really wasn't watching a lot of the movies. Part of it was lack of interest. Part of it was doing dumb townie things.
+
+I first saw *Walk Hard* on DVD. We didn't pay for cable TV in my twenty-something slacker apartment, just my PS2 slim for entertainment. Dudes would bring over DVDs and they'd become part of the collection, either from roommates or even random visitors. I never bought it. I don't know whose copy it was. It was just there. Often DVDs would just be on loop for like 2 weeks straight. *Walk Hard* ended up being one of them.
+
+John C. Reilly later told [The Ringer](https://www.theringer.com/2019/05/29/movies/walk-hard-dewey-cox-oral-history-john-c-reilly-music-biopic-jake-kasdan-judd-apatow), "we tried to kill the musical biopic with this movie." It didn't work.
 
 *Bohemian Rhapsody* came out eleven years later and made something like $900 million. Then came *Rocketman*, *Elvis*, *Bob Marley: One Love* and *Back to Black*. The reviews for nearly all of them brought up Dewey Cox at some point. You can hardly watch a musician struggle with addiction without expecting John C. Reilly to wander into the scene.
 
@@ -158,7 +160,7 @@ Hard to imitate something people don't even notice. *The Matrix* was the opposit
 
 Unlike *Walk Hard*, it actually worked. Before *Shrek*, animated fairy tales were mostly told with a straight face. After it, for about a decade, a lot of animated movies came with pop songs, celebrity voices, and a main character who knew exactly how stupid fairy tales were. Some of that was the wrong lesson. Other studios saw how much money *Shrek* made and decided the secret was the smirk.
 
-I caught scenes and was familiar with a lot of these movies because I worked in movie theaters as a manager and projectionist from like 2003 into 2010.
+I caught scenes and was familiar with a lot of these movies because I was a manager and projectionist from like 2003 into 2010. I built the print for *Shark Tale* when it came in, so I had to watch it. Bobby De Niro plays a shark who learns to accept his gay son. I liked the movie and got so tickled at the idea of it being a spiritual follow-up to *Goodfellas* that I wrote a piece about it for a freshman writing class. I never turned it in. *Madagascar* and *Over the Hedge* brought lots of kids in. The only thing I recall about *Hoodwinked* is smoking cigarettes outside the theater, looking at that poster and thinking, oh, another one.
 
 Eventually even Disney came around. In *Enchanted*, they made fun of their own princesses. In *Frozen*, a big part of the point is that you shouldn't marry a guy you met that afternoon, which would have been news to about half the Disney catalog.
 
