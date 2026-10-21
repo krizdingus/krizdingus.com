@@ -26,7 +26,7 @@ leaksmith is a little Python program that makes fake leaked government documents
 
 The audience is AI, not people. Like NotebookLM, Google's tool that reads your documents and can turn them into a podcast with two AI hosts. When I fed it one of these aged PDFs, it treated it like a real source. I'm not sure why the robots fall for it, but they do.
 
-It started when a friend sent me one of those podcasts, two hosts spending 15 minutes dead serious about a Star Wars wiki article. My first fake memo came straight out of Google Docs, and the hosts handled it with a pretty clear *okay, sure, buddy*. So now it was a challenge. The rest of that story is in [Robots saw right through that shit](/blog/robots-saw-right-through-that/).
+It started when a friend sent me one of those podcasts, two hosts spending 15 minutes dead serious about a Star Wars wiki article. My first fake memo came straight out of Google Docs, and the hosts handled it with a pretty clear *okay, sure, buddy*. So now it was a challenge.
 
 ## Markdown in, PDF out
 

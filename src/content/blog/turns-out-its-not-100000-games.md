@@ -6,6 +6,7 @@ hero_alt: "Three Game Boy cartridges sit beside a pixel magnifying glass and a c
 hero_caption: "Around four and a half thousand games, now searchable without leaving the chat."
 date_published: 2026-05-21
 tags: ["game-boy", "discord"]
+draft: true
 ---
 
 This is a story about a Discord bot that searches a list of Game Boy games, and I realize every part of that sentence might need explaining. Discord's the easy one. It's a chat app where communities run their own servers, and a bot is a program that sits in one of those servers and answers commands. The rest takes a minute.

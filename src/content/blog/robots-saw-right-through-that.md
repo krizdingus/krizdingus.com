@@ -7,6 +7,7 @@ hero_alt: "A photocopier turns a clean memo into a worn, creased copy while two 
 hero_caption: "Same fake memo. A few more trips through the copier."
 date_published: 2026-07-02
 tags: ["code", "ai"]
+draft: true
 ---
 
 Okay, so if you've never messed with NotebookLM: it's a Google tool where you upload your documents, PDFs, web pages, whatever, and it reads them for you. You can ask it questions about your stuff. It also has a button that turns all of it into a podcast, two AI hosts talking through whatever you gave them like it's their show.

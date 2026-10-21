@@ -24,7 +24,7 @@ Say you want to put a Game Boy game on a flash cart, a cartridge you write games
 
 This bot looks it up from inside Discord, where communities run their own servers, basically big group chats, and a bot is an account that answers commands. It searches 4,469 titles from the No-Intro Game Boy set. No-Intro catalogs dumped cartridges, the game files people call ROMs, under consistent names.
 
-It started as a plan to build a nicer front end for Catskull's GB ROM Database. I thought his search could work better for the stuff I look up, and honestly I wanted to see if I could beat it. I did build one: the Flash Cartridge Assistant, a search page that lived on this site in 2024, and it's the project that eventually turned into this bot. But something like 39 other people had built a search page too, including Catskull. So the next version went where the Game Boy people already are, which is Discord, arguing about mappers. The three days of building it are [their own story](/blog/turns-out-its-not-100000-games/).
+It started as a plan to build a nicer front end for Catskull's GB ROM Database. I thought his search could work better for the stuff I look up, and honestly I wanted to see if I could beat it. I did build one: the Flash Cartridge Assistant, a search page that lived on this site in 2024, and it's the project that eventually turned into this bot. But something like 39 other people had built a search page too, including Catskull. So the next version went where the Game Boy people already are, which is Discord, arguing about mappers.
 
 ## Slash commands
 

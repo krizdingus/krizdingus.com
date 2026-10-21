@@ -21,6 +21,13 @@
 /blog/the-texture-lives-in-the-profile/ /blog/the-texture-wasnt-in-the-profile/ 301
 /images/og/blog/the-texture-lives-in-the-profile.jpg /images/og/blog/the-texture-wasnt-in-the-profile.jpg 301
 
+# Posts back in draft while they're revised (2026-10-21). Temporary: take
+# these out when draft: true comes off.
+/blog/robots-saw-right-through-that /blog/ 302
+/blog/robots-saw-right-through-that/ /blog/ 302
+/blog/turns-out-its-not-100000-games /blog/ 302
+/blog/turns-out-its-not-100000-games/ /blog/ 302
+
 # Old /mousebitelabs/ label page (2024-25). The label images go to the same
 # labels on the project page, the print-ready zip to the repo that holds the
 # files, and everything else under it to the project page.
