@@ -76,3 +76,12 @@
 # favicon-32/96/180/192).
 /assets/images/* /images/:splat 301
 /assets/icons/* /icons/:splat 301
+
+# Project pages taken off the site (2026-10-21). The models are still on
+# MakerWorld and GitHub; the old URLs land on the projects index.
+/projects/dingus-game-kart /projects/ 301
+/projects/dingus-game-kart/ /projects/ 301
+/projects/fdm-friendly-gameboy-cartridge /projects/ 301
+/projects/fdm-friendly-gameboy-cartridge/ /projects/ 301
+/images/og/projects/dingus-game-kart.jpg /images/og/projects.jpg 301
+/images/og/projects/fdm-friendly-gameboy-cartridge.jpg /images/og/projects.jpg 301

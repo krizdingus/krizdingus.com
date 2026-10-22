@@ -9,11 +9,10 @@
     "colophon": { "path": "/colophon/", "crumb": "> krizdingus / colophon", "title": "Colophon",  "sub": "What this site is made of.", "hue": "berry", "mood": "plum" }
   },
   "projects": {
+    "claudometer":                      { "src": "/images/projects/claudometer/on-desk.webp", "layout": "framed" },
     "cassette-case-gameboy-games":      { "src": "/images/projects/cassette-case-gameboy-games/open-and-closed.webp", "layout": "framed" },
     "magsafe-zyn-container":            { "src": "/images/projects/magsafe-zyn-container/open-with-pouches.webp", "layout": "photo", "position": "centre" },
     "zyn-container-easy-open-threaded": { "src": "/images/projects/zyn-container-easy-open-threaded/open-with-pouches.webp", "layout": "photo", "position": "centre" },
-    "dingus-game-kart":                 { "src": "/images/projects/dingus-game-kart/turntable-frame.webp", "layout": "framed" },
-    "fdm-friendly-gameboy-cartridge":   { "src": "/images/projects/fdm-friendly-gameboy-cartridge/tetris-shell.webp", "layout": "framed" },
     "gameboy-bootleg-cartridge-labels": { "src": "/images/projects/gameboy-bootleg-cartridge-labels/game-boy-wars.webp", "layout": "framed" },
     "gamepak-discreet-display-stand":   { "src": "/images/projects/gamepak-discreet-display-stand/crystal-front.webp", "layout": "framed" },
     "gbc-palette-editor":               { "src": "/images/projects/gbc-palette-editor/palette-edit-light.webp", "layout": "framed" },

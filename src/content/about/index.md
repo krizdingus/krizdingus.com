@@ -23,8 +23,8 @@ There's software too, mostly tools I wanted for myself. The <a href="/projects/g
 
 Other software:
 
-- <a href="/projects/peekabu/">Peekabu</a>, which puts my Bambu printer's camera and temps in the Mac menu bar
-- <a href="/projects/claudometer/">Claudometer</a>, a cheap little touchscreen on my desk that tells me how much Claude Code I have left this week
+- <a href="/projects/peekabu/">Peekabu</a>, which puts my Bambu printer's camera and temps on my Mac
+- <a href="/projects/claudometer/">Claudometer</a>, a cheap little touchscreen that showed how much Claude Code I had left each week
 - <a href="/projects/leaksmith/">leaksmith</a>, which ages fake government memos until an AI takes them at face value
 - <a href="/projects/gb-rom-database-bot/">GB ROM Database Bot</a>, for looking up Game Boy games without leaving Discord
 - <a href="/projects/linkbruh/">linkbruh</a>, a side-project Discord bot that fixes X and Instagram links so the videos actually play

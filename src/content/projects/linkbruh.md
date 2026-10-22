@@ -2,7 +2,7 @@
 title: "linkbruh: a Discord Bot That Fixes X and Instagram Embeds"
 summary: "A side-project Discord bot that fixes X and Instagram links so the video actually plays in the chat."
 seo_title: "linkbruh: a Discord bot that fixes embeds"
-description: "A side-project Discord bot that fixes X and Instagram links so the video actually plays in the chat, instead of everyone clicking out to a login wall."
+description: "A side-project Discord bot that fixes X and Instagram links so the video actually plays in the chat, instead of everyone leaving Discord to watch it."
 category: "bot"
 tags: ["Discord", "Node.js"]
 hero_image: ""
@@ -21,24 +21,31 @@ field_report:
   stars: 0
 ---
 
-Someone posts an X link in Discord. Discord shows a gray box. Everyone clicks through, gets a login wall, comes back, and asks what it was. linkbruh is a small bot that fixes that. I built it for a server where my friends and I share a lot of links. We got annoyed with how X and Instagram links showed up and just wanted to watch them right there in the chat. (If you've never used Discord, it's chat rooms called servers, split into channels, and a bot is a member of the server that's really a script.)
+I built linkbruh for a server where my friends and I share a lot of links. (If you've never used Discord, it's group chat split into servers and channels, and a bot is a member of the server that's really a script.) We'd share links from X and Instagram, and if we wanted to look at one, we'd have to leave Discord, which could be kind of a pain if you were on a phone or just otherwise lazy. We didn't like having to open up another app to see these shares, which were largely just videos. And so we got to thinking, well, could we just build something that inlines this video?
 
-Embed proxies are sites that stand in for X and Instagram and hand Discord a preview it can play. Swap the domain, x.com to vxtwitter.com, and the video shows up. The bot does the swapping so nobody has to remember to.
+I didn't release this to be used elsewhere, and I found out this has been done by other means. Mine was just more of a custom solution for our Discord server, and also just to see if I could build one.
 
-It posts the fix through a channel webhook, a way for a program to post under any name and picture it wants, which is how it carries the original poster's name. Then it deletes the original so the channel isn't two links deep in every conversation. If the original poster doesn't want the repost, they react with ❌ and it's gone. Profile links and links already on a proxy get left alone.
+## How it fixes them
 
-X videos get the proxy link. Instagram posts get downloaded and uploaded as attachments, video or photos (up to ten for a carousel), with the original link along for anyone who wants the app.
+For X, the fix is a domain swap. Sites like vxtwitter.com and fxtwitter.com stand in for X and hand Discord a preview that actually plays, so x.com becomes vxtwitter.com and the video shows up. Before it posts, the bot checks which of those sites is really serving the video right now. Tweets without a video get left alone.
 
-## Proxies and permissions
+Instagram doesn't get a proxy link. The bot downloads the post and uploads it to the chat as a file, video or photos, up to ten at a time. Initially I was having difficulty with Instagram just pulling cover stills, so every time we would test it, we weren't getting videos, we were just getting the single preview image, the cover still. Now if all it can find for a reel is the still, it won't post it.
 
-Proxy domains live in a priority list per service at the top of `src/config.js`. Before posting, the bot probes the candidates and uses the first one that actually serves a video, so when a proxy dies, it gets skipped automatically. Instagram proxies churn constantly; when embeds stop working, move a current one to the front of the list.
+When you post a link in there, the bot gets the link. It actually removes your comment if it's able to actually post it. And then it replaces your comment with the embedded video or post, attributed to you, with the original source link.
 
-Since Instagram fixes are attachments, the bot needs Attach Files permission or every Instagram post fails with a Missing Permissions error. Discord packs a bot's permissions into one number in its invite link, and the README has the full integer and a table of what each bit is for, plus the warning that kicking the bot deletes its role and you have to re-invite with the full value. It's a lot of permissions for a bot that fixes links, but each one's doing something.
+## Hit and miss
 
-## What it can't fix
+It's still running today. It is very hit and miss with Instagram video. And a lot of it has to do with Discord's limits for free servers. And none of us are trying to pay for it. So it fails a lot. Essentially anything over 10 megabytes fails. For maybe 2 weeks we had premium features on the server just to see if it would work. And it did. It did work more consistently. There were still failures that I chalk up to possibly having something to do with account privacy. But I never looked into those.
 
-Private, age-restricted, or deleted Instagram posts. Instagram only serves those videos to a logged-in, age-verified session, so there's nothing public to fetch. In that case the bot leaves the original alone and posts a short note that deletes itself after about 12 seconds. Same if a proxy can only produce a reel's cover frame instead of the video, or the reel is over Discord's 25 MB upload limit for a non-boosted server.
+Private and age-restricted posts never work, since Instagram only shows those to someone who's logged in. If it fails, it leaves your original post, and then it leaves the "couldn't fix this one." comment there for like 12 seconds, and then that goes away. I haven't gone back to write very many fallbacks beyond that. Which is annoying, the more I see it, but it's a small Discord channel with like 6 dudes in it.
 
-## Your bot, your token
+## Run your own
 
-You run it yourself. Node 20.18 or later, a bot token (the key it logs in with) in `.env`, and Message Content Intent turned on in the Developer Portal, since without it the bot can't read what people post. `npm start`. `npm test` for the tests. The README also covers deploying it on Railway.
+There's no public invite, so you run it yourself. Whatever's on GitHub is the newest version. I may not have updated the README very well. I should. You'll need:
+
+- Node 20.19 or later
+- a bot token in `.env`
+- Message Content Intent turned on in the Developer Portal, or the bot can't read the links
+- the invite permissions listed in the README. Instagram needs Attach Files, and without Manage Webhooks and Manage Messages the bot replies with the fix instead of reposting.
+
+Then `npm start`, and `npm test` for the tests. The README also covers deploying it on Railway.

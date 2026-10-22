@@ -32,35 +32,31 @@ field_report:
   stars: 0
 ---
 
-Some people take games made for the original Game Boy, the one with four shades of green, and hack color into them for the Game Boy Color. That's called colorizing, and it's a kind of romhack, a fan-made edit of a game. A big part of the job is palettes, the sets of colors the game gets to use, and this app edits the `.pal` files they live in.
+Some people take games made for the original Game Boy, the one with four shades of green, and hack color into them for the Game Boy Color. A big part of the job is palettes, the sets of colors the game gets to use, and this app edits the `.pal` files they're kept in while you work on them.
 
-Nearly every tool for it is Windows-only. That's fine if you use Windows. I don't, mostly. I wanted to try colorizing on my Mac, and the options were "run it under Wine and hope" (Wine runs Windows programs on other systems, most of the time) or "just get a Windows machine." I wasn't going to boot into Windows like it's 2003, so I started rebuilding the tools I needed, and this is the first one.
+It's a recreation of toruzz's GBC Palette Editor. I made it because the tool it's based on was Windows only, and I didn't feel like whipping out a Windows laptop or having to run Wine and hope, or just get the Windows machine. And again, just like lots of things, I just wanted to see if I could do it.
 
-It's a recreation of toruzz's GBC Palette Editor. toruzz built the original, and his [blog](https://toruzz.com/blog) on Game Boy colorization is what I leaned on the whole time. If you're on Windows, use his.
+I've been on and off for a long time trying to learn how to make my own Game Boy games, colorize old Game Boy games, translate Game Boy games. And so building this was part of an exercise in trying to understand part of that process. There's just not a lot of tools for Mac for this. So the goal was to sort of try to build or rebuild a suite of tools for Mac. And this was the first. Even by then, I wasn't certain that I would get around to all of them.
 
-## Swatches, sliders, raw hex
+To be honest, not a lot fought me. I can't say there was much of a struggle here. It was more the research that was the heavier part, I guess. I leaned on toruzz's [blog](https://toruzz.com/blog) a lot for learning. None of his code went into it. I don't know how to reverse engineer that. If you're on Windows, use his.
 
-- Open, edit, and save `.pal` files
-- All 32 colors of a palette block in a swatch grid, with the raw hex alongside
-- Per-channel RGB editing with correct 5-bit-per-channel Game Boy Color math
-- Sample colors from an image file or the clipboard
-- **Copy .db**: export the current block as plain uppercase hex, no spaces, eight rows of eight bytes, ready to paste into a hex editor or patcher
-- Undo and redo within a session
-- Per-palette-index notes, stored in a `.notes.json` sidecar next to the `.pal` (move the `.pal` without it and the notes stay behind)
-- Light and dark theme, recent files, drag-and-drop
+## What it does
 
-About the 5-bit thing: each color channel (red, green, blue) only goes from 0 to 31. The common shortcut for showing that on a normal screen, multiplying by eight, comes out slightly off at the bright end, so the editor does the real conversion.
+- Opens, edits and saves `.pal` files, one at a time
+- Shows all 32 colors of a palette block in a grid, with the raw hex next to it
+- RGB sliders for each color
+- Import Image and Paste Image cut a picture into a 4 x 8 grid and take the middle pixel of each square, so it wants a picture laid out like a palette
+- Copy .db puts the block on the clipboard as eight rows of plain hex
+- Notes for each palette block, kept in the app's own data folder
 
 ## Download
 
-Version 1.0.0 is a signed, notarized Apple Silicon build, so macOS shouldn't throw the unidentified-developer warning at you. The zip includes the app, a short README, and `example.pal`, four palette blocks pulled from a real colorization project so you have something to poke at before touching your own files.
+I barely published it. I did get it signed, so you can download it. It's for Apple Silicon Macs.
 
 ## Rough edges
 
-One file at a time. Palette count is inferred from file size, so a file that isn't a multiple of 64 bytes gets a warning. It'll still load the complete blocks and keep the leftover bytes when you save. Undo history dies when you close the app. And it's Electron, a web page dressed up as a desktop app, because I'm a web developer and I was not going to learn Swift to ship a small utility. The repo includes a legal addendum from one H. Maury Spiderman, Esq., which carries no legal authority.
+Undo history dies when you close the app. Moving or renaming a `.pal` loses its notes.
 
-## Why it's shaped like this
-
-The plan is a small set of single-purpose tools that together cover the Game Boy colorization workflow on a Mac, each one small enough to use without a tutorial. Not a full ROM hacking suite, and not trying to be one.
+It's Electron, which is a web page dressed up like a desktop app. I'm a web developer and I didn't feel like trying to learn Swift to ship a small utility. I just wanted to build something quick. And Electron is something I was familiar with already.
 
 Free to use, modify, and share for non-commercial purposes. You cannot sell it.

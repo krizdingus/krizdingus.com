@@ -115,31 +115,12 @@
  },
  {
   "out": "projects/claudometer.jpg",
-  "kind": "title",
+  "kind": "framed",
+  "src": "/images/projects/claudometer/on-desk.webp",
   "mood": "paper",
   "hue": "teal",
   "crumb": "> projects / claudometer",
   "title": "Claudometer: a Claude Code Usage Monitor on a $15 ESP32 Display",
-  "url": "krizdingus.com/projects/"
- },
- {
-  "out": "projects/dingus-game-kart.jpg",
-  "kind": "framed",
-  "src": "/images/projects/dingus-game-kart/turntable-frame.webp",
-  "mood": "paper",
-  "hue": "teal",
-  "crumb": "> projects / dingus-game-kart",
-  "title": "Dingus Game Kart: a 3D-Printable Game Boy Cartridge Shell",
-  "url": "krizdingus.com/projects/"
- },
- {
-  "out": "projects/fdm-friendly-gameboy-cartridge.jpg",
-  "kind": "framed",
-  "src": "/images/projects/fdm-friendly-gameboy-cartridge/tetris-shell.webp",
-  "mood": "paper",
-  "hue": "teal",
-  "crumb": "> projects / fdm-friendly-gameboy-cartridge",
-  "title": "FDM-Friendly Game Boy Cartridge",
   "url": "krizdingus.com/projects/"
  },
  {
@@ -227,7 +208,7 @@
   "mood": "paper",
   "hue": "teal",
   "crumb": "> projects / peekabu",
-  "title": "Peekabu: a Mac Menu Bar Monitor for Bambu Lab Printers",
+  "title": "Peekabu: a Mac Monitor for Bambu Lab Printers",
   "url": "krizdingus.com/projects/"
  },
  {

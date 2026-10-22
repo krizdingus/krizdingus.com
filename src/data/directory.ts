@@ -73,14 +73,13 @@ const SHORT_LABELS: Record<string, string> = {
   'cassette-case-gameboy-games': 'Cassette case for GB carts',
   'gamepak-discreet-display-stand': 'Game Pak display stand',
   'zyn-container-easy-open-threaded': 'Threaded Zyn container',
-  'fdm-friendly-gameboy-cartridge': 'FDM-friendly GB cartridge',
   'gameboy-bootleg-cartridge-labels': 'Romhack cartridge labels',
   'mouse-bite-labs-cartridge-labels': 'Mouse Bite Labs labels',
 };
 
 export function shortLabel(slug: string, title: string): string {
   if (SHORT_LABELS[slug]) return SHORT_LABELS[slug];
-  // "Peekabu: a Mac Menu Bar Monitor…" → "Peekabu"
+  // "Peekabu: a Mac Monitor for…" → "Peekabu"
   return title.split(/:\s/)[0].trim();
 }
 
