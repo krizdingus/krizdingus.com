@@ -27,7 +27,7 @@ gallery:
     height: 900
 external_url: "https://makerworld.com/en/models/715832-mini-magsafe-zyn-container"
 external_label: "View on MakerWorld"
-date_published: 2024-10-19
+date_published: 2026-10-02
 featured: true
 status: "live"
 draft: false
@@ -51,27 +51,39 @@ field_report:
 
 Zyn makes nicotine pouches, and they come in a round can. That can is basically a hockey puck, and it's never in the pocket you checked. This is a smaller one that sticks to the back of your phone, because your phone is the one object you reliably know the location of.
 
-MagSafe is Apple's ring of magnets on the back of newer iPhones, the thing magnetic wallets and chargers snap onto. Put a magnetic ring in the bottom of a little can and the can snaps on too. That's the whole trick. The idea was a pouch dock, so I'd stop losing a Zyn in the middle of a panic-coding session.
+MagSafe is Apple's ring of magnets on the back of newer iPhones, the thing magnetic wallets and chargers snap onto. Put a magnetic ring in the bottom of a little can and the can snaps on too. That's the whole trick. It's a magnetic nicotine pouch container so I don't lose a Zyn.
 
 ## Seven or eight pouches
 
-A three-part container: base, lid, and a tray that gets glued in. It's 59 mm across and 12.8 mm tall, thin enough to ride on a phone, and holds seven or eight pouches, which is about half a can. The magnet is a universal MagSafe ring adapter, the kind you buy in a ten-pack, dropped adhesive-side down into a recess in the base. Those are thin magnetic rings with a sticky back, sold for adding MagSafe to cases that don't have it. Anything from 1.2 to 1.6 mm thick fits. The ones I use are iOttie rings, at the thick end.
+A three-part container: base, lid, and a tray that gets glued in. It's 59 mm across and 12.8 mm tall, thin enough to ride on a phone, and holds seven or eight pouches, which is about half a can. The magnet is a universal MagSafe ring adapter dropped adhesive-side down into a recess in the base. Those are thin magnetic rings with a sticky back, sold for adding MagSafe to cases that don't have it. Anything from 1.2 to 1.6 mm thick fits.
 
-The lid closes in any orientation but only opens in one. There are alignment marks on the lid and tray so you're not spinning it like a safe dial. It sounds fussier than it is.
+The rings are the weakest spot. I bought a few different solutions from different vendors, and depending on the ring's strength, the can could barely stay on the phone. They're all about the same price, they all look about the same, so it's tough to really find a good one. The iOttie ones are the strongest I've found so far, and they're the ones I use, at the thick end.
+
+The lid closes in any orientation but only opens in one, lined up by arrows on the lid and tray. That wasn't the hard part. I'd been struggling to figure out how to do threads in Shapr3D, and what's there started as just seeing if it would work. It worked the first time, almost by accident. So it stuck.
 
 ## ABS, for pockets and cars
 
-Modeled in Shapr3D and printed on my Bambu X1C in ABS, the same plastic LEGO bricks are made of. I recommend ABS for this one because it lives in pockets and cars, and ABS shrugs off heat better than PLA does. PETG is a fine second choice. A few people have printed it in clear PETG so they can see how many pouches are left without opening it. Smart.
+Modeled in Shapr3D and printed on my Bambu X1C in ABS, the same plastic LEGO bricks are made of. Use ABS or PETG instead of PLA. A PLA one will warp in a pocket or a hot car.
 
-- 0.4 mm nozzle, 0.16 mm layers, 15% grid infill
-- Two designer profiles, so you can print it on my settings as-is: the MagSafe version, and a plain one with no recess for people who just wanted a small can
+- 0.4 mm nozzle, 0.16 mm layers, 2 walls, 15% grid infill
+- Two designer profiles, so you can print it on my settings as-is: the MagSafe version, and a plain one for people who just wanted a small can
 - 34 to 41 minutes on the bed, then a dab of CA glue (superglue, basically) to mate the tray to the base
 
-If the lid is stiff off the printer, that's normal. Put it on, give it a dozen turns, wash it, and it loosens into something that feels like it came out of a mold.
+If the lid is stiff off the printer, that's normal. Put it on and give it a dozen turns or so, back and forth. That sands it a little so it turns easier. Then give it a wash, so you're not leaving plastic microparticles in with the things you're putting up against your gums.
+
+One guy printed it in clear PETG so he could see how many pouches were left without opening it. I never thought about using transparent filaments. Pretty clever, and his photo was good. You can see what you've got in there.
 
 ## What the feedback changed
 
-The non-MagSafe profile exists because enough people asked for it that ignoring them started to feel rude. That went up in February 2025. The other requests that keep coming up are a divider for used pouches and a smooth insert for the base. The divider I get. The [threaded one](/projects/zyn-container-easy-open-threaded/) has one.
+There's a second print profile without MagSafe support, up since February 2025, because people kept asking for one. My reaction to that is, well, why don't you just print one of the other ones? I guess people like the small form factor. The whole point of this, in my head, was to have one I could attach to my phone easy. One without MagSafe just means now I've got a smaller container I might lose.
+
+People ask for a divider for used pouches too. The can is pretty small. There's not really room for one. The [threaded one](/projects/zyn-container-easy-open-threaded/) has one.
+
+The cover photo says easy open and close, and one review says the non-MagSafe one is extremely hard to open. It's worth putting the lid on and doing a lot of twisting and turning first; that helps. And frankly there are a lot of variables. How well tuned your printer is can really affect how the tolerances as designed come out. Somebody who hasn't put much thought into their materials and their machine maintenance could run into that. But by and large, by the reviews, it opens easy.
+
+## Where mine is
+
+I've lost mine over the last few months. It still has Zyns in it. I just don't know where I misplaced it. Maybe I should make one where you put an AirTag in it.
 
 ## Remix it, don't sell it
 
