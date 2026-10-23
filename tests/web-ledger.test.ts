@@ -177,14 +177,14 @@ describe('web page results and limits', () => {
       'over $5 million and still counting',
       'during a service outage',
       'more than 50% faster',
-      'about 40%',
+      'in one place',
     ]) expect(results, phrase).toContain(`'${phrase}'`);
   });
 
   it('never mentions what stays off /web/', () => {
     for (const re of [
       /breach/i, /security incident/i, /FirstUSA/i, /Boomtime/i, /\bAI\b/, /r[ée]sum[ée]/i,
-      /LinkedIn/i, /years of experience/i, /day job/i, /Director/i, /Miami\b(?!-Dade)/, /—/,
+      /LinkedIn/i, /years of experience/i, /day job/i, /Director/i, /Miami\b(?!-Dade)/, /—/, /40%/,
     ]) {
       const visible = page.replace(/title="[^"]*— Krizdingus"/, '').replace(/shellTitle="[^"]*"/, '').replace(/\/\/.*$/gm, '');
       expect(visible, String(re)).not.toMatch(re);
