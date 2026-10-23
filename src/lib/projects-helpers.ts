@@ -9,7 +9,14 @@ interface ProjectEntryLike {
 }
 
 interface OrderedLike {
-  data: { display_order?: number; date_published: Date };
+  data: { display_order?: number; date_published: Date; released?: Date };
+}
+
+/** When the thing itself came out: `released` when the page carries a
+ *  different date, otherwise the page's own date. Years, dates, order and
+ *  NEW flags all read this. */
+export function releasedOn(d: { date_published: Date; released?: Date }): Date {
+  return d.released ?? d.date_published;
 }
 
 export function allCategories(projects: ProjectEntryLike[]): string[] {
@@ -40,7 +47,7 @@ export function tagCounts(projects: ProjectEntryLike[]): Array<[string, number]>
     .map((x) => [x.label, x.n]);
 }
 
-/** Newest first. A project can still be pinned with display_order (1-based,
+/** Newest released first. A project can still be pinned with display_order (1-based,
  *  ascending, ahead of the rest); none are right now, so the list's order is
  *  the year column's order. The index and prev/next both use this. */
 export function sortProjects<T extends OrderedLike>(projects: readonly T[]): T[] {
@@ -50,7 +57,7 @@ export function sortProjects<T extends OrderedLike>(projects: readonly T[]): T[]
     if (ao != null && bo != null) return ao - bo;
     if (ao != null) return -1;
     if (bo != null) return 1;
-    return b.data.date_published.getTime() - a.data.date_published.getTime();
+    return releasedOn(b.data).getTime() - releasedOn(a.data).getTime();
   });
 }
 

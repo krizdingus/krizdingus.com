@@ -27,6 +27,15 @@
 /blog/robots-saw-right-through-that/ /blog/ 302
 /blog/turns-out-its-not-100000-games /blog/ 302
 /blog/turns-out-its-not-100000-games/ /blog/ 302
+# Their tags that no live post carries: the tag pages went with them. A
+# tag comes back with its post, so its lines go when that post's do (ai
+# with robots; game-boy and discord with the 100,000 games post).
+/blog/tags/ai /blog/ 302
+/blog/tags/ai/ /blog/ 302
+/blog/tags/game-boy /blog/ 302
+/blog/tags/game-boy/ /blog/ 302
+/blog/tags/discord /blog/ 302
+/blog/tags/discord/ /blog/ 302
 
 # Old /mousebitelabs/ label page (2024-25). The label images go to the same
 # labels on the project page, the print-ready zip to the repo that holds the

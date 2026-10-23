@@ -27,6 +27,10 @@ export const projectsSchema = z.object({
   external_url: z.string().url(),
   external_label: z.string(),
   date_published: z.coerce.date(),
+  // The day the thing itself came out (its MakerWorld or GitHub release),
+  // when the page's own date differs. date_published only spaces the pages
+  // out; the site dates, sorts and flags the project by this.
+  released: z.coerce.date().optional(),
   featured: z.boolean().default(false),
   status: z.enum(['live', 'archived', 'wip']).default('live'),
   draft: z.boolean().default(false),

@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import { getCollection } from 'astro:content';
-import { tagCounts, sortProjects, slugFromId, hostLabel, crtGlyph } from '../../lib/projects-helpers';
+import { releasedOn, tagCounts, sortProjects, slugFromId, hostLabel, crtGlyph } from '../../lib/projects-helpers';
 import { pageCard } from '../../lib/seo';
 import '../../styles/projects.css';
 
@@ -73,7 +73,7 @@ function thumbFor(slug: string): string | null {
         const slug = slugFromId(entry.id);
         const d = entry.data;
         // UTC year so a YYYY-01-01 date doesn't roll back in US timezones.
-        const year = d.date_published.getUTCFullYear();
+        const year = releasedOn(d).getUTCFullYear();
         const thumb = d.hero_image ? thumbFor(slug) : null;
         const glyph = crtGlyph(d.title, d.crt_glyph);
         return (

@@ -20,6 +20,7 @@ gallery:
 external_url: "https://makerworld.com/en/models/1293032-printable-poopin-stool"
 external_label: "View on MakerWorld"
 date_published: 2026-10-08
+released: 2025-04-06
 featured: false
 status: "live"
 draft: false

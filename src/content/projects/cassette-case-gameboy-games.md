@@ -41,6 +41,7 @@ gallery:
 external_url: "https://makerworld.com/en/models/640269-cassette-style-case-for-game-boy-games"
 external_label: "View on MakerWorld"
 date_published: 2024-09-16
+released: 2024-09-13
 featured: false
 status: "live"
 draft: false

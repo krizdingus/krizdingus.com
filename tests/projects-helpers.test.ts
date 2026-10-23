@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { tagCounts, sortProjects, hostLabel, heroDims, showStars, crtGlyph, variantBase, variantWidths, srcsetFor, shortAlt } from '../src/lib/projects-helpers';
+import { tagCounts, sortProjects, releasedOn, hostLabel, heroDims, showStars, crtGlyph, variantBase, variantWidths, srcsetFor, shortAlt } from '../src/lib/projects-helpers';
 import { relatedProjects } from '../src/lib/related-projects';
 
 const p = (tags: string[], category = '3d-print') => ({ data: { category, tags } });
@@ -15,6 +15,14 @@ describe('projects-helpers', () => {
   it('sortProjects: display_order first, then newest', () => {
     const a = d('2024-01-01', 2), b = d('2025-01-01'), c = d('2023-01-01', 1), e = d('2026-01-01');
     expect(sortProjects([a, b, c, e])).toEqual([c, a, e, b]);
+  });
+
+  it('releasedOn prefers the release day over the page date, and sortProjects orders by it', () => {
+    const late = { data: { date_published: new Date('2026-10-18'), released: new Date('2024-09-04') } };
+    const mid = d('2025-05-01');
+    expect(releasedOn(late.data)).toEqual(new Date('2024-09-04'));
+    expect(releasedOn(mid.data)).toEqual(new Date('2025-05-01'));
+    expect(sortProjects([late, mid])).toEqual([mid, late]);
   });
 
   it('hostLabel names the two hosts and falls back to the hostname', () => {

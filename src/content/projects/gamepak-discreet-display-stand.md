@@ -3,7 +3,7 @@ title: "Game Boy Game Pak Discreet Display Stand"
 summary: "A nearly invisible stand that leans a Game Boy, Game Boy Color, or GBA cartridge back at 15 degrees, so the cart seems to be holding itself up. For photos and for shelves."
 description: "A nearly invisible stand that leans a Game Boy, Game Boy Color or GBA cartridge back at 15 degrees, so the cart seems to be holding itself up."
 category: "3d-print"
-tags: ["3D Print", "Game Boy", "Shapr3D"]
+tags: ["3D Print", "Game Boy", "PLA", "Shapr3D"]
 hero_image: "/images/projects/gamepak-discreet-display-stand/crystal-front.webp"
 gallery:
   - src: "/images/projects/gamepak-discreet-display-stand/crystal-front.webp"
@@ -25,6 +25,7 @@ gallery:
 external_url: "https://makerworld.com/en/models/623660-game-boy-game-pak-discreet-display-stand"
 external_label: "View on MakerWorld"
 date_published: 2026-10-18
+released: 2024-09-04
 featured: false
 status: "live"
 draft: false

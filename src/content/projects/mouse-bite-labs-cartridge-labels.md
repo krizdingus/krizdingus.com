@@ -28,6 +28,7 @@ gallery:
 external_url: "https://github.com/krizdingus/mouse-bite-labs-cartridge-labels"
 external_label: "View on GitHub"
 date_published: 2025-05-22
+released: 2024-02-10
 featured: false
 status: "live"
 draft: false

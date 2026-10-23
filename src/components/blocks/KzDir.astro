@@ -8,6 +8,7 @@ import { getCollection } from 'astro:content';
 import { buildDirectory } from '../../data/directory';
 import { workshopRows, formatDay, SITE_TZ } from '../../data/workshop';
 import { latestCommit } from '../../data/git';
+import { releasedOn } from '../../lib/projects-helpers';
 
 const now = new Date();
 const slugOf = (e: { id: string; data: { slug?: string } }) => e.data.slug ?? e.id.replace(/\.mdx?$/, '');
@@ -20,7 +21,7 @@ const dir = buildDirectory(
     slug: slugOf(p),
     title: p.data.title,
     category: p.data.category,
-    date: p.data.date_published,
+    date: releasedOn(p.data),
     downloads: p.data.field_report?.downloads,
     captured: p.data.field_report?.captured,
     source: p.data.field_report?.source,

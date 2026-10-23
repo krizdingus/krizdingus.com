@@ -183,6 +183,7 @@ interface ProjectEntryLike extends ProjectLike {
   tags: string[];
   external_url: string;
   date_published: Date;
+  released?: Date;
   license?: string;
   languages?: string[];
   schema_type?: 'CreativeWork' | 'SoftwareSourceCode';
@@ -214,7 +215,9 @@ export function projectNode(url: string, slug: string, d: ProjectEntryLike): Jso
     name: d.title,
     description: d.description ?? d.summary,
     image: abs(photo ?? `/images/og/projects/${slug}.jpg`),
-    datePublished: isoDay(d.date_published),
+    datePublished: isoDay(d.released ?? d.date_published),
+    // The page's own date is later than the release: the page is the edit.
+    ...(d.released ? { dateModified: isoDay(d.date_published) } : {}),
     author: personRef,
     keywords: d.tags.join(', '),
     inLanguage: 'en',

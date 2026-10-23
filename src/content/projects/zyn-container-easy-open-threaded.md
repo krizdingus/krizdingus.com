@@ -17,6 +17,7 @@ gallery:
 external_url: "https://makerworld.com/en/models/631513-zyn-container-easy-open-threaded"
 external_label: "View on MakerWorld"
 date_published: 2026-10-14
+released: 2024-09-09
 featured: false
 status: "live"
 draft: false

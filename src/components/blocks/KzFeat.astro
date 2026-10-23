@@ -11,12 +11,13 @@ import { getCollection } from 'astro:content';
 import { readingMinutes, postDateLabel } from '../../lib/blog-helpers';
 import { shortLabel, TOP_PICK_COUNT } from '../../data/directory';
 import { formatDay } from '../../data/workshop';
+import { releasedOn } from '../../lib/projects-helpers';
 import { homeImage } from '../../data/home-images';
 import { blogPicture } from '../../lib/blog-images';
 import BlogPicture from '../BlogPicture.astro';
 
 const projects = await getCollection('projects', (e) => !e.data.draft);
-projects.sort((a, b) => b.data.date_published.getTime() - a.data.date_published.getTime());
+projects.sort((a, b) => releasedOn(b.data).getTime() - releasedOn(a.data).getTime());
 const featured = projects.find((p) => p.data.featured) ?? projects[0];
 // Newest build that isn't already the big card.
 const newest = projects.find((p) => p !== featured);
@@ -40,7 +41,7 @@ const CATEGORY_LABEL: Record<string, string> = {
 const STATUS_LABEL: Record<string, string> = { live: 'Live', archived: 'Archived', wip: 'In progress' };
 
 const fSlug = slugOf(featured);
-const fYear = featured.data.date_published.getUTCFullYear();
+const fYear = releasedOn(featured.data).getUTCFullYear();
 const fCategory = CATEGORY_LABEL[featured.data.category] ?? 'Project';
 const fGlyph = featured.data.crt_glyph ?? featured.data.title.slice(0, 3).toUpperCase();
 // The dated numbers from the project's own field report, when it has any.
@@ -192,7 +193,7 @@ const pTags = latestPost ? latestPost.data.tags.slice(0, 2).map((t) => `#${t}`).
             <div class:list={['kz-feat__sm-body', newest.data.hero_image && 'kz-feat__sm-body--media']}>
               {nImg && <img class="kz-feat__avatar" src={nImg.src} alt="" width="64" height="64" loading="lazy" />}
               <div>
-                <p class="kz-feat__kicker">{CATEGORY_LABEL[newest.data.category] ?? 'Project'} · {formatDay(newest.data.date_published)}</p>
+                <p class="kz-feat__kicker">{CATEGORY_LABEL[newest.data.category] ?? 'Project'} · {formatDay(releasedOn(newest.data))}</p>
                 <h3 class="kz-feat__sm-title">{shortLabel(nSlug, newest.data.title)}</h3>
                 <p class="kz-feat__sm-hook">{newest.data.summary}</p>
                 <p class="kz-feat__sm-meta">

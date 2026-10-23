@@ -15,7 +15,7 @@ My day job is Director of Web & Interactive Media at St. Thomas University, whic
 
 I've even been published: my article "The Application of Kantian Ethical Principles in Global Website Design and Development" is in the [Journal of Multidisciplinary Research, Vol. 15, No. 1 (Spring 2023, PDF)](https://jmrpublication.org/wp-content/uploads/2022/11/JMR-151-Spring-2023-1.pdf), starting on page 59.
 
-Around 2022 I got into Game Boy modding, meaning opening up old Game Boys and changing what's inside. 3D printing followed shortly after. Since then it's been a squat stool for the bathroom, a barely-there display stand for carts, a Game Boy cart case shaped like a cassette tape case so it fits in tape racks, a couple of cartridge shells, two cans for Zyn nicotine pouches, and labels for fan translations, romhacks (fan-made edits of old games) and flash carts. It's all on the <a href="/projects/">projects page</a>. The stool is by far my most-downloaded model.
+Around 2022 I got into Game Boy modding, meaning opening up old Game Boys and changing what's inside. 3D printing followed shortly after. Since then it's been a squat stool for the bathroom, a barely-there display stand for carts, a Game Boy cart case shaped like a cassette tape case so it fits in tape racks, two cans for Zyn nicotine pouches, and labels for fan translations, romhacks (fan-made edits of old games) and flash carts. It's all on the <a href="/projects/">projects page</a>. The stool is my most-downloaded model.
 
 Most of the print files are on MakerWorld, Bambu Lab's site for sharing them, and the code's on GitHub. Sometimes I film stuff for [Instagram](https://www.instagram.com/krizdingus/).
 

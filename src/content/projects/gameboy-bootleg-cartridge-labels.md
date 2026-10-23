@@ -34,6 +34,7 @@ gallery:
 external_url: "https://github.com/krizdingus/gameboy-cartridge-labels"
 external_label: "View on GitHub"
 date_published: 2024-06-17
+released: 2024-05-03
 featured: false
 status: "live"
 draft: false

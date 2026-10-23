@@ -28,6 +28,7 @@ gallery:
 external_url: "https://makerworld.com/en/models/715832-mini-magsafe-zyn-container"
 external_label: "View on MakerWorld"
 date_published: 2026-10-02
+released: 2024-10-19
 featured: true
 status: "live"
 draft: false

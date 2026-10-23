@@ -9,7 +9,7 @@ import Pnav from '../../components/Pnav.astro';
 import ProjectQuote from '../../components/ProjectQuote.astro';
 import { getCollection, render } from 'astro:content';
 import { relatedProjects } from '../../lib/related-projects';
-import { sortProjects, slugFromId, showStars, heroDims, variantBase, variantWidths, srcsetFor, shortAlt } from '../../lib/projects-helpers';
+import { sortProjects, releasedOn, slugFromId, showStars, heroDims, variantBase, variantWidths, srcsetFor, shortAlt } from '../../lib/projects-helpers';
 import { splitAlt } from '../../lib/alt-text';
 import { SITE, projectCard, projectNode } from '../../lib/seo';
 import '../../styles/projects.css';
@@ -34,7 +34,7 @@ const { Content } = await render(entry);
 const d = entry.data;
 const slug = slugFromId(entry.id);
 // UTC year so YYYY-01-01 dates don't roll back to the previous year in US timezones.
-const year = d.date_published.getUTCFullYear();
+const year = releasedOn(d).getUTCFullYear();
 const fr = d.field_report;
 const fmtNum = (n: number) => n.toLocaleString('en-US');
 const fmtDate = (dt: Date) => dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
@@ -72,11 +72,12 @@ const pool = allSlugs as Rel[];
 const seed = pool.find((p) => p.slug === slug)!;
 const related = relatedProjects(pool, seed, 2);
 
-const datePublished = fmtDate(d.date_published);
+// The day the project came out, not the page's own date.
+const releasedLabel = fmtDate(releasedOn(d));
 // "Also see" links back into this site render as plain internal links.
 const SITE_ORIGIN = 'https://krizdingus.com';
 // Hero meta: date, the first two tags, and the print time, one item each.
-const heroMeta = [datePublished, ...d.tags.slice(0, 2), ...(d.time ? [d.time] : [])];
+const heroMeta = [releasedLabel, ...d.tags.slice(0, 2), ...(d.time ? [d.time] : [])];
 
 // XP shell status bar: "Running · 3D PRINT".
 const systemTech = d.tags[0]?.toUpperCase() ?? '';
