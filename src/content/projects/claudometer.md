@@ -2,7 +2,7 @@
 title: "Claudometer: a Claude Code Usage Monitor on a $15 ESP32 Display"
 summary: "A little touchscreen for your desk that shows how much of your Claude Code session and weekly limits you've used, and what today's tokens would cost. It runs on a $10 to $15 Cheap Yellow Display and reads local logs, so no cloud service and no API key."
 seo_title: "Claudometer: a Claude Code usage monitor"
-description: "A $10 to $15 ESP32 touchscreen for your desk that shows Claude Code session and weekly usage and what today's tokens would cost, read from local logs. No cloud, no API key."
+description: "A $10 to $15 ESP32 touchscreen that shows Claude Code session and weekly usage and what today's tokens would cost, read from local logs. No cloud, no API key."
 category: "hardware"
 tags: ["ESP32", "Go", "PlatformIO", "Claude Code"]
 hero_image: "/images/projects/claudometer/on-desk.webp"

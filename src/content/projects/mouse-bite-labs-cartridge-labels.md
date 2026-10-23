@@ -1,6 +1,6 @@
 ---
 title: "Mouse Bite Labs Flash Cartridge Labels"
-summary: "Print-ready labels for Mouse Bite Labs’ open-source Game Boy flash cart boards, one for each board type, made for holographic label stock."
+summary: "Print-ready labels for Mouse Bite Labs’ open-source Game Boy flash cart boards: the original MBC1, MBC3 and MBC5 boards and the two multicarts."
 category: "game-boy"
 tags: ["Labels", "Game Boy"]
 hero_image: "/images/projects/mouse-bite-labs-cartridge-labels/mbc3-cartridge.webp"
@@ -43,13 +43,17 @@ field_report:
   stars: 0
 ---
 
-Mouse Bite Labs makes open-source Game Boy cartridge boards, the circuit board inside the shell. It's run by BucketMouse, and these labels are for those boards. My [ROM bot](/projects/gb-rom-database-bot/) runs on their Discord.
+Mouse Bite Labs makes open-source Game Boy cartridge boards, the circuit board inside the shell. It's run by Bucket Mouse, and these labels are for those boards. The boards are flash carts, meaning you write the game onto them yourself. What they don't come with is a label, so the finished cart ends up as good hardware wearing a blank face.
 
-The boards are flash carts, meaning you write the game onto them yourself. What they don't come with is a label, so the finished cart ends up as good hardware wearing a blank face.
+## How they got to him
+
+I didn't use a lot of Discord. I had it but barely touched it, so I wasn't even really aware of his Discord. I sort of just glossed over it while going through docs, as I do to build cartridges. So I emailed him directly like a dork to say, Hey man, I made these things. He loved them, and I said, Yeah man, use them. Seeing the credit in his repos was pretty sick. Felt good.
+
+But what really feels good is every now and then being in there and seeing people that got those labels printed, either did them themselves or reached out to the guy that I recommend, and put their own little Bucket Mouse labels that I designed on their carts. That's the coolest thing for me, not just his reactions. People are actually printing them and using them. I've got several of them on carts I've made for myself.
 
 ## Five board types
 
-One label per board type, so the label tells you what's inside. MBC stands for memory bank controller, a chip on the board, and every game was written for a particular one, so it decides which games that board will run. A multicart holds more than one game on a single cartridge.
+MBC stands for memory bank controller, a chip on the board, and every game was written for a particular one, so it decides which games that board will run. A multicart holds more than one game on a single cartridge.
 
 - MBC1 single-game cartridge
 - MBC3 single-game cartridge
@@ -57,17 +61,19 @@ One label per board type, so the label tells you what's inside. MBC stands for m
 - MBC3 multicart
 - MBC5 multicart
 
-All five share one design, a bucket-headed mouse in sunglasses over a neon grid, with the board type swapped. A mouse wearing a bucket, for BucketMouse's boards. Pretty literal.
+These were made for his original MBC1, 3 and 5 boards and his multicarts. He has since come out with several different ones, but these are for the first ones he came out with.
 
-## The files
+All five share one design, a bucket-headed mouse in sunglasses over a neon grid, with the board type swapped. A mouse wearing a bucket, for Bucket Mouse's boards. Pretty literal. I didn't draw him. I believe that avatar he uses was drawn by another fan of his at some point. I just happened to find a copy high enough resolution by searching Google, and used that.
 
-- PNG-24, 2100 × 1850 pixels, around 2 MB each
-- A preview image alongside each one, so you can see it before you download the print file
-- The README links each label to the matching Mouse Bite Labs board repo
+The black S in MOUSEBITELABS.COM lands on the mouse's black arm, so it nearly reads MOUSEBITELAB .COM. Yeah, I noticed, and it's not perfect.
 
-For printing, the README points to MatthewMods on Etsy for holographic label stock.
+## Printing them
 
-The same five designs are also in my [romhack and translation labels](/projects/gameboy-bootleg-cartridge-labels/).
+The print files are in the `labels` folder on GitHub, PNGs at 2100 × 1850 pixels, with smaller copies in `previews` to look at first. The same five designs are also in my [romhack and translation labels](/projects/gameboy-bootleg-cartridge-labels/).
+
+I designed them with holographic in mind, meaning I intended to print them that way. But I didn't really have a lot of experience with printing on holographic paper. The repo recommends MatthewMods on Etsy because he's got a really good printer. I printed a lot of labels through him before I ended up getting a pretty good printer at home.
+
+You can do it at home with a good photo printer and the proper paper. They're not going to be as good as MatthewMods with his exceptional printer, and then there's cutting them out. Good luck finding, what are they called? The tool to punch rounded corners. I've got one, but it's not even the right size. I think it's two millimeter, and I think the actual Game Boy label ones are one millimeter or one and a half. MatthewMods clearly has a cutter that can do that, so if you want them to be as authentic-looking as possible, I would go through him. Or for sixty dollars, you too can get a hold of one of these things that can cut at least a two millimeter rounded corner on a piece of paper.
 
 ## For your own carts
 

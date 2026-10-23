@@ -40,17 +40,13 @@ gallery:
     height: 1000
 external_url: "https://makerworld.com/en/models/640269-cassette-style-case-for-game-boy-games"
 external_label: "View on MakerWorld"
-date_published: 2024-09-13
+date_published: 2024-09-16
 featured: false
 status: "live"
 draft: false
 exe_name: "CASSETTE.EXE"
-time: "1.6–3.2 h per case, depending on profile"
+time: "1.5–3.4 h per case, depending on profile"
 license: "CC BY-NC-SA 4.0"
-quote:
-  text: "These fit the GB and GBC carts perfectly. I am busy printing for all my loose carts."
-  by: "@PhatA5s"
-  url: "https://makerworld.com/en/models/640269-cassette-style-case-for-game-boy-games"
 links:
   - label: "Files + PSD template on GitHub"
     url: "https://github.com/krizdingus/dmg-cassette-case"
@@ -64,23 +60,31 @@ field_report:
   comments: 35
 ---
 
-The world is full of racks, drawers, and shelves built for audio cassettes, and a lot of them aren't holding cassettes anymore. This is a case shaped like a tape case that holds a Game Boy cart instead, so the cart collection can move into them.
+The world is full of racks, drawers, and shelves built for audio cassettes, and a lot of them aren't holding cassettes anymore.
+
+## Why
+
+I wanted to make some sort of retro container for my Game Boy games. There are people that convert audio cassette cases into Game Boy cases, and maybe I saw those first. I don't quite remember, but I just remember thinking that would be a great form factor for a little DIY Game Boy game case. I was already making all of these bootlegged Pokémon cartridges for myself, so I thought it'd be really cool to have a series of cases for them. By this point, I had been getting a little bit more familiar with Shapr3D, and I wanted to tackle something with a hinge, and so this was it.
+
+I have all the Game Boy Pokémon games that I built myself in cases like these.
 
 ## Tape outside, cart inside
 
-Two parts, lid and body, that snap together and hold one DMG or CGB cartridge. Those are Nintendo's model codes for the original Game Boy and the Game Boy Color. The outside matches a standard audio cassette case, so it slots into racks built for them. There's a plain version, meant for custom labels, and a branded version for multicolor printing. In the multicolor files, the Game Boy and Nintendo branding is split out into separate small pieces, one for the front and one for the spine.
+Two parts, lid and body, that snap together and hold one DMG or CGB cartridge. Those are Nintendo's model codes for the original Game Boy and the Game Boy Color. The outside is sized like a standard audio cassette case, and in my real-world tests, that turned out to be the right size. There's a plain version, meant for custom labels, and a branded version for multicolor printing, with the GAME BOY logo split out into two small pieces, one for the front and one for the spine.
 
-The listing includes print-ready cover labels for Pokémon Red, Blue, Yellow, Gold, Silver, and Crystal, and the same six are in the repo's Labels folder. The Photoshop template for making your own is in the GitHub repo, next to the STL files you actually print. It's set in the ultra-condensed cut of Univers LT Std, which I can't redistribute; Oswald Bold from Google Fonts is close enough that nobody will call you on it. The whole thing is CC BY-NC-SA, so remixes are welcome as long as they credit the original and stay non-commercial.
+The labels correspond to the Pokémon labels I'd already made for my own carts: Red, Blue, Yellow, Gold, Silver, and Crystal, on the listing and in the repo. And then I included the template that I use to make those, in case anyone wanted to make their own labels for any other games. I just wanted to make it easier for folks to keep making off what I had already made, if they wanted to. So far, I don't think anyone has. The template's set in the ultra-condensed cut of Univers LT Std, which I can't redistribute; Oswald Bold from Google Fonts is close enough that nobody will call you on it.
 
-## Eight Bambu profiles
+## The nub
 
-A profile is a saved set of slicer settings, and the slicer is the program that turns a model into instructions for the printer. There are eight, all for Bambu Lab printers: AMS (plain or branded) and non-AMS (one plate or two), each in PLA and ABS. AMS is Bambu's add-on that feeds several spools into one printer, so a print can switch colors by itself. They run 1.6 to 3.2 hours, depending on which one you pick.
+The inside of the lid has a nub on it. I put the nub in there because I didn't like the idea of the cartridges rattling when you picked them up and moved them around. It's to keep it in place. People kept complaining about the nub, worrying about it rubbing up against their labels. Yeah, I don't think that's gonna happen. I really didn't anticipate in any circumstance it would be able to rub against the label. Still don't. But because people kept complaining, I made No Nub lids.
+
+## Printing it
 
 - PLA, PETG, or ABS. PLA's fine for a shelf. ABS or PETG if the case is going somewhere warm or getting handled a lot
 - 0.16 mm layers or finer for a smooth face
-- 5% grid infill, meaning the fill pattern inside the walls. It's a box; it doesn't need to be a brick
+- 5% grid infill, meaning the fill pattern inside the walls
 - No supports
 
-## Where it breaks
+## The hinge
 
-The hinge clip is the part to watch: a couple of people had it snap after a few open-and-close cycles. Separately, one person had warping bad enough to burn six attempts before turning up nozzle temperature. Dry filament fixes most of it. A 1% scale-up fixed a tight fit for someone else. And one reviewer's fix for a lid that rubs: shave about a millimeter off the inner back wall.
+The hinges can be a little bit of a pain. I recognize maybe better engineering could make that easier, and that dry your filament often sounds like a cop-out, but a tuned printer and dry filament, these things tend to print just fine.

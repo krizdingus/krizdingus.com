@@ -2,6 +2,7 @@
 title: "Peekabu: a Mac Monitor for Bambu Lab Printers"
 summary: "A free Mac app for watching a Bambu Lab 3D printer: the live camera, progress and temps in a small window, the percent in the menu bar, and a notification when a print finishes or needs a human."
 seo_title: "Peekabu: a Bambu Lab monitor for the Mac"
+description: "A free Mac app for watching a Bambu Lab 3D printer: live camera, progress and temps in a small window, the percent in the menu bar, and alerts when a print finishes."
 schema_type: "CreativeWork"
 category: "software"
 tags: ["macOS", "Bambu Lab"]

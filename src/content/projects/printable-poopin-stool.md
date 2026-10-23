@@ -1,6 +1,6 @@
 ---
 title: "Printable Poopin’ Stool"
-summary: "A squat-style toilet footstool you print in PETG for under $15, tested to 180 lb. The parts press-fit together without glue."
+summary: "A squat-style toilet footstool you print in PETG for under $15, tested to 180 lb. The main parts press-fit together, no glue."
 category: "3d-print"
 tags: ["3D Print", "PETG", "TPU", "Shapr3D"]
 hero_image: "/images/projects/printable-poopin-stool/in-place.webp"
@@ -19,7 +19,7 @@ gallery:
     height: 725
 external_url: "https://makerworld.com/en/models/1293032-printable-poopin-stool"
 external_label: "View on MakerWorld"
-date_published: 2025-04-06
+date_published: 2026-10-08
 featured: false
 status: "live"
 draft: false
@@ -41,11 +41,19 @@ field_report:
   comments: 241
 ---
 
-A squat stool is a wedge that lifts your knees so your colon stops doing a kink. It sits around the base of the toilet, and you put your feet up on it while you go. You can buy one, or you can print one in PETG and keep a printer busy for most of a day. I did the second one, and I use it every day.
+It's a stool for elevating your legs and knees, evidently to achieve optimal defecating performance. Science says we're supposed to squat over a hole in the dirt to make deuce, but God specifically forbids it or something, and squatting over your toilet seat would be real messy. It sits around the base of the toilet, and you put your feet up on it while you go.
 
 It's my most popular model on MakerWorld, where Bambu Lab hosts people's printable models, by a wide margin.
 
-I made it because the printable stools I kept finding online often ate around 1.5 kg of filament, which is ridiculous. I wanted to see if a printed one could compete with a store-bought one on value. Honestly, I fell a little short. You can probably still get a Squatty Potty-style stool online for about $9 to $12. But it's good enough, and depending on where you live, it might be worth it.
+I made it because the printable stools I kept finding online often ate around 1.5 kg of filament, which is ridiculous. I wanted to see if a printed one could compete with a store-bought one on value. I think I fell a little short. You can probably still get a Squatty Potty-style stool online for about $9 to $12. But it's good enough, and depending on where you live, it might be worth it.
+
+It went up in April 2025, when the president was ramping up his trade war, so the listing pitches it as beating the tariffs. I don't even know what impact tariffs had on the cost of poop stools. It was more of a joke angle than anything.
+
+## The hexagons
+
+The hardest part was the hexagon pattern on the surface. Shapr3D doesn't really have a great way of doing that, so I had to copy and paste a lot of hexagons carefully to build that pattern, and then cut away. That was a pain in the butt.
+
+Then printing. The top boards, where your feet go, can be a pain just because of the surface area and all the different variables that can happen in your printing environment. If there's any parts that are going to be most likely to warp, it's those.
 
 ## The parts
 
@@ -56,19 +64,19 @@ Five unique parts:
 - Four side legs, two per side
 - Five optional TPU feet for tile and other slick floors
 
-Everything press-fits, which means the pieces push together snug and stay put without glue. TPU is the soft, bendy kind of filament, which is why it's the one for the feet.
-
-Assembled it stands about 160 mm tall, a little over six inches, and fits a foot up to a US men's 11. It slides in close to the bowl when you're not using it, same as the store-bought kind. Total material is a little over 600 g, so well under that 1.5 kg. The download is five STL model files and two Bambu print profiles. It's under the Standard Digital File License, so personal use only.
+The main parts press-fit. The feet may need a dab of glue.
 
 ## Not in PLA
 
-**PETG only.** I want to be clear about this because people will read "PLA looks fine" and then it will look fine right up until it shatters under a foot. PLA is brittle. PETG bends. They're the two most common filaments, and they're not interchangeable here. This thing has been tested to 180 lb of resting feet, and "resting" is the operative word. One reviewer's kid loves it. Please don't let your kid stand on it.
+**PETG only.** I specifically said to print this in something like PETG, because that is way less likely to shatter under stress than PLA. PETG is more likely to bend and deform under stress instead of catastrophically snapping, sending a sharp piece of plastic into your foot.
+
+The listing says it's tested up to 180 lb. I had got kind of hefty. I was up to 180 pounds at that point, and I stood on it with all of my body weight. I even bounced on it a bit. So theoretically, it can take more than 180 pounds. But it stood firm with 180-pound fat me on top of it. That said, it's not meant to be a standing stool at all. Please do not stand on it. One reviewer's kid loves it. Please don't let your kid stand on it either.
 
 - Designer profile: 0.2 mm layers, 3 walls, 15% infill, three plates, about 21 hours total on an X1C
 - Feet: separate 2.3-hour TPU profile
 
-A plate is one full load on the printer's bed, so that's three separate prints for the stool, and the feet go on their own. The feet are a separate profile because Bambu Studio threw a fit about mixing filament types on one plate when I set it up.
-
 ## Reviews
 
-They're consistent: it fits, it's solid, it takes forever to print. A few people have glued the joints for extra stiffness, and a few have hit the top and feet with liquid rubber or Plasti Dip, the stuff people dip tool handles in, for grip. Both of those are good ideas I didn't have. The long print time is the one complaint I agree with. Something faster on less material is on the someday list.
+One person glued the joints because it wobbled, and a couple have hit the top and feet with liquid rubber or Plasti Dip, the stuff people dip tool handles in, for grip.
+
+I do hope to make version two. I just have not got around to it. And honestly, I kind of hoped people would take it as a challenge, and I would see people really trying to design more material-efficient versions, and I think I've only seen one so far.
