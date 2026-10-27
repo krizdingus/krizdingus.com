@@ -27,6 +27,8 @@ export interface ResponsiveImage {
 export const HOME_IMAGE_WIDTHS: Record<string, number[]> = {
   '/images/magsafe-zyn-container-3d-print.jpg': [128, 480, 640, 800, 1200],
   '/images/krizdingus-portrait.jpg': [128],
+  // The featured project's rail avatar, cut square the same way.
+  '/images/projects/cassette-case-gameboy-games/open-and-closed.webp': [128],
 };
 
 export function variantPath(original: string, width: number): string {

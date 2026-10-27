@@ -141,6 +141,23 @@ export const blogSchema = z.object({
   draft: z.boolean().default(false),
   // Not signed off yet: shows a "Drafted" marker and stays out of the feed.
   review: z.boolean().default(false),
+  // A browsable strip of pictures under the post, for posts that are mostly
+  // about something you'd want to look at (a site build, a redesign). Same
+  // shape as a project's gallery, and driven by the same viewer script, but
+  // its own component and its own files: public/images/blog/<folder>/ with
+  // responsive copies and square thumbs in a sibling r/ (npm run images -- blog).
+  gallery: z.array(z.object({
+    src: z.string(),
+    alt: z.string(),
+    width: z.number().int().optional(),
+    height: z.number().int().optional(),
+  })).default([]),
+  gallery_title: z.string().optional(),
+  // This post is a case study of a web ledger record: the entry's id in
+  // src/content/web/ ("prospera-real-estate-collective"). /web/ lists the
+  // newest few and reads the client's name and live link off the ledger, so
+  // the post never spells either one out. An id with no record fails the build.
+  case_study_for: z.string().optional(),
 });
 
 export const aboutSchema = z.object({

@@ -42,7 +42,7 @@ external_url: "https://makerworld.com/en/models/640269-cassette-style-case-for-g
 external_label: "View on MakerWorld"
 date_published: 2024-09-16
 released: 2024-09-13
-featured: false
+featured: true
 status: "live"
 draft: false
 exe_name: "CASSETTE.EXE"

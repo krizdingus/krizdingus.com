@@ -1,0 +1,226 @@
+---
+// src/components/Gallery.astro — the picture viewer, shared by project pages
+// and by posts that carry a gallery. One implementation, one look: don't add
+// a second one.
+//
+// Presentation only. The caller resolves its own file paths and passes
+// finished pictures, because projects keep their copies under
+// public/images/projects/<slug>/r/ and posts keep theirs in an r/ beside the
+// picture. Behaviour comes from src/scripts/gallery.ts, which BaseLayout
+// loads on every page and which drives anything inside [data-gallery-root]
+// carrying these data attributes. Thumbnails are real links to the full
+// picture, so the gallery still works with JS off; Prev and Next ship hidden
+// and the script reveals them.
+import { splitAlt } from '../lib/alt-text';
+
+export interface GalleryPicture {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  /** Pre-built srcsets. Empty string means "no copies, use the original". */
+  avif?: string;
+  webp?: string;
+  /** Square thumb for the strip; falls back to the full picture. */
+  thumb?: string;
+}
+
+interface Props {
+  pictures: GalleryPicture[];
+  /** Shown as a heading above the gallery. Without one, pass `label`. */
+  title?: string;
+  /** aria-label for the section when there is no visible heading. */
+  label?: string;
+  sizes: string;
+  /** The first picture is the page's main image: load it eagerly. */
+  eager?: boolean;
+  /** Keeps the description element's id unique if a page ever has two. */
+  idPrefix?: string;
+}
+
+const { pictures, title, label = 'Pictures', sizes, eager = false, idPrefix = 'gal' } = Astro.props;
+
+const pad2 = (n: number) => (n < 10 ? `0${n}` : String(n));
+const total = pictures.length;
+const first = pictures[0];
+const firstAlt = splitAlt(first?.alt ?? '');
+const DESC_ID = `${idPrefix}-desc`;
+const headingId = `${idPrefix}-h`;
+---
+
+{total > 0 && (
+  <section
+    class="gal"
+    data-gallery-root
+    aria-labelledby={title ? headingId : undefined}
+    aria-label={title ? undefined : label}
+  >
+    {title && <h2 class="gal__h" id={headingId}>{title}</h2>}
+
+    <figure class="gal__stage">
+      <picture>
+        {first.avif && <source type="image/avif" srcset={first.avif} sizes={sizes} />}
+        {first.webp && <source type="image/webp" srcset={first.webp} sizes={sizes} />}
+        <img
+          data-gallery-main
+          src={first.src}
+          srcset={first.webp || undefined}
+          sizes={first.webp ? sizes : undefined}
+          alt={firstAlt.alt}
+          aria-describedby={firstAlt.desc ? DESC_ID : undefined}
+          width={first.width}
+          height={first.height}
+          loading={eager ? 'eager' : 'lazy'}
+          fetchpriority={eager ? 'high' : undefined}
+          decoding="async"
+        />
+      </picture>
+      <span class="sr-only" id={DESC_ID} data-gallery-desc>{firstAlt.desc}</span>
+    </figure>
+
+    {total > 1 && (
+      <div class="gal__bar">
+        <span class="gal__count" data-gallery-counter aria-live="polite">{pad2(1)} / {pad2(total)}</span>
+        <div class="gal__ctrls" data-gallery-ctrls hidden>
+          <button type="button" data-gallery="prev"><span aria-hidden="true">← </span>Prev</button>
+          <button type="button" data-gallery="next">Next<span aria-hidden="true"> →</span></button>
+        </div>
+      </div>
+    )}
+
+    {total > 1 && (
+      <ul class="gal__thumbs">
+        {pictures.map((item, i) => (
+          <li>
+            <a
+              class="gal__thumb"
+              href={item.src}
+              data-gallery-thumb
+              data-alt={splitAlt(item.alt).alt}
+              data-desc={splitAlt(item.alt).desc || undefined}
+              data-srcset-avif={item.avif || undefined}
+              data-srcset-webp={item.webp || undefined}
+              data-w={item.width}
+              data-h={item.height}
+              aria-label={`Picture ${pad2(i + 1)} of ${pad2(total)}: ${splitAlt(item.alt).alt}`}
+              aria-current={i === 0 ? 'true' : undefined}
+            >
+              <span class="gal__n" aria-hidden="true">{pad2(i + 1)}</span>
+              <img src={item.thumb || item.src} alt="" width="200" height="200" loading="lazy" decoding="async" fetchpriority="low" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+)}
+
+<style>
+  .gal {
+    margin: 0;
+  }
+  .gal__h {
+    margin: 3rem 0 1rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--border, rgba(128, 128, 128, 0.3));
+    font-size: 1.1rem;
+    letter-spacing: 0.02em;
+  }
+  /* Full-page screenshots run to several thousand pixels tall. Cap the stage
+     and letterbox, so the strip stays usable at any aspect ratio; the thumb
+     is a real link, so the whole picture is always one click away. */
+  .gal__stage {
+    margin: 0;
+    background: var(--bg-secondary, rgba(128, 128, 128, 0.08));
+    border: 1px solid var(--border, rgba(128, 128, 128, 0.3));
+  }
+  /* No CSS width on purpose. The width/height attributes carry the picture's
+     layout size in CSS pixels, so a phone capture taken at 2x (780px of image
+     describing a 390px screen) lays out at 390 and spends the extra pixels on
+     sharpness instead of being stretched. The viewer script keeps those
+     attributes in step as you page through. */
+  .gal__stage img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    max-height: 70vh;
+    margin-inline: auto;
+    object-fit: contain;
+    object-position: top;
+  }
+  .gal__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.6rem;
+  }
+  .gal__count {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.8rem;
+    opacity: 0.75;
+  }
+  .gal__ctrls {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .gal__ctrls button {
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 0.3rem 0.7rem;
+    cursor: pointer;
+    color: inherit;
+    background: transparent;
+    border: 1px solid var(--border, rgba(128, 128, 128, 0.4));
+  }
+  .gal__ctrls button:hover {
+    background: var(--bg-secondary, rgba(128, 128, 128, 0.12));
+  }
+  .gal__thumbs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 0.5rem;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Inside a post the gallery sits in .prose. Prose styles Markdown's own
+     lists only -- it skips any list carrying a class (src/styles/prose.css) --
+     so the strip is left alone. This reset stands behind that, for any other
+     container the gallery is ever dropped into. */
+  .gal__thumbs > li {
+    position: static;
+    margin: 0;
+    padding-left: 0;
+  }
+  .gal__thumbs > li::before {
+    content: none;
+  }
+  .gal__thumb {
+    position: relative;
+    display: block;
+    line-height: 0;
+    border: 1px solid var(--border, rgba(128, 128, 128, 0.3));
+  }
+  .gal__thumb img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+  .gal__thumb[aria-current='true'] {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+  }
+  .gal__n {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 0 0.3em;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.65rem;
+    line-height: 1.6;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.6);
+  }
+</style>

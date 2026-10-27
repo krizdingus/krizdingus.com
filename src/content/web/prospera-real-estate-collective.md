@@ -1,5 +1,5 @@
 ---
 client: "Prospera Real Estate Collective"
 relationship: "freelance"
-site_state: "launching"
+live_url: "https://prosperaco.com/"
 ---

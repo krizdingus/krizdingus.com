@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
-import { groupLedger, monthLabel, stateLabel, waybackMonth, type LedgerFields } from '../src/lib/web-ledger';
+import { groupLedger, monthLabel, stateLabel, waybackMonth, caseStudies, CASE_STUDY_MAX, type LedgerFields } from '../src/lib/web-ledger';
 import { webSchema } from '../src/content.config';
 
 const rec = (client: string, more: Partial<LedgerFields> = {}): LedgerFields => ({ client, ...more });
@@ -98,7 +98,6 @@ describe('web ledger content', () => {
       'ivfmd.md': 'redone',
       'level-three-venue.md': 'gone',
       'sia-scotch-whisky.md': 'gone',
-      'prospera-real-estate-collective.md': 'launching',
     });
   });
 
@@ -109,6 +108,7 @@ describe('web ledger content', () => {
       'kozyak-tropin-throckmorton.md': 'https://kttlaw.com/',
       'stu-moot-court.md': 'https://stumootcourt.org/',
       'journal-of-multidisciplinary-research.md': 'https://www.jmrpublication.org/',
+      'prospera-real-estate-collective.md': 'https://prosperaco.com/',
     });
     for (const f of Object.keys(live)) {
       const d = entries.find((e) => e.file === f)!.data;
@@ -188,6 +188,57 @@ describe('web page results and limits', () => {
     ]) {
       const visible = page.replace(/title="[^"]*— Krizdingus"/, '').replace(/shellTitle="[^"]*"/, '').replace(/\/\/.*$/gm, '');
       expect(visible, String(re)).not.toMatch(re);
+    }
+  });
+});
+
+// Case studies on /web/: the join from a post to the ledger record it was
+// written about. The client's name and live link are read off the ledger, so
+// a site going live is one edit there and nothing in the post.
+describe('case studies', () => {
+  const post = (slug: string, clientId: string, day: string) => ({
+    slug, clientId, title: slug, summary: `about ${slug}`, date: new Date(day),
+  });
+  const ledger = [
+    { id: 'prospera-real-estate-collective', client: 'Prospera Real Estate Collective', live_url: 'https://prosperaco.com/' },
+    { id: 'quiet-client', client: 'Quiet Client' },
+  ];
+
+  it('reads the client name and live link off the ledger', () => {
+    const [c] = caseStudies([post('a-copy-you-paraphrased-is-not-a-copy', 'prospera-real-estate-collective', '2026-10-27')], ledger);
+    expect(c.client).toBe('Prospera Real Estate Collective');
+    expect(c.live_url).toBe('https://prosperaco.com/');
+  });
+
+  it('leaves the live link null when the ledger has none', () => {
+    const [c] = caseStudies([post('quiet', 'quiet-client', '2026-01-01')], ledger);
+    expect(c.client).toBe('Quiet Client');
+    expect(c.live_url).toBeNull();
+  });
+
+  it('puts the newest first and caps the list', () => {
+    const posts = [
+      post('older', 'quiet-client', '2024-01-01'),
+      post('newest', 'quiet-client', '2026-10-27'),
+      post('middle', 'quiet-client', '2025-06-01'),
+    ];
+    expect(caseStudies(posts, ledger).map((c) => c.slug)).toEqual(['newest', 'middle', 'older']);
+    expect(caseStudies(posts, ledger, 2).map((c) => c.slug)).toEqual(['newest', 'middle']);
+    expect(CASE_STUDY_MAX).toBeGreaterThan(0);
+  });
+
+  it('throws when a post names a record the ledger does not have', () => {
+    expect(() => caseStudies([post('orphan', 'no-such-client', '2026-10-27')], ledger))
+      .toThrow(/no web ledger record "no-such-client"/);
+  });
+
+  it('every post that claims a case study points at a real record', () => {
+    const dir = path.resolve(__dirname, '../src/content/blog');
+    const names = new Set(fs.readdirSync(path.resolve(__dirname, '../src/content/web')).map((f) => f.replace(/\.md$/, '')));
+    for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.md'))) {
+      const fm = fs.readFileSync(path.join(dir, file), 'utf8').split(/^---$/m)[1] ?? '';
+      const m = fm.match(/^case_study_for:\s*"([^"]+)"/m);
+      if (m) expect(names, `${file} -> ${m[1]}`).toContain(m[1]);
     }
   });
 });

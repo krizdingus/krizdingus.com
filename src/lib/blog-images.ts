@@ -50,3 +50,41 @@ export function blogPicture(src: string | null | undefined): BlogPicture | null 
   const set = (ext: string) => widths.map((w) => `${base}-${w}.${ext} ${w}w`).join(', ');
   return { src, avif: set('avif'), webp: set('webp'), ...size };
 }
+
+/** A post's gallery pictures, resolved for src/components/Gallery.astro.
+ *  Copies and a 200px square thumb sit in an r/ beside each picture, cut by
+ *  `npm run images -- blog`. Anything without them falls back to the file. */
+// Widths are discovered on disk, not assumed: a 2x phone capture is 780 wide
+// and would fall outside any fixed list.
+
+export interface GalleryItem {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+}
+
+export function blogGalleryPictures(items: GalleryItem[]) {
+  return items.map((item) => {
+    const dir = item.src.replace(/\/[^/]+$/, '');
+    const base = item.src.replace(/^.*\//, '').replace(/\.[^.]+$/, '');
+    const at = (w: number, ext: string) => `${dir}/r/${base}-${w}.${ext}`;
+    const rdir = `public${dir}/r`;
+    const found = fs.existsSync(rdir) ? fs.readdirSync(rdir) : [];
+    const re = new RegExp(`^${base.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-(\\d+)\\.webp$`);
+    const widths = found
+      .map((f) => f.match(re)?.[1])
+      .filter((w): w is string => Boolean(w))
+      .map(Number)
+      .filter((w) => fs.existsSync(`public${at(w, 'avif')}`))
+      .sort((a, b) => a - b);
+    const set = (ext: string) => widths.map((w) => `${at(w, ext)} ${w}w`).join(', ');
+    const thumb = `${dir}/r/${base}-thumb.webp`;
+    return {
+      ...item,
+      avif: set('avif'),
+      webp: set('webp'),
+      thumb: fs.existsSync(`public${thumb}`) ? thumb : item.src,
+    };
+  });
+}

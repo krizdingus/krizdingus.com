@@ -1,9 +1,12 @@
 ---
 import { pageCard } from '../../lib/seo';
+import ExternalLink from '../../components/ExternalLink.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import { getCollection } from 'astro:content';
-import { groupLedger, stateLabel, waybackMonth } from '../../lib/web-ledger';
+import { groupLedger, stateLabel, waybackMonth, caseStudies } from '../../lib/web-ledger';
+import { postSlug } from '../../lib/blog-helpers';
+import { slugFromId } from '../../lib/projects-helpers';
 import './_web.css';
 
 // /web/: what the web work covers, a few results from one employer, then
@@ -23,6 +26,24 @@ import './_web.css';
 const all = await getCollection('web', (e) => !e.data.draft);
 const groups = groupLedger(all, (e) => e.data);
 const total = all.length;
+
+// Case studies: the posts that say which ledger record they were written
+// about. The client's name and live link are read off that record, so a site
+// going live is one edit in the ledger and nothing here or in the post. The
+// list leads with the name, the way the ledger above does, then the write-up
+// and the site. Nothing else: the post's summary, picture and tags are
+// written for the blog and stay there.
+const posts = await getCollection('blog', (e) => !e.data.draft && !e.data.review && Boolean(e.data.case_study_for));
+const cases = caseStudies(
+  posts.map((e) => ({
+    slug: postSlug(e.id),
+    title: e.data.title,
+    summary: e.data.summary,
+    date: e.data.date_published,
+    clientId: e.data.case_study_for!,
+  })),
+  all.map((e) => ({ id: slugFromId(e.id), client: e.data.client, live_url: e.data.live_url })),
+);
 
 const RESULTS_WHERE = 'At St. Thomas University';
 const RESULTS: { lead: string; mark: string; tail: string }[] = [
@@ -206,6 +227,38 @@ const RESULTS: { lead: string; mark: string; tail: string }[] = [
           There are probably more names than this. They go on the list when I find them.
         </p>
       </section>
+
+      {cases.length > 0 && (
+        <section class="web-cases" aria-labelledby="cases-title">
+          <div class="web-cases__side">
+            <header class="section-header">
+              <h2 class="section-title" id="cases-title">Case studies</h2>
+              <div class="section-meta">Newest first</div>
+            </header>
+            <div class="intro-block">
+              <p>
+                Now and again a job is worth writing up properly: what I was handed, what I
+                did with it, and what it looked like by the end. Those write-ups are on the
+                blog, and the newest of them are here.
+              </p>
+            </div>
+          </div>
+
+          <dl class="wc__list">
+            {cases.map((c) => (
+              <div class="wc__row">
+                <dt>{c.client}</dt>
+                <dd>
+                  <a href={`/blog/${c.slug}/`}>Read article: <cite>{c.title}</cite></a>
+                  {c.live_url && (
+                    <ExternalLink href={c.live_url}>See the site</ExternalLink>
+                  )}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
     </div>
   </section>
 </BaseLayout>

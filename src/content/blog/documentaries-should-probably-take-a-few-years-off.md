@@ -6,7 +6,7 @@ description: "Nathan Fielder and Lance Oppenheim's You Can See Everything might 
 hero_image: "/images/blog/documentaries-should-probably-take-a-few-years-off.jpg"
 hero_alt: "A nervous cartoon man in headphones side-eyes a grinning blonde woman, on bright halftone color."
 hero_caption: "This isn't a movie review."
-featured: true
+featured: false
 date_published: 2026-10-21
 tags: ["movies"]
 ---

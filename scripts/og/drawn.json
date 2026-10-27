@@ -60,6 +60,17 @@
   "url": "krizdingus.com/colophon/"
  },
  {
+  "out": "blog/a-copy-you-paraphrased-is-not-a-copy.jpg",
+  "mood": "plum",
+  "hue": "grape",
+  "crumb": "> blog / a-copy-you-paraphrased-is-not-a-copy",
+  "title": "A copy you paraphrased is not a copy",
+  "url": "krizdingus.com/blog/",
+  "kind": "photo",
+  "src": "/images/blog/a-copy-you-paraphrased-is-not-a-copy.jpg",
+  "position": "centre"
+ },
+ {
   "out": "blog/a-theme-is-a-folder.jpg",
   "mood": "plum",
   "hue": "grape",

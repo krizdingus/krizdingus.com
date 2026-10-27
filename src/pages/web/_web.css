@@ -62,19 +62,22 @@
     column-gap: var(--space-xl);
   }
 }
-.web-do__row {
+.web-do__row,
+.wc__row {
   padding: 14px 0 16px;
   border-top: 1px dashed var(--hairline);
   break-inside: avoid;
 }
-.web-do__list dt {
+.web-do__list dt,
+.wc__list dt {
   font-family: var(--font-pixel);
   font-size: 12px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--accent-secondary);
 }
-.web-do__list dd {
+.web-do__list dd,
+.wc__list dd {
   margin: 6px 0 0;
   max-width: 34em;
   font-family: var(--font-mono);
@@ -314,6 +317,7 @@
 :root:not([data-skin-base=none]) .web-results__list li { border-color: var(--hue-line); }
 :root:not([data-skin-base=none]) .web-layout .web-results__list { max-width: none; }
 :root:not([data-skin-base=none]) .web-do__row { border-top: 1px dashed var(--hue-line); }
+:root:not([data-skin-base=none]) .wc__list { border-color: var(--hue-line); }
 /* Night: the thin highlighter band under bold text reads as an underline,
    so the figures go bold in the section ink instead. */
 :root:not([data-skin-base=none])[data-theme="dark"] .web-results__list strong {
@@ -321,7 +325,7 @@
   padding: 0;
   color: var(--hue);
 }
-:root:not([data-skin-base=none]) .site-main .web-do__list dt {
+:root:not([data-skin-base=none]) .site-main :is(.web-do__list, .wc__list) dt {
   font-family: var(--font-display);
   font-size: 19px;
   font-weight: 650;
@@ -331,7 +335,7 @@
   text-transform: none;
   color: var(--hue);
 }
-:root:not([data-skin-base=none]) .web-do__list dd {
+:root:not([data-skin-base=none]) :is(.web-do__list, .wc__list) dd {
   font-family: var(--font-body);
   font-size: 17px;
   line-height: 1.6;
@@ -362,3 +366,37 @@
 @media (max-width: 420px) {
   :root:not([data-skin-base=none]) .wl { font-size: 12.5px; }
 }
+
+/* ---------- Case studies: the write-up, who it was for, the site ----------
+   Laid out like "Who it was for" below it: the words on the left, the list
+   on the right, same breakpoint and same column widths. The rows keep "What
+   I do"'s spacing and type (above) but not its rule between every row --
+   the one rule here stands between the words and the list, down the left
+   edge of the list. Both links are ordinary site links. */
+.web-cases__side .intro-block { margin-bottom: var(--space-md); }
+.wc__row { border-top: 0; }
+.wc__list { margin: 0; }
+@media (min-width: 1100px) {
+  .web-cases {
+    display: grid;
+    grid-template-columns: minmax(0, 30rem) minmax(0, 1fr);
+    column-gap: var(--space-xl);
+    align-items: start;
+  }
+  .web-cases__side .intro-block { margin-bottom: 0; }
+  .wc__list {
+    border-left: 1px dashed var(--hairline);
+    padding-left: var(--space-xl);
+  }
+}
+/* The write-up and the site on one line. The label says what the link is,
+   and the title sits in <cite>, the element for a work's name, so it reads
+   as a title rather than as more of the sentence. */
+.wc__list dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 1.1em;
+  row-gap: 0.2em;
+}
+.wc__list cite { font-style: italic; }

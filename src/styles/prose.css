@@ -75,11 +75,16 @@
 .prose .prompt-link:hover { background: var(--bg-console-elev); }
 
 /* ---------- Lists ---------- */
-.prose ul,
-.prose ol { margin: 0 0 1.4em; padding-left: 0; list-style: none; }
-.prose ul > li,
-.prose ol > li { position: relative; padding-left: 2.2em; margin-bottom: 0.4em; }
-.prose ul > li::before {
+/* Markdown's own lists only. A list that carries a class came from a
+   component (the gallery's thumbnail strip, say), which brings its own
+   styling and must not be given the bracket bullet and its 2em indent --
+   component styles are scoped, and a scoped selector loses to the skinned
+   `:root:not(...) .prose ul > li` below. */
+.prose ul:not([class]),
+.prose ol:not([class]) { margin: 0 0 1.4em; padding-left: 0; list-style: none; }
+.prose ul:not([class]) > li,
+.prose ol:not([class]) > li { position: relative; padding-left: 2.2em; margin-bottom: 0.4em; }
+.prose ul:not([class]) > li::before {
   content: '[+]';
   position: absolute; left: 0;
   font-family: var(--font-mono);
@@ -87,9 +92,9 @@
   font-weight: 700;
   user-select: none;
 }
-.prose ol { counter-reset: ol; }
-.prose ol > li { counter-increment: ol; }
-.prose ol > li::before {
+.prose ol:not([class]) { counter-reset: ol; }
+.prose ol:not([class]) > li { counter-increment: ol; }
+.prose ol:not([class]) > li::before {
   content: '[' counter(ol) ']';
   position: absolute; left: 0;
   font-family: var(--font-mono);
@@ -389,10 +394,10 @@
 }
 :root:not([data-skin-base=none])[data-theme="dark"] .prose a { text-decoration-color: var(--hue-line); }
 :root:not([data-skin-base=none]) .prose em { color: inherit; }
-:root:not([data-skin-base=none]) .prose ul > li,
-:root:not([data-skin-base=none]) .prose ol > li { padding-left: 2em; margin-bottom: 0.45em; }
-:root:not([data-skin-base=none]) .prose ul > li::before,
-:root:not([data-skin-base=none]) .prose ol > li::before {
+:root:not([data-skin-base=none]) .prose ul:not([class]) > li,
+:root:not([data-skin-base=none]) .prose ol:not([class]) > li { padding-left: 2em; margin-bottom: 0.45em; }
+:root:not([data-skin-base=none]) .prose ul:not([class]) > li::before,
+:root:not([data-skin-base=none]) .prose ol:not([class]) > li::before {
   color: var(--hue);
   font-size: 0.74em;
   font-weight: 700;

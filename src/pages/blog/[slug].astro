@@ -3,10 +3,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import Pnav from '../../components/Pnav.astro';
 import BlogPicture from '../../components/BlogPicture.astro';
+import Gallery from '../../components/Gallery.astro';
 import { getCollection, render } from 'astro:content';
 import { postDateLabel, readingMinutes, postSlug, needsReview } from '../../lib/blog-helpers';
 import { SITE, postCard, blogPostingNode } from '../../lib/seo';
-import { blogPicture } from '../../lib/blog-images';
+import { blogPicture, blogGalleryPictures } from '../../lib/blog-images';
 import { splitAlt } from '../../lib/alt-text';
 import '../../styles/blog.css';
 
@@ -116,6 +117,14 @@ const wordLabel = formatWords(wordCount);
     {pic && heroAlt.desc && <span class="sr-only" id={HERO_DESC_ID}>{heroAlt.desc}</span>}
     <article class="prose" style="margin:0 auto">
       <Content />
+      {entry.data.gallery.length > 0 && (
+        <Gallery
+          pictures={blogGalleryPictures(entry.data.gallery)}
+          title={entry.data.gallery_title ?? 'The pictures'}
+          sizes="(max-width: 640px) calc(100vw - 48px), 580px"
+          idPrefix="post-gal"
+        />
+      )}
     </article>
   </section>
 

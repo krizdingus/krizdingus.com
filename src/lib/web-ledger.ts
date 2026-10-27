@@ -1,8 +1,9 @@
 // src/lib/web-ledger.ts
-// Helpers for the web ledger (/web/): which group a record sits in, the
-// group labels (data, so the page prose never has to name or count them),
-// the words for what's known about a site, and the month a Wayback capture
-// was taken (read off its URL). Pure functions, so they're unit-tested.
+// Helpers for /web/: which group a ledger record sits in, the group labels
+// (data, so the page prose never has to name or count them), the words for
+// what's known about a site, the month a Wayback capture was taken (read off
+// its URL), and the case studies, which join a post to the ledger record it
+// was written about. Pure functions, so they're unit-tested.
 
 export type WebRelationship = 'agency' | 'freelance' | 'in-house';
 export type WebSiteState = 'redone' | 'gone' | 'launching' | 'unknown';
@@ -86,4 +87,64 @@ export function stateLabel(state: WebSiteState | undefined): string | null {
 export function waybackMonth(url: string | null | undefined): MonthLabel | null {
   const m = url?.match(/^https:\/\/web\.archive\.org\/web\/(\d{4})(\d{2})\d{8}\//);
   return m ? monthLabel(m[1], Number(m[2])) : null;
+}
+
+/** A post that says, in its frontmatter, which ledger record it was written
+ *  about (`case_study_for`). */
+export interface CaseStudySource {
+  slug: string;
+  title: string;
+  summary: string;
+  date: Date;
+  /** The id of the ledger record ("prospera-real-estate-collective"). */
+  clientId: string;
+}
+
+/** A ledger record, as the page reads it out of the collection. */
+export interface LedgerRecord {
+  id: string;
+  client: string;
+  live_url?: string | null;
+}
+
+export interface CaseStudy {
+  slug: string;
+  title: string;
+  summary: string;
+  date: Date;
+  /** The client's name, off the ledger: the post never spells it a second time. */
+  client: string;
+  /** The live site, off the ledger, so the link lives in exactly one place. */
+  live_url: string | null;
+}
+
+/** How many write-ups the page shows. The rest stay on the blog. */
+export const CASE_STUDY_MAX = 5;
+
+/** The case studies, newest first and capped. The client's name and live link
+ *  are read off the ledger rather than repeated in the post, so a site going
+ *  live is one edit. A post pointing at a record that isn't in the ledger
+ *  throws, so the build fails instead of quietly dropping the write-up. */
+export function caseStudies(
+  posts: CaseStudySource[],
+  ledger: LedgerRecord[],
+  max: number = CASE_STUDY_MAX,
+): CaseStudy[] {
+  const byId = new Map(ledger.map((r) => [r.id, r]));
+  const out = posts.map((p) => {
+    const record = byId.get(p.clientId);
+    if (!record) {
+      throw new Error(`case study "${p.slug}": no web ledger record "${p.clientId}"`);
+    }
+    return {
+      slug: p.slug,
+      title: p.title,
+      summary: p.summary,
+      date: p.date,
+      client: record.client,
+      live_url: record.live_url ?? null,
+    };
+  });
+  out.sort((a, b) => b.date.getTime() - a.date.getTime());
+  return out.slice(0, Math.max(0, max));
 }

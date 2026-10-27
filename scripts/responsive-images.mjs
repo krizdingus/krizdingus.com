@@ -9,6 +9,8 @@
 //   blog      each post's hero_image, at 480, 800, 1200 and 1600 px, with
 //             a credit line in the metadata (scripts/image-credit.mjs).
 //             Output: public/images/blog/r/<base>-<w>.<ext>
+//             plus each post's gallery pictures, at 480/800/1200 with a
+//             200px square thumb, into <the picture's folder>/r/
 //
 //   npm run images               (both)
 //   npm run images -- blog       (just one: blog or projects)
@@ -33,20 +35,39 @@ function frontMatter(file) {
   return fs.readFileSync(file, 'utf8').split(/^---$/m)[1] ?? '';
 }
 
-async function variants(input, out, base, widths, { credit = false } = {}) {
+// `crisp` is for pictures that are mostly fine text and flat UI, like
+// screenshots: the photo-tuned defaults smear small type badly enough that
+// people read it as a rendering fault. Higher quality, no chroma subsampling.
+/** A copy that already exists and is no older than its source is left alone.
+ *  Without this, adding one width re-encodes every picture on the site, and a
+ *  newer sharp writes slightly different bytes, so a one-width change arrives
+ *  as a diff touching hundreds of files. Delete a copy to force it back. */
+function upToDate(file, srcTime) {
+  try { return fs.statSync(file).mtimeMs >= srcTime; } catch { return false; }
+}
+
+async function variants(input, out, base, widths, { credit = false, crisp = false } = {}) {
   fs.mkdirSync(out, { recursive: true });
   const meta = await sharp(input).metadata();
   const ws = widths.filter((w) => w < meta.width);
   if (meta.width <= widths[widths.length - 1] && !ws.includes(meta.width)) ws.push(meta.width);
+  const srcTime = fs.statSync(input).mtimeMs;
+  const made = [];
   for (const w of ws) {
+    const webp = path.join(out, `${base}-${w}.webp`);
+    const avif = path.join(out, `${base}-${w}.avif`);
+    if (upToDate(webp, srcTime) && upToDate(avif, srcTime)) continue;
     const img = () => {
       const p = sharp(input).resize({ width: w, withoutEnlargement: true });
       return credit ? withCredit(p) : p;
     };
-    await img().webp({ quality: 76, effort: 6 }).toFile(path.join(out, `${base}-${w}.webp`));
-    await img().avif({ quality: 52, effort: 6 }).toFile(path.join(out, `${base}-${w}.avif`));
+    await img().webp(crisp ? { quality: 93, effort: 6, smartSubsample: false } : { quality: 76, effort: 6 })
+      .toFile(webp);
+    await img().avif(crisp ? { quality: 80, effort: 6, chromaSubsampling: '4:4:4' } : { quality: 52, effort: 6 })
+      .toFile(avif);
+    made.push(w);
   }
-  return { width: meta.width, ws };
+  return { width: meta.width, ws, made };
 }
 
 if (!only || only === 'projects') {
@@ -62,10 +83,13 @@ if (!only || only === 'projects') {
       if (!fs.existsSync(input)) { console.warn('missing', input); continue; }
       const base = path.basename(src).replace(/\.[^.]+$/, '');
       const out = path.join(root, 'public/images/projects', slug, 'r');
-      const { width, ws } = await variants(input, out, base, [480, 800, 1200]);
-      await sharp(input).resize({ width: 200, height: 200, fit: 'cover' }).webp({ quality: 72, effort: 6 })
-        .toFile(path.join(out, `${base}-thumb.webp`));
-      console.log(slug, base, width, ws.join(','));
+      const { width, made } = await variants(input, out, base, [480, 800, 1200]);
+      const thumb = path.join(out, `${base}-thumb.webp`);
+      if (!upToDate(thumb, fs.statSync(input).mtimeMs)) {
+        await sharp(input).resize({ width: 200, height: 200, fit: 'cover' }).webp({ quality: 72, effort: 6 })
+          .toFile(thumb);
+      }
+      if (made.length) console.log(slug, base, width, 'cut', made.join(','));
     }
   }
 }
@@ -78,7 +102,26 @@ if (!only || only === 'blog') {
     const input = path.join(root, 'public', hero);
     if (!fs.existsSync(input)) { console.warn('missing', input); continue; }
     const base = path.basename(hero).replace(/\.[^.]+$/, '');
-    const { width, ws } = await variants(input, path.join(root, 'public/images/blog/r'), base, [480, 800, 1200, 1600], { credit: true });
-    console.log('blog', base, width, ws.join(','));
+    const { width, made } = await variants(input, path.join(root, 'public/images/blog/r'), base, [480, 800, 1200, 1600], { credit: true });
+    if (made.length) console.log('blog', base, width, 'cut', made.join(','));
+  }
+  // Gallery pictures, where a post has them. They are screenshots and other
+  // people's work, so no credit line. Copies land next to the picture, in a
+  // sibling r/, plus a 200px square thumb for the strip.
+  for (const f of fs.readdirSync(dir).filter((x) => /\.mdx?$/.test(x))) {
+    const gal = frontMatter(path.join(dir, f)).match(/^gallery:\n([\s\S]*?)(?=^[A-Za-z_]|\Z)/m)?.[1] ?? '';
+    for (const [, src] of gal.matchAll(/src:\s*"([^"]+)"/g)) {
+      const input = path.join(root, 'public', src);
+      if (!fs.existsSync(input)) { console.warn('missing', input); continue; }
+      const out = path.join(root, 'public', path.dirname(src), 'r');
+      const base = path.basename(src).replace(/\.[^.]+$/, '');
+      const { width, made } = await variants(input, out, base, [480, 800, 1200], { crisp: true });
+      const thumb = path.join(out, `${base}-thumb.webp`);
+      if (!upToDate(thumb, fs.statSync(input).mtimeMs)) {
+        await sharp(input).resize(200, 200, { fit: 'cover', position: 'top' })
+          .webp({ quality: 90, effort: 6 }).toFile(thumb);
+      }
+      if (made.length) console.log('blog gallery', base, width, 'cut', made.join(','));
+    }
   }
 }

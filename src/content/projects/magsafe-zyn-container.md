@@ -29,7 +29,7 @@ external_url: "https://makerworld.com/en/models/715832-mini-magsafe-zyn-containe
 external_label: "View on MakerWorld"
 date_published: 2026-10-02
 released: 2024-10-19
-featured: true
+featured: false
 status: "live"
 draft: false
 exe_name: "MAGSAFE-ZYN.EXE"

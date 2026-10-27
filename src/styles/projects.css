@@ -205,96 +205,15 @@
 .proj-detail__main { min-width: 0; }
 .proj-detail__side { display: flex; flex-direction: column; gap: var(--space-md); min-width: 0; }
 
+/* The gallery keeps no margin of its own (it is the last thing in a post),
+   so here, where the write-up follows it, this column sets the gap. */
+.proj-detail__main > .gal { margin-bottom: var(--space-lg); }
+
 /* The write-up runs to the same right edge as the picture above it. */
 .prose.proj-prose { max-width: none; }
 /* Long filenames in inline code (dingus-kart_label-template.psd) break
    instead of pushing the page sideways at 320. */
 .proj-prose :not(pre) > code { overflow-wrap: anywhere; }
-
-/* picture viewer (2+ pictures) */
-.proj-viewer {
-  margin: 0 0 var(--space-lg);
-  padding: 10px;
-  background: var(--bg-console);
-  border: 2px solid var(--border-strong);
-  box-shadow: 4px 4px 0 var(--shadow-color);
-}
-.proj-viewer__stage {
-  margin: 0;
-  aspect-ratio: 4 / 3;
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
-  background: #000;
-  border: 1px solid #3a3d3d;
-}
-.proj-viewer__stage picture,
-.proj-shot picture { display: contents; }
-.proj-viewer__stage img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.proj-viewer__bar {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;
-  padding: 10px 0;
-}
-.proj-viewer__count {
-  font-family: var(--font-crt); font-size: 22px; line-height: 1;
-  color: var(--accent-terminal);
-}
-.proj-viewer__ctrls { display: flex; gap: 6px; }
-/* Prev/Next need JS: gone with JS off; with JS on, their space is held until
-   gallery.ts shows them, so the bar doesn't grow after first paint. */
-.proj-viewer__ctrls[hidden] { display: none; }
-@media (scripting: enabled) {
-  .proj-viewer__ctrls[hidden] { display: flex; visibility: hidden; }
-}
-.proj-viewer__ctrls button {
-  min-height: 34px; padding: 6px 14px;
-  font-family: var(--font-pixel); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
-  background: var(--bg-panel); color: #1a1c1c;
-  border: 2px solid;
-  border-color: var(--bevel-light) var(--border-strong) var(--border-strong) var(--bevel-light);
-  cursor: pointer;
-}
-.proj-viewer__ctrls button:active { border-color: var(--border-strong) var(--bevel-light) var(--bevel-light) var(--border-strong); }
-.proj-viewer__ctrls button:focus-visible { outline: 2px solid var(--accent-terminal); outline-offset: 2px; }
-.proj-viewer__thumbs {
-  list-style: none; margin: 0; padding: 0;
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px;
-}
-.proj-thumb {
-  position: relative; display: block;
-  aspect-ratio: 1;
-  overflow: hidden;
-  background: #000;
-  border: 2px solid #4a4d4d;
-}
-.proj-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0.62; transition: opacity var(--dur-fast) linear; }
-.proj-thumb:hover img,
-.proj-thumb[aria-current="true"] img { opacity: 1; }
-.proj-thumb[aria-current="true"] { border-color: var(--accent-terminal); }
-.proj-thumb:focus-visible { outline: 2px solid var(--accent-terminal); outline-offset: 2px; }
-.proj-thumb__n {
-  position: absolute; top: 0; left: 0; z-index: 1;
-  padding: 2px 5px;
-  font-family: var(--font-pixel); font-size: 8px; letter-spacing: 0.05em;
-  background: rgba(0, 0, 0, 0.8); color: var(--accent-terminal);
-}
-
-/* one picture: always the full column, so every hero frame (and the viewer
-   stage) ends on the same right edge. A picture narrower than 4:3 sits on a
-   4:3 black stage like the viewer's, rather than running tall. */
-.proj-shot {
-  width: 100%;
-  margin: 0 0 var(--space-lg);
-  background: #000;
-  border: 2px solid var(--border-strong);
-  box-shadow: 4px 4px 0 var(--shadow-color);
-}
-.proj-shot img { display: block; width: 100%; height: auto; }
-.proj-shot--stage {
-  aspect-ratio: 4 / 3;
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
-}
-.proj-shot--stage img { width: auto; height: 100%; max-width: 100%; object-fit: contain; }
 
 /* Hero meta: date · tag · tag · time. Each "·" hangs in the gap before its
    item, and the row is pulled left by one gap inside a clipping box, so the
@@ -388,11 +307,6 @@
 }
 @media (max-width: 640px) {
   .proj-detail { padding: var(--space-md); gap: var(--space-md); }
-  .proj-viewer { padding: 6px; }
-  .proj-viewer__thumbs { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 6px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .proj-thumb img { transition: none; }
 }
 
 /* =============================================================
@@ -466,15 +380,6 @@
 
 /* ---------- detail ---------- */
 :root:not([data-skin-base=none]) .prose.proj-prose { max-width: 30.5em; }
-:root:not([data-skin-base=none]) .proj-viewer,
-:root:not([data-skin-base=none]) .proj-shot {
-  border: 2px solid var(--border-strong);
-  box-shadow: var(--print);
-}
-:root:not([data-skin-base=none])[data-theme="dark"] :is(.proj-viewer, .proj-shot) { border-color: var(--hue-line); }
-:root:not([data-skin-base=none]) .proj-viewer { border-radius: var(--radius-md); overflow: hidden; }
-:root:not([data-skin-base=none]) .proj-viewer__ctrls button { font-size: 12.5px; border-radius: var(--radius-sm); }
-:root:not([data-skin-base=none]) .proj-thumb__n { font-size: 12.5px; }
 :root:not([data-skin-base=none]) .proj-meta__item::before { color: var(--hue); }
 :root:not([data-skin-base=none]) .facts { padding: 14px 18px 18px; }
 :root:not([data-skin-base=none]) .facts__h { font-size: 19px; color: var(--hue); border-bottom: 2px solid var(--card-rule); }
