@@ -21,6 +21,13 @@
 /blog/the-texture-lives-in-the-profile/ /blog/the-texture-wasnt-in-the-profile/ 301
 /images/og/blog/the-texture-lives-in-the-profile.jpg /images/og/blog/the-texture-wasnt-in-the-profile.jpg 301
 
+# "A copy you paraphrased is not a copy" was retitled "Finishing someone
+# else's website" (2026-10-27), hours after it went out, and its slug
+# followed. It had already been in the feed, so the old links get a home.
+/blog/a-copy-you-paraphrased-is-not-a-copy /blog/finishing-someone-elses-website/ 301
+/blog/a-copy-you-paraphrased-is-not-a-copy/ /blog/finishing-someone-elses-website/ 301
+/images/og/blog/a-copy-you-paraphrased-is-not-a-copy.jpg /images/og/blog/finishing-someone-elses-website.jpg 301
+
 # Posts back in draft while they're revised (2026-10-21). Temporary: take
 # these out when draft: true comes off.
 /blog/robots-saw-right-through-that /blog/ 302

@@ -1,8 +1,8 @@
 ---
-title: "A copy you paraphrased is not a copy"
+title: "Finishing someone else's website"
 summary: "A Miami developer handed me a half-built Elementor site and about a week to finish it. What I inherited, what the client's notes actually meant, and the twenty-one minutes it took to go live."
 description: "A Miami developer handed me a half-built Elementor site and about a week to finish it. What I inherited, and the twenty-one minutes it took to go live."
-hero_image: "/images/blog/a-copy-you-paraphrased-is-not-a-copy.jpg"
+hero_image: "/images/blog/finishing-someone-elses-website.jpg"
 hero_alt: "Kris, drawn crudely in scribbled ink, holding up a copy of the same web page in each hand: he sits between two monitors against a collage of cyan, magenta and yellow blocks and halftone dots."
 date_published: 2026-10-27
 tags: ["case-study", "wordpress"]
