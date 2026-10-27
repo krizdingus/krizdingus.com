@@ -76,8 +76,11 @@ if (!only || only === 'projects') {
     const slug = f.replace(/\.md$/, '');
     const fm = frontMatter(path.join(dir, f));
     const srcs = new Set([...fm.matchAll(/^\s*-\s*src:\s*"([^"]+)"/gm)].map((m) => m[1]));
+    // The page shows the gallery when there is one and the hero only when
+    // there isn't (src/pages/projects/[slug].astro), so a hero sitting behind
+    // a gallery needs no copies: nothing would ever reference them.
     const hero = fm.match(/^hero_image:\s*"([^"]*)"/m)?.[1];
-    if (hero) srcs.add(hero);
+    if (hero && srcs.size === 0) srcs.add(hero);
     for (const src of srcs) {
       const input = path.join(root, 'public', src);
       if (!fs.existsSync(input)) { console.warn('missing', input); continue; }
@@ -85,7 +88,7 @@ if (!only || only === 'projects') {
       const out = path.join(root, 'public/images/projects', slug, 'r');
       const { width, made } = await variants(input, out, base, [480, 800, 1200]);
       const thumb = path.join(out, `${base}-thumb.webp`);
-      if (!upToDate(thumb, fs.statSync(input).mtimeMs)) {
+      if (galSrcs.length > 1 && !upToDate(thumb, fs.statSync(input).mtimeMs)) {
         await sharp(input).resize({ width: 200, height: 200, fit: 'cover' }).webp({ quality: 72, effort: 6 })
           .toFile(thumb);
       }
@@ -110,7 +113,10 @@ if (!only || only === 'blog') {
   // sibling r/, plus a 200px square thumb for the strip.
   for (const f of fs.readdirSync(dir).filter((x) => /\.mdx?$/.test(x))) {
     const gal = frontMatter(path.join(dir, f)).match(/^gallery:\n([\s\S]*?)(?=^[A-Za-z_]|\Z)/m)?.[1] ?? '';
-    for (const [, src] of gal.matchAll(/src:\s*"([^"]+)"/g)) {
+    // One picture means no thumbnail strip (src/components/Gallery.astro),
+    // so that gallery needs no square thumbs either.
+    const galSrcs = [...gal.matchAll(/src:\s*"([^"]+)"/g)].map((m) => m[1]);
+    for (const src of galSrcs) {
       const input = path.join(root, 'public', src);
       if (!fs.existsSync(input)) { console.warn('missing', input); continue; }
       const out = path.join(root, 'public', path.dirname(src), 'r');
