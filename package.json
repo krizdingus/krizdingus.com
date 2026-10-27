@@ -9,12 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "og": "node scripts/og-cards.mjs",
-    "images": "node scripts/responsive-images.mjs"
+    "astro": "astro"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.4.4",
