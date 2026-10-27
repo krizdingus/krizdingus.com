@@ -3,9 +3,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import Pnav from '../../components/Pnav.astro';
 import BlogPicture from '../../components/BlogPicture.astro';
+import ExternalLink from '../../components/ExternalLink.astro';
 import Gallery from '../../components/Gallery.astro';
 import { getCollection, render } from 'astro:content';
 import { postDateLabel, readingMinutes, postSlug, needsReview } from '../../lib/blog-helpers';
+import { slugFromId } from '../../lib/projects-helpers';
 import { SITE, postCard, blogPostingNode } from '../../lib/seo';
 import { blogPicture, blogGalleryPictures } from '../../lib/blog-images';
 import { splitAlt } from '../../lib/alt-text';
@@ -35,6 +37,14 @@ const canonicalPath = `/blog/${slug}`;
 const draft = needsReview(entry.data);
 const card = postCard(slug, entry.data);
 const pic = blogPicture(entry.data.hero_image);
+// A case study is about a client's site, so the post ends with a way to go
+// and look at it. The link and the client's name are read off that client's
+// web ledger record, the same place /web/ reads them, so a site going live
+// is still one edit in one file. No record or no live link means no band.
+const studyOf = entry.data.case_study_for
+  ? (await getCollection('web')).find((e) => slugFromId(e.id) === entry.data.case_study_for)
+  : undefined;
+const studyLive = studyOf?.data.live_url ?? null;
 // Long alt text keeps a short alt and moves the rest to a hidden description.
 const heroAlt = splitAlt(entry.data.hero_alt ?? '');
 const HERO_DESC_ID = 'post-img-desc';
@@ -127,6 +137,15 @@ const wordLabel = formatWords(wordCount);
       )}
     </article>
   </section>
+
+  {studyLive && (
+    <div class="cta-block">
+      <ExternalLink class="cta-big" href={studyLive}>
+        See the live site<span class="sr-only">, {studyOf!.data.client}</span>
+        <span aria-hidden="true">↗</span>
+      </ExternalLink>
+    </div>
+  )}
 
   {(prev || next) && (
     <Pnav
